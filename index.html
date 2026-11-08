@@ -123,11 +123,13 @@ body.calm::before,.calm .fx{display:none}
 .b4{animation:zap 3.3s infinite 0s}.b5{animation:zap 3.9s infinite 1s}.b6{animation:zap 4.4s infinite 2.6s}.b7{animation:zap 3.5s infinite 1.9s}
 .b8{animation:zap 4.8s infinite .8s}.b9{animation:zap 4.1s infinite 3s}.b10{animation:zap 5s infinite 2s}.b11{animation:zap 3.7s infinite 3.4s}
 }
+.fx canvas{position:absolute;inset:0;width:100%;height:100%}
+body::before{display:none!important}
 </style>
 </head>
 <body>
 <div class="fx" aria-hidden="true"><div class="halo"></div>
-<svg viewBox="0 0 100 100" preserveAspectRatio="none"><polyline class="bolt b1" points="12,0 17,14 10,24 18,40 12,52 20,70 15,84"/><polyline class="bolt b2" points="88,0 82,16 90,28 80,46 86,60 78,80 84,92"/><polyline class="bolt b3" points="50,0 46,9 53,17 47,27 52,34"/><polyline class="bolt bw b4" points="4,0 9,12 3,24 10,38 5,52 11,66"/><polyline class="bolt bw b5" points="30,0 26,11 33,21 27,33 31,42"/><polyline class="bolt bw b6" points="70,0 75,12 68,23 74,36 69,46"/><polyline class="bolt bw b7" points="96,0 91,15 97,28 90,42 95,58"/><polyline class="bolt bw b8" points="20,0 16,10 23,20 17,32 22,44 18,54"/><polyline class="bolt bw b9" points="60,0 64,12 57,24 63,36 58,50 62,62 59,76"/><polyline class="bolt bw b10" points="40,0 44,12 38,22 43,34 39,46"/><polyline class="bolt bw b11" points="82,0 78,12 85,24 79,38 84,50"/></svg></div>
+<canvas id="bolt"></canvas></div>
 <div class="wrap">
 
 <section class="view on" id="home">
@@ -162,9 +164,7 @@ body.calm::before,.calm .fx{display:none}
 <script>
 const CFG={
   // 1) Apps Script 웹 앱 배포 주소(…/exec)를 아래 따옴표 안에 붙여넣으세요.
-  endpoint:"",
-  // 2) 명예의 전당 이미지: 파일 경로나 주소를 쉼표로 추가하세요. 예) ["hall/1.jpg","hall/2.jpg"]
-  hallImages:[]
+  endpoint:"https://script.google.com/macros/s/AKfycbyyTgw5CfJ-ShIrPc82jqnlx_p1WqViLocKPH9MlUMRGBZDxScnLkBh3F50dRSS86pTDw/exec",
 };
 const Q=[
  {k:'nick',l:'닉네임',q:'게임에서 사용하는 닉네임을 알려주세요.',t:'text'},
@@ -234,6 +234,53 @@ const later=fn=>()=>setTimeout(fn,matchMedia('(hover:none)').matches?220:0);
 $('goForm').onclick=later(()=>{fromConfirm=false;step(0)});
 $('goHall').onclick=later(hall);
 ['contextmenu','selectstart','dragstart'].forEach(t=>document.addEventListener(t,e=>{if(!(e.target.closest&&e.target.closest('input,textarea')))e.preventDefault()}));$('hallBack').onclick=()=>show('home');
+
+(function(){
+  const cv=document.getElementById('bolt'),cx=cv.getContext('2d');
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  let W,H;
+  const fit=()=>{const D=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*D;cv.height=H*D;cx.setTransform(D,0,0,D,0,0)};
+  fit();addEventListener('resize',fit);
+  // 중점 변위법: 선분을 반으로 쪼개며 무작위로 꺾어 자연스러운 번개 경로 생성
+  const path=(x1,y1,x2,y2,off)=>{let p=[[x1,y1],[x2,y2]];for(;off>2;off/=2){const q=[p[0]];for(let i=1;i<p.length;i++){const a=p[i-1],b=p[i];q.push([(a[0]+b[0])/2+(Math.random()-.5)*off,(a[1]+b[1])/2+(Math.random()-.5)*off*.35],b)}p=q}return p};
+  function make(){
+    const x=Math.random()*W,ex=x+(Math.random()-.5)*W*.25,ey=H*(.45+Math.random()*.5);
+    const main=path(x,0,ex,ey,Math.min(W,260)*.55),br=[];
+    for(let i=8;i<main.length-8;i++)if(Math.random()<.04){
+      const b=main[i],d=Math.random()<.5?-1:1,len=H*(.08+Math.random()*.2);
+      br.push(path(b[0],b[1],b[0]+d*len*(.5+Math.random()),b[1]+len,len*.5));
+    }
+    return {lines:[main,...br]};
+  }
+  function draw(s,a){
+    cx.lineJoin='round';cx.lineCap='round';
+    s.lines.forEach((l,k)=>{
+      [[k?3:7,'rgba(255,190,40,'+.35*a+')',30],[k?1.6:3.2,'rgba(255,230,120,'+.8*a+')',14],[k?.8:1.6,'rgba(255,255,245,'+a+')',6]].forEach(([w,c,bl])=>{
+        cx.beginPath();l.forEach((p,i)=>i?cx.lineTo(p[0],p[1]):cx.moveTo(p[0],p[1]));
+        cx.strokeStyle=c;cx.lineWidth=w;cx.shadowColor='#ffc83c';cx.shadowBlur=bl;cx.stroke();
+      });
+    });
+    cx.shadowBlur=0;
+  }
+  const prof=[1,.12,.9,.25,.7,.45,.3,.18,.1,.05]; // 번쩍·꺼짐·재번쩍(리턴 스트로크)으로 깜빡이며 사라짐
+  let live=[];
+  function frame(now){
+    cx.clearRect(0,0,W,H);
+    live=live.filter(o=>{
+      const k=Math.floor((now-o.t)/45);if(k<0)return true;if(k>=prof.length)return false;
+      const a=prof[k];cx.fillStyle='rgba(255,215,90,'+a*.1+')';cx.fillRect(0,0,W,H);draw(o.s,a);return true;
+    });
+    requestAnimationFrame(frame);
+  }
+  function strike(){
+    if(!document.hidden&&!document.body.classList.contains('calm')){
+      const n=Math.random()<.25?2:1,t=performance.now();
+      for(let i=0;i<n;i++)live.push({s:make(),t:t+i*90});
+    }
+    const m=W<900;setTimeout(strike,(m?500:800)+Math.random()*(m?1100:1400));
+  }
+  strike();requestAnimationFrame(frame);
+})();
 </script>
 </body>
 </html>
