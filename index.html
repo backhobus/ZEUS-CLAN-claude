@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+<meta name="theme-color" content="#07080c">
+<title>ZEUS CLAN | 모던워쉽 클랜 가입 신청</title>
+<link rel="icon" href="zeus-logo.png">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{--bg:#07080c;--panel:#10131b;--line:#2a2f3c;--gold:#e0b84f;--gold-hi:#f4de98;--gold-lo:#9a7424;--ink:#ece6d4;--mute:#9aa0ad;--bolt:#bcd4f0;--err:#ff6b6b;
+--serif:'Pretendard Variable',Pretendard,-apple-system,'Segoe UI',sans-serif;--sans:'Pretendard Variable',Pretendard,-apple-system,'Segoe UI',sans-serif}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{letter-spacing:-.01em;background:var(--bg);color:var(--ink);font:400 16px/1.6 var(--sans);word-break:keep-all;overflow-wrap:break-word;text-wrap:pretty;-webkit-tap-highlight-color:transparent}
+h1,h2,p{text-wrap:balance}
+h2,.titles,.btn{letter-spacing:-.025em}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}
+[hidden]{display:none!important}
+
+/* ---------- HOME ---------- */
+#home{min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:max(28px,env(safe-area-inset-top)) 20px max(32px,env(safe-area-inset-bottom));
+background:radial-gradient(70% 45% at 50% 0%,rgba(110,140,200,.22),transparent 70%),radial-gradient(90% 60% at 50% 110%,rgba(224,184,79,.10),transparent 70%),var(--bg)}
+.top{text-align:center}
+.since{font:700 clamp(16px,4.4vw,20px)/1.2 'Orbitron',var(--sans);letter-spacing:.1em;background:linear-gradient(180deg,#f8e8b0,#d9ab3e 70%,#b88a2e);-webkit-background-clip:text;background-clip:text;color:transparent}
+.titles{margin-top:6px;font:600 clamp(17px,4.6vw,22px)/1.5 var(--serif);color:var(--ink)}
+.titles b{color:var(--gold-hi);font-weight:700}
+.stage{flex:1;width:100%;max-width:460px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:22px;margin-top:16px}
+.side{width:100%;display:flex;flex-direction:column;align-items:center;gap:22px}
+.intro{text-align:center}
+.intro h1{font:900 clamp(32px,10vw,44px)/1.1 'Orbitron',var(--sans);letter-spacing:.06em;color:#f4ecd6;text-shadow:0 0 22px rgba(224,184,79,.45),0 2px 0 rgba(0,0,0,.6)}
+.intro .sub{margin-top:10px;font:800 clamp(18px,5vw,22px)/1.35 var(--sans);color:var(--gold-hi);letter-spacing:-.02em}
+.intro .hint{margin-top:6px;font-size:15px;color:var(--mute)}
+.crest{position:relative;width:min(46vw,210px);aspect-ratio:1}
+.crest img{position:relative;z-index:1;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 28px rgba(224,184,79,.28))}
+.crest::before{content:"";position:absolute;inset:-18%;border-radius:50%;background:radial-gradient(circle,rgba(188,212,240,.55),rgba(188,212,240,0) 62%);opacity:0;animation:strike 9s 1s infinite}
+@keyframes strike{0%,100%{opacity:0}2%{opacity:.95}4%{opacity:.15}6%{opacity:.8}14%{opacity:0}}
+.menu{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:96px;padding:16px 10px;border-radius:14px;border:1px solid var(--gold-lo);background:rgba(16,19,27,.78);color:var(--ink);text-decoration:none;font:700 clamp(15px,4vw,17px)/1.3 var(--serif);text-align:center;transition:transform .2s,box-shadow .25s,border-color .25s}
+.btn i{font-size:26px;color:var(--gold)}
+.btn:hover{transform:translateY(-2px);border-color:var(--gold-hi);box-shadow:0 8px 26px rgba(224,184,79,.18)}
+.btn.apply{grid-column:1/-1;min-height:118px;flex-direction:row;gap:14px;font-size:clamp(18px,5vw,22px);color:#1a1405;border-color:var(--gold-hi);background:linear-gradient(135deg,#f4de98,#d9ab3e 55%,#b88a2e)}
+.btn.apply i{color:#1a1405;font-size:32px}
+.btn.disc{border-color:rgba(88,101,242,.65);background:rgba(88,101,242,.2)}
+.btn.disc i{color:#9aa8ff}
+.btn.disc:hover{border-color:#8f9bff;box-shadow:0 8px 26px rgba(88,101,242,.28)}
+
+/* ---------- OVERLAYS ---------- */
+.overlay{position:fixed;inset:0;z-index:20;background:rgba(4,5,8,.86);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center}
+.sheet{position:relative;width:100%;height:100dvh;display:flex;flex-direction:column;background:var(--panel);padding:max(16px,env(safe-area-inset-top)) 22px max(16px,env(safe-area-inset-bottom))}
+.bar{height:6px;border-radius:6px;background:#1c212d;overflow:hidden;flex:none}
+.bar i{display:block;height:100%;width:0;border-radius:6px;background:linear-gradient(90deg,var(--gold-lo),var(--gold-hi));box-shadow:0 0 12px rgba(244,222,152,.6);transition:width .65s cubic-bezier(.22,.8,.24,1)}
+.slides{flex:1;position:relative;overflow-y:auto;display:flex;align-items:center}
+.slide{width:100%;padding:24px 0}
+.slide.on{animation:in .4s cubic-bezier(.22,.8,.24,1)}
+@keyframes in{from{opacity:0;transform:translateX(var(--dx,24px))}to{opacity:1;transform:none}}
+.slide h2{font:800 clamp(22px,6vw,28px)/1.4 var(--serif);margin-bottom:22px}
+.fld{width:100%;padding:15px 16px;border-radius:10px;border:1px solid var(--line);background:#0b0d13;font-size:17px;transition:border-color .2s,box-shadow .2s}
+.fld:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(224,184,79,.18)}
+.fld::placeholder{color:#5d6472}
+textarea.fld{min-height:150px;resize:vertical}
+.err{min-height:1.6em;margin-top:10px;color:var(--err);font-size:15px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.choice{padding:18px 10px;border-radius:12px;border:1px solid var(--line);background:#0b0d13;font:700 18px var(--sans);transition:.2s}
+.choice[aria-pressed=true]{border-color:var(--gold-hi);background:rgba(224,184,79,.16);color:var(--gold-hi)}
+.rv{list-style:none;padding:0;display:grid;gap:10px}
+.rv li{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#0b0d13}
+.rv small{grid-column:1;color:var(--mute);font-size:13px}
+.rv span{grid-column:1;font-size:16px;white-space:pre-wrap}
+.rv button{grid-column:2;grid-row:1/3;padding:8px 14px;border-radius:8px;border:1px solid var(--gold-lo);background:none;color:var(--gold);font-size:14px}
+.nav{flex:none;display:grid;grid-template-columns:1fr 9fr;gap:10px;padding-top:12px}
+.nav.one{grid-template-columns:1fr}
+.nav button{padding:16px 0;border-radius:12px;font:700 17px var(--sans);border:1px solid var(--line);background:#161a24}
+.nav .go{border:0;color:#1a1405;background:linear-gradient(135deg,#f4de98,#d9ab3e 60%,#b88a2e)}
+.nav button:disabled{opacity:.55;cursor:wait}
+.done{text-align:center;width:100%}
+.done i{font-size:44px;color:var(--gold);margin-bottom:18px}
+.done h2{margin-bottom:10px}
+.done p{color:var(--mute)}
+.done button{margin-top:28px;padding:12px 28px;border-radius:10px;border:1px solid var(--gold-lo);background:none;color:var(--gold)}
+
+.hallhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.hallhead h2{font:800 24px var(--serif)}
+.x{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:#161a24}
+.gal{flex:1;overflow-y:auto;display:grid;grid-template-columns:1fr;gap:14px;align-content:start}
+.gal img{width:100%;border-radius:10px;border:1px solid var(--gold-lo);display:block}
+.gal p{color:var(--mute);text-align:center;padding:48px 0}
+
+/* ---------- DESKTOP: 전용 화면 ---------- */
+@media (min-width:960px){
+ #home{padding:40px 64px}
+ .top{width:100%;padding-bottom:22px;border-bottom:1px solid rgba(224,184,79,.25)}
+ .since{font-size:24px}
+ .titles{font-size:26px}
+ .stage{max-width:1100px;flex-direction:row;gap:72px;margin-top:0}
+ .crest{width:min(36vw,440px);flex:none}
+ .side{flex:1;align-items:stretch;gap:32px}
+ .intro{text-align:left}
+ .intro h1{font-size:60px}
+ .intro .sub{font-size:28px}
+ .intro .hint{font-size:17px}
+ .menu{gap:16px}
+ .btn{min-height:150px;font-size:20px}
+ .btn i{font-size:34px}
+ .btn.apply{min-height:190px;font-size:28px}
+ .btn.apply i{font-size:44px}
+ .sheet{width:640px;height:auto;min-height:520px;max-height:86vh;border-radius:18px;border:1px solid var(--gold-lo);box-shadow:0 30px 90px rgba(0,0,0,.7),0 0 60px rgba(224,184,79,.08);padding:30px 40px}
+ .slides{min-height:330px}
+ .gal{grid-template-columns:repeat(2,1fr)}
+ #hall .sheet{width:min(1000px,92vw)}
+ .gal{grid-template-columns:repeat(3,1fr)}
+}
+/* ---------- MOBILE ---------- */
+@media (max-width:959px){
+ .f-age::placeholder{font-size:11.5px;letter-spacing:-.02em}
+ .fld.f-age{font-size:16px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<main id="home">
+  <header class="top">
+    <p class="since">Since 2020</p>
+    <p class="titles">영웅, 전설 타이틀 누적 <b>299개</b> 배출</p>
+  </header>
+  <section class="stage">
+    <div class="crest"><img src="zeus-logo.png" alt="ZEUS 클랜 엠블럼"></div>
+    <div class="side">
+    <div class="intro">
+      <h1>ZEUS CLAN</h1>
+      <p class="sub">모던워쉽 클랜 가입 신청</p>
+      <p class="hint">가입을 원하시면 아래에서 신청서를 작성해 주세요.</p>
+    </div>
+    <nav class="menu" aria-label="메뉴">
+      <button class="btn apply" id="bApply" type="button">
+        <!-- 가입신청서 작성 아이콘 (서류/펜) -->
+        <i class="fa-solid fa-file-signature"></i><span>가입신청서 작성</span>
+      </button>
+      <button class="btn" id="bHall" type="button">
+        <!-- 명예의 전당 아이콘 (트로피) -->
+        <i class="fa-solid fa-trophy"></i><span>명예의 전당</span>
+      </button>
+      <a class="btn disc" href="https://discord.gg/Bd79ZUXdm2" target="_blank" rel="noopener">
+        <!-- 공식 디스코드 아이콘 (디스코드 로고) -->
+        <i class="fa-brands fa-discord"></i><span>공식 디스코드</span>
+      </a>
+    </nav>
+    </div>
+  </section>
+</main>
+
+<!-- 가입 신청서 -->
+<div class="overlay" id="form" hidden role="dialog" aria-modal="true" aria-label="가입 신청서">
+  <div class="sheet">
+    <div class="bar" id="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="fill"></i></div>
+    <div class="slides">
+      <section class="slide">
+        <h2>게임에서 사용하는 닉네임을 알려주세요.</h2>
+        <input class="fld" id="f-nick" maxlength="30" autocomplete="off">
+        <p class="err" aria-live="polite"></p>
+      </section>
+      <section class="slide">
+        <h2>게임 UID를 알려주세요.</h2>
+        <input class="fld" id="f-uid" maxlength="40" placeholder="예: 428BCBA023C04781" autocomplete="off" autocapitalize="characters" spellcheck="false">
+        <p class="err" aria-live="polite"></p>
+      </section>
+      <section class="slide">
+        <h2>연령대를 알려주세요.</h2>
+        <input class="fld f-age" id="f-age" maxlength="20" placeholder="가입 절차를 위해서만 사용되며, 외부로 공유되지 않습니다." autocomplete="off">
+        <p class="err" aria-live="polite"></p>
+      </section>
+      <section class="slide">
+        <h2>ZEUS에 가입하고 싶은 사유를 알려주세요.</h2>
+        <textarea class="fld" id="f-reason" maxlength="500"></textarea>
+        <p class="err" aria-live="polite"></p>
+      </section>
+      <section class="slide">
+        <h2>디스코드에 참가하여 토너먼트에 도전할 의향이 있나요?</h2>
+        <div class="choices" id="f-tour">
+          <button class="choice" type="button" data-v="예" aria-pressed="false">예</button>
+          <button class="choice" type="button" data-v="아니요" aria-pressed="false">아니요</button>
+        </div>
+        <p class="err" aria-live="polite"></p>
+      </section>
+      <section class="slide">
+        <h2>마지막으로 확인해주세요.</h2>
+        <ul class="rv" id="review"></ul>
+      </section>
+      <section class="slide done" id="doneSlide">
+        <i class="fa-solid fa-bolt"></i>
+        <h2>신청이 완료되었어요.</h2>
+        <p>가입안내방에서 매니저님 확인을 기다려주세요.</p>
+        <button type="button" id="bClose">처음으로</button>
+      </section>
+    </div>
+    <div class="nav" id="nav"><button id="prev" type="button">이전</button><button id="next" class="go" type="button">다음</button></div>
+    <div class="nav one" id="navSubmit" hidden><button id="submit" class="go" type="button">가입 신청하기</button></div>
+  </div>
+</div>
+
+<!-- 명예의 전당 -->
+<div class="overlay" id="hall" hidden role="dialog" aria-modal="true" aria-label="명예의 전당">
+  <div class="sheet">
+    <div class="hallhead"><h2>명예의 전당</h2><button class="x" id="hallX" type="button" aria-label="닫기"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="gal" id="gal"></div>
+  </div>
+</div>
+
+<script>
+/* Apps Script 웹 앱 배포 URL (…/exec)을 아래에 붙여 넣으세요. */
+const API = "https://script.google.com/macros/s/AKfycbzA_sQT2t4RaWgI6LPBjLk5wDBUBcAgoW9gwZBa5b57SBrXxWgsOzatT2fV5vluYPGztw/exec";
+
+const $ = s => document.querySelector(s);
+const slides = [...document.querySelectorAll('.slide')];
+const LAST = 5, DONE = 6;
+const A = {nick:'', uid:'', age:'', reason:'', tour:''};
+const keys = ['nick','uid','age','reason','tour'];
+const labels = ['닉네임','게임 UID','연령대','가입 사유','토너먼트 의향'];
+const field = i => [$('#f-nick'),$('#f-uid'),$('#f-age'),$('#f-reason'),null][i];
+let cur = 0, busy = false;
+
+function check(i){
+  const v = i === 4 ? A.tour : field(i).value.trim();
+  if(!v) return '답변을 입력해 주세요.';
+  if(i === 1 && !(/^[0-9A-Z]{15,16}$/.test(v) && !v.includes('O'))) return '게임 UID를 다시 확인해주세요.';
+  if(i === 2 && !/\d/.test(v)) return '숫자를 포함해 주세요.';
+  return '';
+}
+function show(i, back){
+  cur = i;
+  slides.forEach((s,k)=>{ s.hidden = k !== i; s.classList.remove('on'); });
+  const s = slides[i]; s.style.setProperty('--dx', back ? '-24px' : '24px'); void s.offsetWidth; s.classList.add('on');
+  const pct = Math.round(Math.min(i,4)/4*100);
+  $('#fill').style.width = pct + '%'; $('#bar').setAttribute('aria-valuenow', pct);
+  $('#nav').hidden = i >= LAST; $('#navSubmit').hidden = i !== LAST; $('#bar').style.visibility = i === DONE ? 'hidden' : '';
+  if(i === LAST) renderReview();
+  const f = field(i); if(f && i < LAST) setTimeout(()=>f.focus({preventScroll:true}), 120);
+}
+function renderReview(){
+  const ul = $('#review'); ul.replaceChildren();
+  keys.forEach((k,i)=>{
+    const li = document.createElement('li'), sm = document.createElement('small'), sp = document.createElement('span'), b = document.createElement('button');
+    sm.textContent = labels[i]; sp.textContent = A[k]; b.type = 'button'; b.textContent = '수정'; b.onclick = () => show(i,true);
+    li.append(sm,sp,b); ul.append(li);
+  });
+}
+function next(){
+  if(cur >= LAST) return;
+  const e = check(cur);
+  if(e){ slides[cur].querySelector('.err').textContent = e; return; }
+  if(cur < 4) A[keys[cur]] = field(cur).value.trim();
+  show(cur + 1);
+}
+function openForm(){
+  keys.forEach(k=>A[k]=''); ['nick','uid','age','reason'].forEach(k=>$('#f-'+k).value='');
+  document.querySelectorAll('.choice').forEach(c=>c.setAttribute('aria-pressed','false'));
+  document.querySelectorAll('.err').forEach(p=>p.textContent='');
+  $('#form').hidden = false; document.body.style.overflow = 'hidden'; show(0);
+}
+function closeAll(){ $('#form').hidden = true; $('#hall').hidden = true; document.body.style.overflow = ''; }
+
+$('#bApply').onclick = openForm;
+$('#next').onclick = next;
+$('#prev').onclick = () => cur === 0 ? closeAll() : show(cur - 1, true);
+$('#bClose').onclick = closeAll;
+$('#f-uid').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase(); });
+document.querySelectorAll('.fld').forEach(f => f.addEventListener('focus', () => f.closest('.slide').querySelector('.err').textContent = ''));
+document.querySelectorAll('.choice').forEach(c => c.onclick = () => {
+  document.querySelectorAll('.choice').forEach(x => x.setAttribute('aria-pressed', String(x === c)));
+  A.tour = c.dataset.v; slides[4].querySelector('.err').textContent = '';
+});
+/* 엔터 = 다음 (한글 입력 조합 중 엔터는 무시, 사유란은 Shift+Enter로 줄바꿈) */
+$('#form').addEventListener('keydown', e => {
+  if(e.key !== 'Enter' || e.isComposing || e.keyCode === 229 || e.shiftKey) return;
+  if(cur >= LAST || e.target.closest('button')) return;
+  e.preventDefault(); next();
+});
+
+$('#submit').onclick = async () => {
+  if(busy) return; busy = true;
+  const btn = $('#submit'); btn.disabled = true; btn.textContent = '신청 중…';
+  try{
+    const r = await fetch(API, {method:'POST', body: JSON.stringify(A)});
+    const j = await r.json();
+    if(!j.ok) throw new Error(j.error || 'fail');
+    show(DONE);
+  }catch(err){
+    btn.textContent = '신청에 실패했어요. 다시 시도하기';
+  }finally{ busy = false; btn.disabled = false; if(cur !== DONE && btn.textContent === '신청 중…') btn.textContent = '가입 신청하기'; }
+};
+
+/* 명예의 전당 */
+$('#bHall').onclick = async () => {
+  $('#hall').hidden = false; document.body.style.overflow = 'hidden';
+  const g = $('#gal'), msg = t => { const p = document.createElement('p'); p.textContent = t; g.replaceChildren(p); };
+  msg('불러오는 중이에요.');
+  try{
+    const j = await (await fetch(API + '?action=hall')).json();
+    if(!j.images || !j.images.length) return msg('명예의 전당이 곧 채워질 예정이에요.');
+    g.replaceChildren(...j.images.map(u => { const im = new Image(); im.src = u; im.alt = '명예의 전당'; im.loading = 'lazy'; return im; }));
+  }catch(e){ msg('불러오지 못했어요. 잠시 후 다시 시도해 주세요.'); }
+};
+$('#hallX').onclick = closeAll;
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && !$('#hall').hidden) closeAll(); });
+</script>
+</body>
+</html>
