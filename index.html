@@ -116,11 +116,18 @@ body{overflow-x:clip}
 .hero::before{content:"";position:absolute;left:50%;top:130px;width:780px;height:780px;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,200,60,.42),rgba(255,170,0,.12) 42%,transparent 68%);pointer-events:none;z-index:-1}
 body::before{background:radial-gradient(circle at 27% 34%,rgba(255,214,80,.3),transparent 45%)}
 }
+body.calm::before,.calm .fx{display:none}
+@media(max-width:899px){
+.bw{display:block}
+.b1{animation:zap 3s infinite .3s}.b2{animation:zap 3.6s infinite 1.4s}.b3{animation:zap 4.2s infinite 2.2s}
+.b4{animation:zap 3.3s infinite 0s}.b5{animation:zap 3.9s infinite 1s}.b6{animation:zap 4.4s infinite 2.6s}.b7{animation:zap 3.5s infinite 1.9s}
+.b8{animation:zap 4.8s infinite .8s}.b9{animation:zap 4.1s infinite 3s}.b10{animation:zap 5s infinite 2s}.b11{animation:zap 3.7s infinite 3.4s}
+}
 </style>
 </head>
 <body>
 <div class="fx" aria-hidden="true"><div class="halo"></div>
-<svg viewBox="0 0 100 100" preserveAspectRatio="none"><polyline class="bolt b1" points="12,0 17,14 10,24 18,40 12,52 20,70 15,84"/><polyline class="bolt b2" points="88,0 82,16 90,28 80,46 86,60 78,80 84,92"/><polyline class="bolt b3" points="50,0 46,9 53,17 47,27 52,34"/><polyline class="bolt bw b4" points="4,0 9,12 3,24 10,38 5,52 11,66"/><polyline class="bolt bw b5" points="30,0 26,11 33,21 27,33 31,42"/><polyline class="bolt bw b6" points="70,0 75,12 68,23 74,36 69,46"/><polyline class="bolt bw b7" points="96,0 91,15 97,28 90,42 95,58"/></svg></div>
+<svg viewBox="0 0 100 100" preserveAspectRatio="none"><polyline class="bolt b1" points="12,0 17,14 10,24 18,40 12,52 20,70 15,84"/><polyline class="bolt b2" points="88,0 82,16 90,28 80,46 86,60 78,80 84,92"/><polyline class="bolt b3" points="50,0 46,9 53,17 47,27 52,34"/><polyline class="bolt bw b4" points="4,0 9,12 3,24 10,38 5,52 11,66"/><polyline class="bolt bw b5" points="30,0 26,11 33,21 27,33 31,42"/><polyline class="bolt bw b6" points="70,0 75,12 68,23 74,36 69,46"/><polyline class="bolt bw b7" points="96,0 91,15 97,28 90,42 95,58"/><polyline class="bolt bw b8" points="20,0 16,10 23,20 17,32 22,44 18,54"/><polyline class="bolt bw b9" points="60,0 64,12 57,24 63,36 58,50 62,62 59,76"/><polyline class="bolt bw b10" points="40,0 44,12 38,22 43,34 39,46"/><polyline class="bolt bw b11" points="82,0 78,12 85,24 79,38 84,50"/></svg></div>
 <div class="wrap">
 
 <section class="view on" id="home">
@@ -155,7 +162,9 @@ body::before{background:radial-gradient(circle at 27% 34%,rgba(255,214,80,.3),tr
 <script>
 const CFG={
   // 1) Apps Script 웹 앱 배포 주소(…/exec)를 아래 따옴표 안에 붙여넣으세요.
-  endpoint:"https://script.google.com/macros/s/AKfycbyyTgw5CfJ-ShIrPc82jqnlx_p1WqViLocKPH9MlUMRGBZDxScnLkBh3F50dRSS86pTDw/exec",
+  endpoint:"",
+  // 2) 명예의 전당 이미지: 파일 경로나 주소를 쉼표로 추가하세요. 예) ["hall/1.jpg","hall/2.jpg"]
+  hallImages:[]
 };
 const Q=[
  {k:'nick',l:'닉네임',q:'게임에서 사용하는 닉네임을 알려주세요.',t:'text'},
@@ -167,7 +176,7 @@ const Q=[
 const $=id=>document.getElementById(id);
 const A={};let cur=0,fromConfirm=false;
 const setBar=p=>requestAnimationFrame(()=>{$('barI').style.width=p+'%'});
-function show(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));scrollTo(0,0)}
+function show(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));document.body.classList.toggle('calm',id==='form'||id==='hallV');scrollTo(0,0)}
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const uidOk=v=>/^[0-9A-Z]{15,16}$/.test(v)&&!v.includes('O');
 
