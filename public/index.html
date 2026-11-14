@@ -470,6 +470,25 @@ body::before{display:none!important}
 
 
 
+/* 데스크톱 브랜드 문구: 원래 문구의 자연 너비를 유지하고, 문구 변경 후에도 같은 테두리 크기 고정 */
+@media (min-width:900px){
+  #brandTag{
+    box-sizing:border-box;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:auto;
+    height:44px;
+    white-space:nowrap;
+    vertical-align:middle;
+  }
+  #brandTagText{
+    display:inline-block;
+    white-space:nowrap;
+    text-align:center;
+  }
+}
+
 /* 데스크톱 최종 확인 화면: 개인정보 안내문과 제출 버튼 사이 불필요한 세로 여백 제거 */
 @media (min-width:900px){
   .right-panel #form .privacy-note{
@@ -689,13 +708,29 @@ function updateBrandTag(isContentView){
   if(!tag||!text)return;
   const nextMode=isContentView?'content':'home';
   if(tag.dataset.mode===nextMode)return;
-  tag.dataset.mode=nextMode;
   clearTimeout(brandTagTimer);
   const nextHtml=isContentView
     ? 'WHERE YOUR LEGEND BEGINS'
     : '<span class="y">영웅</span>, <span class="p">전설</span> 타이틀 누적 299개 배출';
   const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const desktop=matchMedia('(min-width:900px)').matches;
+
+  // 데스크톱에서 최초 전환 직전의 원래 문구 너비를 저장합니다.
+  // 따라서 테두리 너비는 기존 디자인 그대로이며, 이후 문구가 바뀌어도 고정됩니다.
+  if(desktop){
+    if(tag.dataset.widthLocked!=='true'){
+      const originalWidth=tag.getBoundingClientRect().width;
+      if(originalWidth>0){
+        tag.style.width=originalWidth+'px';
+        tag.dataset.widthLocked='true';
+      }
+    }
+  }else{
+    // 모바일에서는 인라인 고정 너비를 제거하여 기존 반응형 동작을 유지합니다.
+    tag.style.width='';
+    delete tag.dataset.widthLocked;
+  }
+  tag.dataset.mode=nextMode;
 
   if(reduceMotion){
     text.innerHTML=nextHtml;
@@ -796,9 +831,14 @@ function step(i){
   show('form');if(f1&&q.t!=='area')setTimeout(()=>f1.focus({preventScroll:true}),50);
 }
 function confirmV(){
-  $('stepL').textContent='FINAL CHECK';setBar(100);$('stage').innerHTML=`<h2>마지막으로 확인해주세요.</h2>
-  ${Q.map((q,i)=>`<div class="row"><div><span>${q.l}</span><p>${esc(A[q.k])}</p></div><button class="edit" data-i="${i}">수정</button></div>`).join('')}
-  <p class="privacy-note">부정 이용 방지를 위해 IP 주소와 운영체제(OS)가 일부 검사됩니다.</p>
+  $('stepL').textContent='FINAL CHECK';setBar(100);
+  const privacyNotice='<p class="privacy-note">중복 신청 및 부정 이용 방지를 위해 IP 주소, 운영체제(OS), 브라우저가 제공하는 기종 정보가 수집되어 가입 신청 관리에 이용됩니다. 기종 정보는 브라우저 환경에 따라 확인되지 않을 수 있습니다.</p>';
+  const answerRows=Q.map((q,i)=>`<div class="row"><div><span>${q.l}</span><p>${esc(A[q.k])}</p></div><button class="edit" data-i="${i}">수정</button></div>`).join('');
+  const confirmDetails=matchMedia('(min-width:900px)').matches
+    ? privacyNotice+answerRows
+    : answerRows+privacyNotice;
+  $('stage').innerHTML=`<h2>마지막으로 확인해주세요.</h2>
+  ${confirmDetails}
   <p class="err" id="err"></p><div class="nav one"><button class="b go" id="send">가입 신청하기</button></div>`;
   document.querySelectorAll('.edit').forEach(b=>b.onclick=()=>{fromConfirm=true;step(+b.dataset.i)});
   $('send').onclick=submit;show('form');
