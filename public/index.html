@@ -554,6 +554,33 @@ body::before{display:none!important}
   #home .card.main{min-height:clamp(82px,13.5dvh,94px)}
 }
 
+
+
+/* 모든 화면에서 저작권 문구를 화면의 최하단에 배치 */
+@media (min-width: 900px) {
+  .wrap { display:flex; flex-direction:column; }
+  .desktop-layout { flex:1 1 0%; min-height:0; }
+  .foot { flex:0 0 auto; margin-top:auto; }
+}
+@media (max-width: 899px) {
+  .wrap { display:flex; flex-direction:column; }
+  .desktop-layout { flex:1 1 0%; min-height:0; }
+  .foot {
+    display:block;
+    flex:0 0 auto;
+    margin-top:auto;
+    padding-bottom:max(2px,env(safe-area-inset-bottom,0px));
+  }
+  body:not(.home-state) .right-panel {
+    flex:1 1 0%;
+    min-height:0;
+    overflow-y:auto;
+    overscroll-behavior-y:contain;
+  }
+  body.hall-state .right-panel { overflow:hidden; }
+  body.keyboard-open .right-panel { overflow:visible; }
+  body.keyboard-open .foot { display:none; }
+}
 </style>
 <!-- Main emblem normalized to symmetric transparent bounds for optical centering. -->
 </head>
@@ -607,7 +634,7 @@ body::before{display:none!important}
   </main>
 </div>
 
-<footer class="foot">ZEUS CLAN · ALL RIGHTS RESERVED</footer>
+<footer class="foot">ZEUS CLAN • ALL RIGHTS RESERVED</footer>
 </div>
 <script>
 const CFG={
