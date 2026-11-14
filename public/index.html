@@ -1092,8 +1092,8 @@ function startHallPrefetch(){
     if(!response.ok||result.error||!Array.isArray(result.images))throw new Error('hall_list_failed');
 
     hallImageItems=result.images.filter(item=>item&&/^[a-zA-Z0-9_-]{10,200}$/.test(String(item.id||'')));
-    // 서버가 반환한 폴더 추가 시각 기준으로 브라우저에서도 최신순을 한 번 더 보장합니다.
-    hallImageItems.sort((a,b)=>Number(b.addedAt||0)-Number(a.addedAt||0));
+    // Google Drive 파일 수정 날짜(modifiedAt)가 가장 최신인 순서를 브라우저에서도 보장합니다.
+    hallImageItems.sort((a,b)=>Number(b.modifiedAt||0)-Number(a.modifiedAt||0));
     hallImageElements=hallImageItems.map((item,index)=>{
       const img=document.createElement('img');
       img.alt='명예의 전당';
