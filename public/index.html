@@ -966,7 +966,7 @@ function confirmV(){
   $('stage').innerHTML=`<h2>작성하신 내용을<br>마지막으로 확인해주세요.</h2>
   ${confirmDetails}
   <p class="err" id="err"></p><div class="nav one confirm-submit"><button class="b go" id="send">가입 신청하기</button></div>`;
-  document.querySelectorAll('.edit').forEach(b=>b.onclick=()=>{fromConfirm=true;step(+b.dataset.i)});
+  document.querySelectorAll('.edit[data-i]').forEach(b=>b.onclick=()=>{fromConfirm=true;step(+b.dataset.i)});
   $('send').onclick=submit;show('form');
 }
 function detectOsFromUserAgent(ua){
