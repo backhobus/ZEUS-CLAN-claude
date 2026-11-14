@@ -487,7 +487,6 @@ body::before{display:none!important}
     </section>
 
 <section class="view" id="form"><div class="panel" id="formBox">
-  <p class="privacy-note">중복 신청 및 부정 이용 방지를 위해 IP 주소, 운영체제(OS), 브라우저가 제공하는 기종 정보가 수집되어 가입 신청 관리에 이용됩니다. 기종 정보는 브라우저 환경에 따라 확인되지 않을 수 있습니다.</p>
   <div class="step" id="stepL"></div><div class="bar"><i id="barI"></i></div><div id="stage"></div>
 </div></section>
 
@@ -706,10 +705,22 @@ function step(i){
    <div class="nav"><button class="b" id="prev">이전</button><button class="b go" id="next">다음</button></div>`;
   const err=$('err'),hide=()=>err.classList.remove('on');
   const f1=$('f');
-  const read=()=>{if(f1)A[q.k]=q.sm?f1.value.replace(/\s*\n\s*/g,' ').trim():f1.value.trim()};
+  const read=()=>{if(f1){const value=q.sm?f1.value.replace(/\s*\n\s*/g,' ').trim():f1.value.trim();A[q.k]=q.k==='uid'?value.toUpperCase():value}};
   
   if(f1){
     f1.value=A[q.k]||'';
+    if(q.k==='uid'){
+      f1.value=f1.value.toUpperCase();
+      A.uid=f1.value;
+      f1.addEventListener('input',()=>{
+        const cursor=f1.selectionStart;
+        const upper=f1.value.toUpperCase();
+        if(f1.value!==upper){
+          f1.value=upper;
+          if(cursor!==null)f1.setSelectionRange(cursor,cursor);
+        }
+      });
+    }
     ['focus','input'].forEach(e=>f1.addEventListener(e,()=>{hide();read();}));
     f1.addEventListener('keydown',(e)=>{
       if(e.key==='Enter'){
@@ -742,6 +753,7 @@ function step(i){
 function confirmV(){
   $('stepL').textContent='FINAL CHECK';setBar(100);$('stage').innerHTML=`<h2>마지막으로 확인해주세요.</h2>
   ${Q.map((q,i)=>`<div class="row"><div><span>${q.l}</span><p>${esc(A[q.k])}</p></div><button class="edit" data-i="${i}">수정</button></div>`).join('')}
+  <p class="privacy-note">중복 신청 및 부정 이용 방지를 위해 IP 주소, 운영체제(OS), 브라우저가 제공하는 기종 정보가 수집되어 가입 신청 관리에 이용됩니다. 기종 정보는 브라우저 환경에 따라 확인되지 않을 수 있습니다.</p>
   <p class="err" id="err"></p><div class="nav one"><button class="b go" id="send">가입 신청하기</button></div>`;
   document.querySelectorAll('.edit').forEach(b=>b.onclick=()=>{fromConfirm=true;step(+b.dataset.i)});
   $('send').onclick=submit;show('form');
