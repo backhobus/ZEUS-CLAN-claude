@@ -79,7 +79,7 @@ input:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(23
 .bolt{font-size:40px}
 
 /* 수정된 명예의 전당 그리드 및 이미지 스타일 */
-.hall{display:grid;grid-template-columns:repeat(2, 1fr);gap:12px}.hall img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.045);content-visibility:auto}
+.hall{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:12px}.hall img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.045);content-visibility:auto;-webkit-touch-callout:default!important;-webkit-user-select:auto;user-select:auto;-webkit-user-drag:element;user-drag:element;touch-action:pan-y;cursor:context-menu}
 
 .empty{text-align:center;color:var(--mut);padding:24px 0;font-size:15px}
 .top{display:flex;align-items:center;gap:10px;margin-bottom:14px}.top h2{margin:0}
@@ -287,6 +287,14 @@ body::before{display:none!important}
   #home.view.on{display:flex;flex:1 0 auto;justify-content:center;width:100%;margin-block:auto}
   #home .grid{width:100%}
   .right-panel .view:not(#home){width:100%;max-width:none;margin-block:auto}
+
+  /* 명예의 전당에서는 화면 프레임은 고정하고 이미지 목록만 세로 스크롤합니다. */
+  body.hall-state .desktop-layout{flex:1 1 auto;min-height:0;overflow:hidden}
+  body.hall-state .right-panel{flex:1 1 auto;min-height:0;justify-content:flex-start;overflow:hidden}
+  body.hall-state #hallV.view.on{display:flex;flex:1 1 auto;min-height:0;max-height:100%;margin:0;overflow:hidden}
+  body.hall-state #hallV>.panel{display:flex;flex:1 1 auto;flex-direction:column;min-height:0;max-height:100%;overflow:hidden;box-sizing:border-box}
+  body.hall-state #hallV .top{flex:0 0 auto}
+  body.hall-state #hallV .hall{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;flex:1 1 auto;min-height:0;max-height:none;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;touch-action:pan-y;padding-bottom:max(12px,env(safe-area-inset-bottom,0px))}
 }
 
 #brandTag{transition:opacity .5s ease,transform .5s ease}
@@ -881,6 +889,7 @@ function show(id){
   const isHome=id==='home';
   const isContentView=!isHome;
   document.body.classList.toggle('home-state',isHome);
+  document.body.classList.toggle('hall-state',id==='hallV');
   document.body.classList.toggle('calm',id==='form'||id==='hallV'||id==='doneV');
   updateBrandTag(isContentView);
   const wrap=document.querySelector('.wrap');
@@ -1083,10 +1092,12 @@ function startHallPrefetch(){
     if(!response.ok||result.error||!Array.isArray(result.images))throw new Error('hall_list_failed');
 
     hallImageItems=result.images.filter(item=>item&&/^[a-zA-Z0-9_-]{10,200}$/.test(String(item.id||'')));
+    // 서버가 반환한 폴더 추가 시각 기준으로 브라우저에서도 최신순을 한 번 더 보장합니다.
+    hallImageItems.sort((a,b)=>Number(b.addedAt||0)-Number(a.addedAt||0));
     hallImageElements=hallImageItems.map((item,index)=>{
       const img=document.createElement('img');
       img.alt='명예의 전당';
-      img.draggable=false;
+      img.draggable=true;
       img.decoding='async';
       img.loading='eager';
       img.fetchPriority='low';
@@ -1145,7 +1156,11 @@ $('goForm').onclick=later(openApplyForm);
 $('goHall').onclick=later(hall);
 // 첫 화면이 표시되자마자 명예의 전당 목록과 이미지를 백그라운드에서 미리 불러옵니다.
 startHallPrefetch().catch(()=>{});
-['contextmenu','selectstart','dragstart'].forEach(t=>document.addEventListener(t,e=>{if(!(e.target.closest&&e.target.closest('input,textarea')))e.preventDefault()}));$('hallBack').onclick=()=>show('home');$('doneBack').onclick=()=>{fromConfirm=false;setBar(0);show('home')};
+['contextmenu','selectstart','dragstart'].forEach(t=>document.addEventListener(t,e=>{
+  const hallImage=e.target&&e.target.closest?e.target.closest('#hallList img'):null;
+  if(hallImage)return;
+  if(!(e.target.closest&&e.target.closest('input,textarea')))e.preventDefault();
+}));$('hallBack').onclick=()=>show('home');$('doneBack').onclick=()=>{fromConfirm=false;setBar(0);show('home')};
 
 // 새로고침 시 마지막으로 가입신청서를 보고 있었다면 같은 단계/최종 확인 화면을 복원합니다.
 if(restoredApplyDraft&&restoredApplyDraft.view==='form'){
