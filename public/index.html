@@ -899,9 +899,7 @@ function confirmV(){
   $('stepL').textContent='FINAL CHECK';setBar(100);
   const privacyNotice='<p class="privacy-note">부정 이용 방지를 위해 IP 주소와 운영체제(OS)가 일부 검사됩니다.</p>';
   const answerRows=Q.map((q,i)=>`<div class="row"><div><span>${q.l}</span><p>${esc(A[q.k])}</p></div><button class="edit" data-i="${i}">수정</button></div>`).join('');
-  const confirmDetails=matchMedia('(min-width:900px)').matches
-    ? privacyNotice+answerRows
-    : answerRows+privacyNotice;
+  const confirmDetails=privacyNotice+answerRows;
   $('stage').innerHTML=`<h2>마지막으로 확인해주세요.</h2>
   ${confirmDetails}
   <p class="err" id="err"></p><div class="nav one"><button class="b go" id="send">가입 신청하기</button></div>`;
