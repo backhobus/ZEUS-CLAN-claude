@@ -51,6 +51,8 @@ input:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(23
 .yn button.sel{background:var(--gold);color:#1a1305;border-color:var(--gold)}
 .nav{display:grid;grid-template-columns:1fr 9fr;gap:10px;margin-top:16px}
 .nav.one{grid-template-columns:1fr}
+.nav.edit-return{display:grid;grid-template-columns:1fr}
+.nav.edit-return #next{width:100%;min-width:0}
 .b{padding:14px 8px;font:700 16px 'Noto Sans KR',sans-serif;border-radius:10px;border:1px solid var(--line);background:rgba(0,0,0,.3);color:var(--gold2);cursor:pointer}
 .b.go{background:linear-gradient(135deg,#f6dc9b,#e9c46a 55%,#c9973a);color:#1a1305;border:0}
 .b:disabled{opacity:.5}
@@ -719,7 +721,7 @@ function step(i){
   else f=`<input type="text" id="f" autocomplete="off" ${q.ph?`placeholder="${esc(q.ph)}"`:''}>`;
   $('stepL').textContent='STEP '+(i+1)+' / 5';setBar(i*25);$('stage').innerHTML=`
    <h2>${q.q}</h2>${f}<p class="err" id="err"></p>
-   <div class="nav"><button class="b" id="prev">이전</button><button class="b go" id="next">다음</button></div>`;
+   <div class="nav ${fromConfirm?'edit-return':''}">${fromConfirm?'':'<button class="b" id="prev">이전</button>'}<button class="b go" id="next">다음</button></div>`;
   const err=$('err'),hide=()=>err.classList.remove('on');
   const f1=$('f');
   const read=()=>{if(f1){const value=q.sm?f1.value.replace(/\s*\n\s*/g,' ').trim():f1.value.trim();A[q.k]=q.k==='uid'?value.toUpperCase():value}};
@@ -758,7 +760,9 @@ function step(i){
   document.querySelectorAll('.yn button').forEach(b=>{
     if(A[q.k]===b.dataset.v)b.classList.add('sel');
     b.onclick=()=>{A[q.k]=b.dataset.v;document.querySelectorAll('.yn button').forEach(x=>x.classList.toggle('sel',x===b));hide()}});
-  $('prev').onclick=()=>{read();if(fromConfirm){fromConfirm=false;confirmV()}else if(i===0){show('home');setBar(0)}else step(i-1)};
+  if(!fromConfirm){
+    $('prev').onclick=()=>{read();if(i===0){show('home');setBar(0)}else step(i-1)};
+  }
   $('next').onclick=()=>{
     read();const v=A[q.k]||'';
     if(!v){err.textContent='답변을 입력해 주세요.';err.classList.add('on');return}
