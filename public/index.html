@@ -562,6 +562,11 @@ body::before{display:none!important}
   .desktop-layout { flex:1 1 0%; min-height:0; }
   .foot { flex:0 0 auto; margin-top:auto; }
 }
+@media (min-width: 900px) {
+  /* 태블릿이 데스크톱 레이아웃으로 표시된 상태에서 가상 키보드가 열리면
+     하단 문구가 키보드 위로 이동해 보이지 않도록 잠시 숨깁니다. */
+  body.tablet-keyboard-open .foot { visibility:hidden!important; }
+}
 @media (max-width: 899px) {
   .wrap { display:flex; flex-direction:column; }
   .desktop-layout { flex:1 1 0%; min-height:0; }
@@ -797,6 +802,71 @@ function clearApplyDraft(){
   mobileQuery.addEventListener?.('change',updateViewport);
   applyViewport(viewport?viewport.height:window.innerHeight,0);
   updateViewport();
+})();
+
+// 태블릿은 화면 폭이 넓어 데스크톱 레이아웃을 사용하므로,
+// 모바일 전용 키보드 처리와 별도로 키보드가 열렸을 때 하단 문구만 숨깁니다.
+(function setupTabletKeyboardFooter(){
+  const desktopQuery=matchMedia('(min-width:900px)');
+  const viewport=window.visualViewport;
+  let baseHeight=viewport?viewport.height:window.innerHeight;
+  let fieldFocused=false;
+  let keyboardOpen=false;
+
+  const isField=el=>!!(el&&el.matches&&el.matches('input,textarea'));
+  const currentHeight=()=>viewport?viewport.height:window.innerHeight;
+
+  function update(){
+    const height=currentHeight();
+    if(!desktopQuery.matches){
+      if(keyboardOpen)document.body.classList.remove('tablet-keyboard-open');
+      keyboardOpen=false;
+      fieldFocused=false;
+      baseHeight=height;
+      return;
+    }
+
+    if(fieldFocused){
+      const reduction=baseHeight-height;
+      if(reduction>120&&!keyboardOpen){
+        keyboardOpen=true;
+        document.body.classList.add('tablet-keyboard-open');
+      }else if(keyboardOpen&&reduction<80){
+        keyboardOpen=false;
+        document.body.classList.remove('tablet-keyboard-open');
+        baseHeight=height;
+      }
+    }else if(keyboardOpen){
+      if(height>=baseHeight-80){
+        keyboardOpen=false;
+        document.body.classList.remove('tablet-keyboard-open');
+        baseHeight=height;
+      }
+    }else{
+      baseHeight=height;
+    }
+  }
+
+  document.addEventListener('focusin',event=>{
+    if(!desktopQuery.matches||!isField(event.target))return;
+    if(!keyboardOpen)baseHeight=currentHeight();
+    fieldFocused=true;
+    update();
+  });
+  document.addEventListener('focusout',event=>{
+    if(!isField(event.target))return;
+    setTimeout(()=>{
+      fieldFocused=isField(document.activeElement);
+      update();
+    },250);
+  });
+  if(viewport){
+    viewport.addEventListener('resize',update,{passive:true});
+    viewport.addEventListener('scroll',update,{passive:true});
+  }
+  window.addEventListener('resize',update,{passive:true});
+  desktopQuery.addEventListener?.('change',update);
+  update();
 })();
 
 function updateBrandTag(isContentView){
