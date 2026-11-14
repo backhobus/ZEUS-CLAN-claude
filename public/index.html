@@ -990,6 +990,55 @@ $('goForm').onclick=later(()=>{fromConfirm=false;step(0)});
 $('goHall').onclick=later(hall);
 ['contextmenu','selectstart','dragstart'].forEach(t=>document.addEventListener(t,e=>{if(!(e.target.closest&&e.target.closest('input,textarea')))e.preventDefault()}));$('hallBack').onclick=()=>show('home');$('doneBack').onclick=()=>{fromConfirm=false;setBar(0);show('home')};
 
+// 모바일 기기의 시스템/브라우저 뒤로가기를 화면 내 뒤로가기 동작에 연결합니다.
+(function setupMobileBackNavigation(){
+  const isMobile=matchMedia('(max-width:899px)').matches||/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent||'');
+  if(!isMobile)return;
+
+  const armBackTrap=()=>{
+    try{
+      const current=history.state;
+      const nextState=current&&typeof current==='object'&&!Array.isArray(current)
+        ? {...current,__zeusClanBackTrap:true}
+        : {__zeusClanBackTrap:true};
+      history.pushState(nextState,'',location.href);
+    }catch(e){}
+  };
+
+  // 첫 뒤로가기를 웹페이지 이탈 대신 앱 내부 이동으로 받을 수 있도록 준비합니다.
+  armBackTrap();
+
+  window.addEventListener('popstate',()=>{
+    const activeView=document.querySelector('.view.on');
+    if(!activeView)return;
+
+    let handled=false;
+    if(activeView.id==='form'){
+      const previousButton=$('prev');
+      if(previousButton){
+        // 가입신청 단계에서는 화면의 '이전' 버튼과 동일하게 동작합니다.
+        previousButton.click();
+        handled=true;
+      }else if(fromConfirm){
+        // 최종 확인에서 수정 화면으로 들어온 경우 최종 확인으로 돌아갑니다.
+        fromConfirm=false;
+        confirmV();
+        handled=true;
+      }else if($('send')){
+        // 최종 확인 화면에는 이전 버튼이 없으므로 마지막 입력 단계로 돌아갑니다.
+        step(4);
+        handled=true;
+      }
+    }else if(activeView.id==='hallV'){
+      $('hallBack').click();
+      handled=true;
+    }
+
+    // 처리한 경우에만 다음 시스템 뒤로가기도 앱 내부에서 받을 수 있게 다시 등록합니다.
+    if(handled)armBackTrap();
+  });
+})();
+
 (function(){
   const cv=document.getElementById('bolt'),cx=cv.getContext('2d');
   if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
