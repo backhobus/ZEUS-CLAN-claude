@@ -790,7 +790,7 @@ function updateBrandTag(isContentView){
 }
 function positionMobileBrand(){
   const layout=$('desktopLayout');
-  const page=$('.wrap');
+  const page=document.querySelector('.wrap');
   const firstButton=$('goForm');
   if(!layout||!page||!firstButton)return;
   if(!matchMedia('(max-width:899px)').matches||!document.body.classList.contains('home-state')){
@@ -806,7 +806,7 @@ function positionMobileBrand(){
 
 (function watchMobileBrandPosition(){
   const layout=$('desktopLayout');
-  const page=$('.wrap');
+  const page=document.querySelector('.wrap');
   const firstButton=$('goForm');
   if(!layout||!page||!firstButton)return;
   const schedule=()=>requestAnimationFrame(()=>requestAnimationFrame(positionMobileBrand));
