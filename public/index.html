@@ -542,6 +542,18 @@ body::before{display:none!important}
   }
 }
 
+
+
+/* 모바일 홈 메뉴 버튼: 화면에서 더 넉넉하고 꽉 차 보이도록 높이 확대 */
+@media(max-width:899px){
+  #home .card{min-height:clamp(76px,12dvh,96px);padding-top:12px;padding-bottom:12px}
+  #home .card.main{min-height:clamp(94px,15dvh,114px)}
+}
+@media(max-width:899px) and (max-height:620px){
+  #home .card{min-height:clamp(66px,11dvh,78px)}
+  #home .card.main{min-height:clamp(82px,13.5dvh,94px)}
+}
+
 </style>
 <!-- Main emblem normalized to symmetric transparent bounds for optical centering. -->
 </head>
