@@ -968,7 +968,12 @@ function step(i,options={}){
     if(q.k==='uid'&&!uidOk(v)){err.textContent='게임 UID를 다시 확인해주세요.';err.classList.add('on');return}
     if(fromConfirm){fromConfirm=false;confirmV()}else if(i<4)step(i+1);else confirmV();
   };
-  show('form');if(f1&&q.t!=='area'&&!options.skipAutofocus)setTimeout(()=>f1.focus({preventScroll:true}),50);
+  show('form');
+  // 가입 버튼의 사용자 클릭과 같은 이벤트 흐름 안에서 즉시 포커스합니다.
+  // setTimeout/requestAnimationFrame으로 미루면 iOS·Android에서 키보드 자동 표시가 차단될 수 있습니다.
+  if(f1&&q.t!=='area'&&!options.skipAutofocus){
+    try{f1.focus({preventScroll:true});}catch(error){f1.focus();}
+  }
 }
 function confirmV(){
   draftStage='confirm';fromConfirm=false;saveApplyDraft('form');
@@ -1158,7 +1163,7 @@ const later=fn=>()=>setTimeout(fn,matchMedia('(hover:none)').matches?220:0);
 function openApplyForm(){
   if(restoredApplyDraft||Object.values(A).some(value=>String(value||'').length>0)){
     if(draftStage==='confirm'&&Q.every(q=>String(A[q.k]||'').trim()))confirmV();
-    else step(cur,{skipAutofocus:true});
+    else step(cur);
   }else{
     fromConfirm=false;step(0);
   }
