@@ -460,6 +460,23 @@ body::before{display:none!important}
   }
 }
 
+
+
+/* 데스크톱 최종 확인 화면: 개인정보 안내문과 제출 버튼 사이 불필요한 세로 여백 제거 */
+@media (min-width:900px){
+  .right-panel #form .privacy-note{
+    margin-bottom:4px;
+    padding:8px 10px;
+    line-height:1.5;
+  }
+  .right-panel #form .err{
+    margin:0 2px;
+    min-height:0;
+  }
+  .right-panel #form .nav.one{
+    margin-top:4px;
+  }
+}
 </style>
 <!-- Main emblem normalized to symmetric transparent bounds for optical centering. -->
 </head>
