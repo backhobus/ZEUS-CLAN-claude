@@ -521,7 +521,7 @@ body::before{display:none!important}
     margin:0 2px;
     min-height:0;
   }
-  .right-panel #form .nav.one{
+  .right-panel #form .nav.confirm-submit{
     margin-top:4px;
   }
 }
@@ -965,7 +965,7 @@ function confirmV(){
   const confirmDetails=privacyNotice+answerRows;
   $('stage').innerHTML=`<h2>작성하신 내용을<br>마지막으로 확인해주세요.</h2>
   ${confirmDetails}
-  <p class="err" id="err"></p><div class="nav one"><button class="b go" id="send">가입 신청하기</button></div>`;
+  <p class="err" id="err"></p><div class="nav one confirm-submit"><button class="b go" id="send">가입 신청하기</button></div>`;
   document.querySelectorAll('.edit').forEach(b=>b.onclick=()=>{fromConfirm=true;step(+b.dataset.i)});
   $('send').onclick=submit;show('form');
 }
