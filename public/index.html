@@ -635,49 +635,16 @@ const Q=[
 const $=id=>document.getElementById(id);
 const brandLogoEl=$('brandLogo'),doneLogoEl=$('doneLogo');
 if(brandLogoEl&&doneLogoEl)doneLogoEl.src=brandLogoEl.src;
-// 가입신청 임시저장은 이미지 캐시와 분리되어 브라우저 로컬 저장소에만 보관됩니다.
-const APPLY_DRAFT_KEY='zeusClanApplyDraft_v1';
-function loadApplyDraft(){
-  try{
-    const raw=localStorage.getItem(APPLY_DRAFT_KEY);
-    if(!raw)return null;
-    const saved=JSON.parse(raw);
-    if(!saved||saved.version!==1||!saved.answers||typeof saved.answers!=='object')return null;
-    const answers={};
-    Q.forEach(q=>{
-      const value=saved.answers[q.k];
-      answers[q.k]=typeof value==='string'?value.slice(0,q.k==='why'?2000:100):'';
-    });
-    return {
-      answers,
-      cur:Number.isInteger(saved.cur)?Math.max(0,Math.min(Q.length-1,saved.cur)):0,
-      stage:saved.stage==='confirm'?'confirm':'step',
-      fromConfirm:saved.fromConfirm===true,
-      view:['form','home','hallV'].includes(saved.view)?saved.view:'home'
-    };
-  }catch(error){return null;}
-}
-const restoredApplyDraft=loadApplyDraft();
-const A=restoredApplyDraft?restoredApplyDraft.answers:{};
-let cur=restoredApplyDraft?restoredApplyDraft.cur:0;
-let fromConfirm=restoredApplyDraft?restoredApplyDraft.fromConfirm:false;
-let draftStage=restoredApplyDraft?restoredApplyDraft.stage:'step';
-let draftView=restoredApplyDraft?restoredApplyDraft.view:'home';
+// 가입신청 답변은 현재 탭의 메모리에만 보관합니다. 브라우저 저장소나 서버에 임시저장하지 않습니다.
+// 따라서 다른 탭·브라우저·기기 이용자와 답변이 공유되지 않으며, 같은 탭에서 홈으로 이동해도 유지됩니다.
+const A={};
+let cur=0;
+let fromConfirm=false;
+let draftStage='step';
 let brandTagTimer=0;
-function saveApplyDraft(view=draftView){
-  try{
-    const answers={};
-    Q.forEach(q=>answers[q.k]=String(A[q.k]||''));
-    localStorage.setItem(APPLY_DRAFT_KEY,JSON.stringify({
-      version:1,answers,cur,stage:draftStage,fromConfirm,view,updatedAt:Date.now()
-    }));
-    draftView=view;
-  }catch(error){/* 저장공간이 차단된 브라우저에서는 입력 기능을 계속 사용할 수 있습니다. */}
-}
 function clearApplyDraft(){
-  try{localStorage.removeItem(APPLY_DRAFT_KEY);}catch(error){}
   Q.forEach(q=>{delete A[q.k]});
-  cur=0;fromConfirm=false;draftStage='step';draftView='home';
+  cur=0;fromConfirm=false;draftStage='step';
 }
 
 // 모바일 가상 키보드가 열린 동안에만 화면 스크롤을 허용하고,
@@ -897,7 +864,6 @@ function positionMobileBrand(){
 
 function show(id){
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));
-  if(id==='form'||id==='home'||id==='hallV')saveApplyDraft(id);
   const isHome=id==='home';
   const isContentView=!isHome;
   document.body.classList.toggle('home-state',isHome);
@@ -913,7 +879,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const uidOk=v=>/^[0-9A-Z]{15,16}$/.test(v)&&!v.includes('O');
 
 function step(i,options={}){
-  cur=i;draftStage='step';saveApplyDraft('form');const q=Q[i];
+  cur=i;draftStage='step';const q=Q[i];
   let f;
   if(q.t==='yn')f=`<div class="yn"><button data-v="예">예</button><button data-v="아니요">아니요</button></div>`;
   else if(q.t==='area')f=`<textarea id="f" ${q.sm?'style="min-height:84px"':''} ${q.ph?`placeholder="${esc(q.ph)}"`:''}></textarea>`;
@@ -923,7 +889,7 @@ function step(i,options={}){
    <div class="nav ${i===0?'one':''} ${fromConfirm?'edit-return':''}">${i===0||fromConfirm?'':'<button class="b" id="prev">이전</button>'}<button class="b go" id="next">다음</button></div>`;
   const err=$('err'),hide=()=>err.classList.remove('on');
   const f1=$('f');
-  const read=()=>{if(f1){const value=q.sm?f1.value.replace(/\s*\n\s*/g,' ').trim():f1.value.trim();A[q.k]=q.k==='uid'?value.toUpperCase():value;saveApplyDraft('form')}};
+  const read=()=>{if(f1){const value=q.sm?f1.value.replace(/\s*\n\s*/g,' ').trim():f1.value.trim();A[q.k]=q.k==='uid'?value.toUpperCase():value}};
   
   if(f1){
     f1.value=A[q.k]||'';
@@ -958,7 +924,7 @@ function step(i,options={}){
   }
   document.querySelectorAll('.yn button').forEach(b=>{
     if(A[q.k]===b.dataset.v)b.classList.add('sel');
-    b.onclick=()=>{A[q.k]=b.dataset.v;saveApplyDraft('form');document.querySelectorAll('.yn button').forEach(x=>x.classList.toggle('sel',x===b));hide()}});
+    b.onclick=()=>{A[q.k]=b.dataset.v;document.querySelectorAll('.yn button').forEach(x=>x.classList.toggle('sel',x===b));hide()}});
   if(!fromConfirm && i>0){
     $('prev').onclick=()=>{read();step(i-1)};
   }
@@ -976,7 +942,7 @@ function step(i,options={}){
   }
 }
 function confirmV(){
-  draftStage='confirm';fromConfirm=false;saveApplyDraft('form');
+  draftStage='confirm';fromConfirm=false;
   const privacyNotice='<p class="privacy-note">부정 이용 방지를 위해 IP 주소와 운영체제(OS)가 일부 검사됩니다.</p>';
   const answerRows=Q.map((q,i)=>`<div class="row"><div><span>${q.l}</span><p>${esc(A[q.k])}</p></div><button class="edit" data-i="${i}">수정</button></div>`).join('');
   const confirmDetails=privacyNotice+answerRows;
@@ -1161,11 +1127,12 @@ const tapFx=el=>{el.classList.add('tap');setTimeout(()=>el.classList.remove('tap
 document.querySelectorAll('.card').forEach(c=>c.addEventListener('pointerdown',()=>tapFx(c)));
 const later=fn=>()=>setTimeout(fn,matchMedia('(hover:none)').matches?220:0);
 function openApplyForm(){
-  if(restoredApplyDraft||Object.values(A).some(value=>String(value||'').length>0)){
-    if(draftStage==='confirm'&&Q.every(q=>String(A[q.k]||'').trim()))confirmV();
-    else step(cur);
+  // 같은 탭에서 홈으로 나갔다 돌아온 경우에는 작성 위치와 답변을 이어서 보여줍니다.
+  // 제출이 완료되어 clearApplyDraft()가 실행된 뒤라면 cur=0의 빈 신청서로 시작합니다.
+  if(draftStage==='confirm'&&!fromConfirm){
+    confirmV();
   }else{
-    fromConfirm=false;step(0);
+    step(cur);
   }
 }
 // 가입신청서는 지연 실행 없이 클릭 즉시 열어 모바일 터치 이벤트 누락을 방지합니다.
@@ -1177,23 +1144,9 @@ startHallPrefetch().catch(()=>{});
   const hallImage=e.target&&e.target.closest?e.target.closest('#hallList img'):null;
   if(hallImage)return;
   if(!(e.target.closest&&e.target.closest('input,textarea')))e.preventDefault();
-}));$('hallBack').onclick=()=>show('home');$('formBack').onclick=()=>show('home');$('doneBack').onclick=()=>{fromConfirm=false;show('home')};
+}));$('hallBack').onclick=()=>show('home');$('formBack').onclick=()=>{show('home')};$('doneBack').onclick=()=>{clearApplyDraft();fromConfirm=false;show('home')};
 
-// 새로고침 시 마지막으로 가입신청서를 보고 있었다면 같은 단계/최종 확인 화면을 복원합니다.
-if(restoredApplyDraft&&restoredApplyDraft.view==='form'){
-  if(draftStage==='confirm'&&Q.every(q=>String(A[q.k]||'').trim()))confirmV();
-  else step(cur,{skipAutofocus:true});
-}
-// 브라우저가 페이지를 백그라운드로 보내거나 종료하기 직전에도 현재 입력값을 한 번 더 기록합니다.
-window.addEventListener('pagehide',()=>{
-  const input=$('f');
-  if(input&&document.querySelector('.view.on')?.id==='form'&&Q[cur]){
-    const q=Q[cur];
-    const value=q.sm?input.value.replace(/\s*\n\s*/g,' ').trim():input.value.trim();
-    A[q.k]=q.k==='uid'?value.toUpperCase():value;
-  }
-  if(document.querySelector('.view.on')?.id==='form')saveApplyDraft('form');
-});
+// 새로고침 이후에는 신청서 입력을 복원하지 않습니다. 다음 이용자는 항상 새 신청을 시작합니다.
 
 // 모바일 기기의 시스템/브라우저 뒤로가기를 화면 내 뒤로가기 동작에 연결합니다.
 (function setupMobileBackNavigation(){
@@ -1232,6 +1185,10 @@ window.addEventListener('pagehide',()=>{
       }else if($('send')){
         // 최종 확인 화면에는 이전 버튼이 없으므로 마지막 입력 단계로 돌아갑니다.
         step(4);
+        handled=true;
+      }else{
+        // 첫 번째 작성 단계에서 시스템 뒤로가기를 누르면 홈으로 이동하되 작성 내용은 같은 탭에 유지합니다.
+        show('home');
         handled=true;
       }
     }else if(activeView.id==='hallV'){
