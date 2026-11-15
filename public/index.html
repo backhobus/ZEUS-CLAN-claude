@@ -28,9 +28,6 @@
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -10%,#1d2a4d 0,#0b1022 45%,var(--bg) 80%);color:var(--tx);font-family:'Noto Sans KR',system-ui,sans-serif;word-break:keep-all;overflow-wrap:break-word;text-wrap:balance;line-height:1.55}
-body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 15%,rgba(255,214,80,.28),transparent 55%);opacity:0;animation:flash 5s infinite}
-@keyframes flash{0%,88%,94%,100%{opacity:0}90%{opacity:1}92%{opacity:.3}93%{opacity:.9}}
-@media(prefers-reduced-motion:reduce){body::before{animation:none}}
 .wrap{max-width:520px;margin:0 auto;padding:20px 18px 16px;min-height:calc(100vh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));display:flex;flex-direction:column}
 .view{display:none;animation:in .35s ease}.view.on{display:block}
 @keyframes in{from{opacity:0;transform:translateY(8px)}}
@@ -41,13 +38,13 @@ h1{font:800 clamp(24px,8vw,48px) Orbitron,'Noto Sans KR',sans-serif;letter-spaci
 .tag{margin:10px auto 0;font-size:13.5px;color:#b9c6ea;padding:6px 16px;border:1px solid rgba(150,170,230,.35);border-radius:999px;display:inline-block;background:rgba(120,140,220,.08)}.tag .y{color:#f5cf55;font-weight:700}.tag .p{color:#b98cff;font-weight:700}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .card{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:10px;text-align:center;min-height:98px;padding:12px;border-radius:16px;border:1.5px solid var(--cb);background:var(--cg);color:#f6ecc8;font:700 16px 'Noto Sans KR',sans-serif;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;--cb:#5d5632;--cg:linear-gradient(135deg,#1d1c17,#101317);--gl:rgba(233,196,106,.28)}
-.card::before{content:"";position:absolute;z-index:-1;left:-18%;right:-18%;top:30%;bottom:-52%;border-radius:50%;background:radial-gradient(ellipse at 50% 42%,var(--gl) 0%,transparent 72%);filter:blur(18px);opacity:0;transform:translate3d(0,7px,0) scale(.92);transition:opacity .25s ease,transform .25s ease;pointer-events:none}.card::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.16) 50%,transparent 65%);transform:translateX(-120%);pointer-events:none}
+.card::before{content:"";position:absolute;z-index:-1;left:-18%;right:-18%;top:30%;bottom:-52%;border-radius:50%;background:radial-gradient(ellipse at 50% 42%,var(--gl) 0%,transparent 72%);filter:blur(18px);opacity:0;transform:translate3d(0,7px,0) scale(.92);transition:opacity .25s ease,transform .25s ease;pointer-events:none}.card::after{content:"";position:absolute;inset:0;border-radius:inherit;background-image:linear-gradient(105deg,transparent 44%,rgba(255,255,255,.16) 50%,transparent 56%);background-size:300% 100%;background-repeat:no-repeat;background-position:0% 0;pointer-events:none}
 .card svg{width:24px;height:24px;flex:none}
 .card .arr{color:#b9964a;font-size:20px;transition:transform .3s ease}
 .card.main{grid-column:1/-1;min-height:120px;font-size:20px;--cb:#e1c04f;--cg:linear-gradient(90deg,#4a3a14,#13110c 50%,#4a3a14);--gl:rgba(225,192,79,.35)}
 .card.dc{--cb:#3f4aa0;--cg:linear-gradient(135deg,#1f2550,#0e1124);--gl:rgba(125,135,255,.35)}
 .card .ic{color:#f2cf5a}.card.dc .ic{color:#8f95ff}
-@keyframes sheen{to{transform:translateX(120%)}}
+@keyframes sheen{from{background-position:0% 0}to{background-position:100% 0}}
 @keyframes wob{0%,100%{transform:rotate(0)}30%{transform:rotate(-12deg) scale(1.15)}70%{transform:rotate(8deg) scale(1.1)}}
 @media(hover:hover){.card:hover{transform:translateY(-3px);box-shadow:0 10px 30px var(--gl);border-color:#fff3c4}.card:hover::before{opacity:1;transform:translate3d(0,0,0) scale(1)}.card:hover::after{animation:sheen .8s ease}.card:hover .ic{animation:wob .6s ease}.card:hover .arr{transform:translateX(6px)}}
 .card:active,.card.tap{transform:scale(.97);box-shadow:0 0 26px var(--gl);border-color:#fff3c4}.card:active::before,.card.tap::before{opacity:.9;transform:translate3d(0,0,0) scale(1)}
@@ -78,27 +75,19 @@ input:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(23
 .edit{flex:none;padding:6px 12px;font:500 13px 'Noto Sans KR',sans-serif;border-radius:8px;border:1px solid var(--line);background:none;color:var(--gold2);cursor:pointer}
 .done{text-align:center;padding:36px 10px}
 .done h2{font-size:22px;color:var(--gold2)}.done p{color:var(--mut);margin:0}
-.bolt{font-size:40px}
 
 /* 수정된 명예의 전당 그리드 및 이미지 스타일 */
 .hall{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:12px}.hall img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.045);content-visibility:auto;-webkit-touch-callout:default!important;-webkit-user-select:auto;user-select:auto;-webkit-user-drag:element;user-drag:element;touch-action:pan-y;cursor:context-menu}
 
 .empty{text-align:center;color:var(--mut);padding:24px 0;font-size:15px}
 .top{display:flex;align-items:center;gap:10px;margin-bottom:14px}.top h2{margin:0}
-.admin{margin-top:14px;font-size:13px;color:var(--mut)}
 body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
 img{-webkit-user-drag:none;user-drag:none}
 .foot{margin-top:auto;padding-top:12px;text-align:center;font:500 12px Cinzel,serif;letter-spacing:.2em;color:rgba(185,198,234,.55)}
 .fx{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.fx svg{position:absolute;inset:0;width:100%;height:100%}
 .halo{position:absolute;left:50%;top:150px;width:560px;height:560px;max-width:140vw;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,200,60,.34),rgba(255,170,0,.1) 42%,transparent 68%)}
-@keyframes pulse{50%{opacity:.5;transform:translate(-50%,-50%) scale(1.14)}}
-.bolt{fill:none;stroke:#ffd54a;stroke-width:5;stroke-linejoin:round;vector-effect:non-scaling-stroke;opacity:0;filter:drop-shadow(0 0 6px #ffcf3a) drop-shadow(0 0 16px #ffb300)}
-.b1{animation:zap 4s infinite .5s}.b2{animation:zap 5s infinite 2s}.b3{animation:zap 6s infinite 3.5s}
-@keyframes zap{0%,91%,100%{opacity:0}92%{opacity:1}93%{opacity:.15}94%{opacity:1}97%{opacity:0}}
 .wrap{position:relative;z-index:1}
-@keyframes glow{0%,100%{box-shadow:0 0 0 6px rgba(233,196,106,.1),0 0 40px rgba(233,196,106,.28)}50%{box-shadow:0 0 0 8px rgba(255,208,80,.18),0 0 70px rgba(255,200,60,.6)}}
 @media(prefers-reduced-motion:reduce){.fx *,.logo{animation:none!important}}
 @media(min-width:900px){
 .wrap{max-width:1120px;padding:48px 40px 24px}
@@ -114,12 +103,8 @@ h1{font-size:68px;letter-spacing:.05em}
 .view:not(#home){width:100%;max-width:780px;margin:0 auto}
 .panel{padding:32px 36px}
 h2{font-size:24px}
-.halo{width:900px;height:900px;top:260px}
 }
-.bw{display:none}
 @media(min-width:900px){
-.bw{display:block}
-.b4{animation:zap 4.5s infinite 1.5s}.b5{animation:zap 5.5s infinite 3s}.b6{animation:zap 6.5s infinite 0s}.b7{animation:zap 5s infinite 2.5s}
 .wrap{max-width:1180px}
 #home.on{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;align-content:center;flex:1}
 .hero{display:block;text-align:center;margin:0}
@@ -133,18 +118,10 @@ h1{font-size:50px}
 .halo{display:none}
 body{overflow-x:clip}
 .hero{position:relative}
-.hero::before{content:"";position:absolute;left:50%;top:130px;width:900px;height:900px;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,200,60,.42),rgba(255,170,0,.12) 42%,transparent 68%);pointer-events:none;z-index:-1}
-body::before{background:radial-gradient(circle at 27% 34%,rgba(255,214,80,.3),transparent 45%)}
+.hero::before{content:"";position:absolute;left:50%;top:calc(var(--logo-size,240px)/2);width:900px;height:900px;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,200,60,.42),rgba(255,170,0,.12) 42%,transparent 68%);pointer-events:none;z-index:-1}
 }
-body.calm::before,.calm .fx{display:none}
-@media(max-width:899px){
-.bw{display:block}
-.b1{animation:zap 3s infinite .3s}.b2{animation:zap 3.6s infinite 1.4s}.b3{animation:zap 4.2s infinite 2.2s}
-.b4{animation:zap 3.3s infinite 0s}.b5{animation:zap 3.9s infinite 1s}.b6{animation:zap 4.4s infinite 2.6s}.b7{animation:zap 3.5s infinite 1.9s}
-.b8{animation:zap 4.8s infinite .8s}.b9{animation:zap 4.1s infinite 3s}.b10{animation:zap 5s infinite 2s}.b11{animation:zap 3.7s infinite 3.4s}
-}
+.calm .fx{display:none}
 .fx canvas{position:absolute;inset:0;width:100%;height:100%}
-body::before{display:none!important}
 
 
 /* 모바일: 화면별 중앙 정렬, 하단 문구 보호, 키보드가 열린 경우에만 스크롤 */
@@ -255,8 +232,8 @@ body::before{display:none!important}
     width:100%;
   }
   .brand-panel{display:flex;align-items:center;justify-content:center;min-width:0}
-  .brand-panel .hero{display:block;width:100%;text-align:center;margin:0}
-  .brand-panel .hero .logo{width:240px;height:240px}
+  .brand-panel .hero{--logo-size:240px;display:block;width:100%;text-align:center;margin:0}
+  .brand-panel .hero .logo{width:var(--logo-size);height:var(--logo-size)}
   .brand-panel .hero .since{margin:16px 0 8px}
   .brand-panel .hero h1{font-size:50px}
   .brand-panel .hero .tag{margin-top:12px;font-size:15px}
@@ -590,15 +567,22 @@ body::before{display:none!important}
 /* 터치 태블릿은 데스크톱 레이아웃을 유지하되, 주소창·가상 키보드의 실제 표시 영역에 고정 */
 @media (min-width:900px){
   html.tablet-viewport-lock{height:100%;overflow:hidden;overscroll-behavior:none}
+  /* 평상시(키보드 닫힘): JS가 측정한 값 없이 CSS만으로 화면을 가득 채웁니다.
+     홈 화면·키보드를 내린 뒤의 화면이 항상 같은 기준을 쓰므로 로고 세트 위치가 어긋나지 않습니다. */
   body.tablet-device{
     position:fixed;
-    inset-inline:0;
-    top:var(--tablet-visual-top,0px);
+    left:0;right:0;top:0;bottom:0;
     width:100%;
-    height:var(--tablet-visual-height,100dvh);
+    height:auto;
     min-height:0;
     overflow:hidden;
     overscroll-behavior:none;
+  }
+  /* 키보드가 열린 동안에만 실제로 보이는 영역(키보드·자동완성 줄 제외)에 맞춥니다. */
+  body.tablet-device.tablet-keyboard-open{
+    bottom:auto;
+    top:var(--tablet-visual-top,0px);
+    height:var(--tablet-visual-height,100%);
   }
   body.tablet-device .wrap{
     height:100%;
@@ -730,9 +714,11 @@ body::before{display:none!important}
   }
   body.tablet-device #brandPanel .hero h1{
     transform:translate3d(0,var(--tablet-brand-title-shift,0px),0);
-    transition:transform .20s cubic-bezier(.22,.75,.25,1);
-    will-change:transform;
+    transition:transform .20s cubic-bezier(.22,.75,.25,1),opacity .18s ease;
+    will-change:transform,opacity;
   }
+  /* 키보드(자동완성 줄 포함) 때문에 로고와 겹칠 만큼 공간이 부족하면 ZEUS CLAN 글자를 숨깁니다. */
+  body.tablet-device.tablet-brand-title-hidden #brandPanel .hero h1{opacity:0}
   body.tablet-device.tablet-keyboard-open #brandPanel .hero .since{
     /* 높이와 여백은 유지해 제목의 기준 좌표가 애니메이션 도중 바뀌지 않게 합니다. */
     opacity:0;
@@ -860,6 +846,29 @@ body::before{display:none!important}
   }
 }
 
+
+/* ───────── 데스크톱·패드: 버튼 호버/탭 후광이 직각으로 잘리지 않도록 ─────────
+   원인 1) .card{overflow:hidden}이 카드 아래로 번지는 후광(::before)을 카드 경계에서 잘랐음
+   원인 2) .right-panel{overflow:hidden}이 좌우 가장자리 카드의 box-shadow 후광을 패널 경계에서 잘랐음
+   → 카드는 overflow를 풀고(반짝임은 배경 위치 이동으로 카드 안에만 표시), 홈 화면에서는 우측 패널도 넘침을 허용합니다. */
+@media (min-width:900px){
+  .card{overflow:visible}
+  .card:hover,.card.tap{z-index:3}
+  .card::before{left:-10%;right:-10%;top:38%;bottom:-58%;filter:blur(22px)}
+  .card:hover{box-shadow:0 14px 40px var(--gl)}
+  body.home-state .right-panel{overflow:visible}
+  body.home-state .right-panel #home.view.on{overflow:visible}
+}
+
+/* 패드: ZEUS CLAN • ALL RIGHTS RESERVED 문구를 휴대폰과 같은 간격으로 화면 맨 아래에 배치합니다.
+   (패드는 데스크톱용 하단 여백 24px + 문구 여백이 더해져 휴대폰보다 위에 떠 있었음) */
+@media (min-width:900px){
+  body.tablet-device .wrap{padding-bottom:max(12px,env(safe-area-inset-bottom,0px))}
+  body.tablet-device:not(.tablet-keyboard-open) .foot{
+    padding:8px 0 max(2px,env(safe-area-inset-bottom,0px));
+    margin-top:auto;
+  }
+}
 </style>
 <!-- Main emblem normalized to symmetric transparent bounds for optical centering. -->
 </head>
@@ -961,7 +970,6 @@ function clearApplyDraft(){
   let baseHeight=viewport?viewport.height:window.innerHeight;
   let focusedField=null;
   let keyboardDetected=false;
-  let focusStartedAt=0;
   let centerTimer=0;
   let monitorTimer=0;
   let closeTimer=0;
@@ -1082,7 +1090,6 @@ function clearApplyDraft(){
     if(!mobileQuery.matches||!isField(el))return;
     clearTimeout(closeTimer);
     focusedField=el;
-    focusStartedAt=Date.now();
     startMonitor();
     clearTimeout(fallbackTimer);
     // visualViewport를 변경하지 않는 일부 인앱 브라우저에만 늦은 보정 적용.
@@ -1148,9 +1155,26 @@ function clearApplyDraft(){
 (function setupTabletKeyboardAndViewport(){
   const desktopQuery=matchMedia('(min-width:900px)');
   const viewport=window.visualViewport||null;
-  const coarsePointer=matchMedia('(pointer:coarse)').matches||matchMedia('(any-pointer:coarse)').matches;
-  const touchDevice=(Number(navigator.maxTouchPoints)||0)>0||('ontouchstart' in window)||coarsePointer||/Android|iPad|Tablet/i.test(navigator.userAgent||'');
-  const isTabletDesktop=desktopQuery.matches&&touchDevice;
+  const root=document.documentElement;
+  const coarseQuery=matchMedia('(pointer:coarse)');
+  const anyCoarseQuery=matchMedia('(any-pointer:coarse)');
+  const fineHoverQuery=matchMedia('(hover:hover) and (pointer:fine)');
+
+  // 기기를 고정값으로 판별하지 않고, 실행 중에 입력 방식·화면 너비를 다시 읽어 판단합니다.
+  // - iPad / 갤럭시 탭 / 기타 안드로이드 태블릿 / 데스크톱 모드로 열린 태블릿 모두 대상
+  // - iPadOS는 Mac처럼 보이는 UA를 보내므로 터치 지점 수로 구분
+  // - 마우스·트랙패드가 주 입력인 터치 노트북은 데스크톱으로 취급
+  // - 세로(<900px)로 열었다가 가로(≥900px)로 돌려도 다시 판별
+  function detectTouchTablet(){
+    const ua=navigator.userAgent||'';
+    const points=Number(navigator.maxTouchPoints)||0;
+    const touchCapable=points>0||('ontouchstart' in window)||anyCoarseQuery.matches||coarseQuery.matches;
+    if(!touchCapable)return false;
+    const iPadOS=/Macintosh/i.test(ua)&&points>1;
+    const tabletUA=/iPad|Android|Tablet|Silk|Kindle/i.test(ua);
+    return iPadOS||tabletUA||coarseQuery.matches||!fineHoverQuery.matches;
+  }
+  let isTabletDesktop=false;
 
   let baseHeight=0;
   let baseWidth=window.innerWidth||0;
@@ -1167,6 +1191,9 @@ function clearApplyDraft(){
   let lastVisibleHeight=0;
   let restoreFrame=0;
   let restoreTimer=0;
+  let brandTitleHidden=false;
+  let brandTitleTimers=[];
+  const BRAND_TITLE_MARGIN=14; // 제목 위(로고)·아래(키보드)에 반드시 남길 최소 여백(px)
 
   const isField=el=>!!(el&&el.matches&&el.matches('input,textarea'));
   function viewportMetrics(){
@@ -1202,9 +1229,8 @@ function clearApplyDraft(){
     if(candidates.length)return Math.min(...candidates);
     if(baseHeight-metrics.visible>threshold)return Math.max(0,currentTop())+metrics.visible;
 
-    // 키보드가 뷰포트 수치를 전혀 제공하지 않는 WebView에서만 사용하는 마지막 추정값입니다.
-    const estimatedHeight=Math.min(360,Math.max(220,baseHeight*.36));
-    return Math.max(0,baseHeight-estimatedHeight);
+    // 키보드 위치를 측정할 수 없으면 임의로 추정하지 않습니다. (호출부에서 제목을 숨김)
+    return null;
   }
 
   function computedTranslateY(element){
@@ -1217,6 +1243,22 @@ function clearApplyDraft(){
     return 0;
   }
 
+  function setBrandTitleHidden(hidden){
+    if(brandTitleHidden===hidden)return;
+    brandTitleHidden=hidden;
+    document.body.classList.toggle('tablet-brand-title-hidden',hidden);
+  }
+
+  // 제목 이동값·숨김 상태·예약된 재측정을 한 번에 원상복구합니다.
+  function resetBrandTitleAdjustments(){
+    const title=document.querySelector('#brandPanel .hero h1');
+    if(title)title.style.removeProperty('--tablet-brand-title-shift');
+    if(brandTitleFrame){cancelAnimationFrame(brandTitleFrame);brandTitleFrame=0;}
+    brandTitleTimers.forEach(clearTimeout);brandTitleTimers=[];
+    brandTitleHidden=false;
+    document.body.classList.remove('tablet-brand-title-hidden');
+  }
+
   function updateTabletBrandTitlePosition(){
     if(!isTabletDesktop||!keyboardOpen)return;
     const logo=document.getElementById('brandLogo');
@@ -1224,42 +1266,82 @@ function clearApplyDraft(){
     if(!logo||!title)return;
     const logoRect=logo.getBoundingClientRect();
     if(!logoRect.height)return;
-
-    // 실제 표시된 로고 이미지의 하단과 키보드 상단 사이 간격의 정확한 중앙에 제목 중심을 둡니다.
-    const imageBottomY=logoRect.bottom;
-    const keyboardTop=keyboardTopY();
-    const targetCenterY=imageBottomY+Math.max(0,keyboardTop-imageBottomY)/2;
     const titleRect=title.getBoundingClientRect();
     if(!titleRect.height)return;
+
+    // 로고 이미지 하단 ~ 키보드(자동완성 버튼 줄 포함) 상단 사이에 제목이 여백까지 들어갈 수 있는지 확인합니다.
+    // 들어가지 않으면 로고를 침범하는 대신 제목을 숨깁니다. (히스테리시스로 경계에서 깜빡임 방지)
+    const imageBottomY=logoRect.bottom;
+    const keyboardTop=keyboardTopY();
+    if(keyboardTop===null){setBrandTitleHidden(true);return;}
+    const gap=keyboardTop-imageBottomY;
+    const needed=titleRect.height+BRAND_TITLE_MARGIN*2;
+    const fits=brandTitleHidden?gap>=needed+18:gap>=needed;
+    if(!fits){setBrandTitleHidden(true);return;}
+    setBrandTitleHidden(false);
+
+    const targetCenterY=imageBottomY+gap/2;
     const naturalTitleCenter=titleRect.top+titleRect.height/2-computedTranslateY(title);
     const shift=targetCenterY-naturalTitleCenter;
     title.style.setProperty('--tablet-brand-title-shift',`${Math.round(shift*10)/10}px`);
   }
 
-  function scheduleBrandTitlePosition(){
+  // settle=true: 키보드 자동완성 줄(비밀번호·카드·위치 버튼)처럼 뒤늦게 높이가 바뀌는 경우를 위해 몇 번 더 재측정합니다.
+  function scheduleBrandTitlePosition(settle=false){
     if(!isTabletDesktop||!keyboardOpen)return;
     if(brandTitleFrame)cancelAnimationFrame(brandTitleFrame);
     brandTitleFrame=requestAnimationFrame(()=>{
       brandTitleFrame=0;
       updateTabletBrandTitlePosition();
     });
+    if(settle){
+      brandTitleTimers.forEach(clearTimeout);
+      brandTitleTimers=[140,320,640].map(ms=>setTimeout(()=>{
+        if(keyboardOpen)updateTabletBrandTitlePosition();
+      },ms));
+    }
   }
 
   baseHeight=viewportMetrics().reference;
   lastVisibleHeight=viewportMetrics().visible;
 
-  if(isTabletDesktop){
-    document.documentElement.classList.add('tablet-viewport-lock');
-    document.body.classList.add('tablet-device');
+  // 키보드가 열려 있는 동안에만 실제 표시 영역(높이·상단 오프셋)을 JS로 측정해 적용합니다.
+  // 키보드가 닫힌 평상시에는 값을 전혀 남기지 않아, CSS가 홈 화면과 똑같은 방식으로 화면을 채웁니다.
+  // (카카오톡 등 인앱 브라우저에서 키보드를 내린 뒤 이전에 측정한 값이 남아 위치가 어긋나던 문제 방지)
+  function applyTabletViewport(metrics=viewportMetrics()){
+    if(!isTabletDesktop||!keyboardOpen)return;
+    const height=Math.max(1,Math.round(metrics.visible));
+    const top=Math.max(0,Math.round(currentTop()));
+    root.style.setProperty('--tablet-visual-height',height+'px');
+    root.style.setProperty('--tablet-visual-top',top+'px');
+  }
+  function releaseTabletViewport(){
+    root.style.removeProperty('--tablet-visual-height');
+    root.style.removeProperty('--tablet-visual-top');
   }
 
-  function applyTabletViewport(metrics=viewportMetrics(),forceFull=false){
-    if(!isTabletDesktop)return;
-    const height=Math.max(1,Math.round(forceFull?Math.max(metrics.visible,baseHeight):metrics.visible));
-    const top=forceFull?0:Math.max(0,Math.round(currentTop()));
-    document.documentElement.style.setProperty('--tablet-visual-height',height+'px');
-    document.documentElement.style.setProperty('--tablet-visual-top',top+'px');
+  function syncTabletMode(){
+    const next=desktopQuery.matches&&detectTouchTablet();
+    if(next===isTabletDesktop)return;
+    isTabletDesktop=next;
+    if(next){
+      root.classList.add('tablet-viewport-lock');
+      document.body.classList.add('tablet-device');
+    }else{
+      root.classList.remove('tablet-viewport-lock');
+      document.body.classList.remove('tablet-device','tablet-keyboard-open');
+      resetBrandTitleAdjustments();
+      keyboardOpen=false;keyboardResizeObserved=false;fieldFocused=false;virtualKeyboardWasOpen=false;
+      clearTimeout(fallbackTimer);clearTimeout(closeCheckTimer);closeCheckTimer=0;
+      stopMonitor();
+      releaseTabletViewport();
+    }
+    const metrics=viewportMetrics();
+    baseHeight=metrics.reference;
+    baseWidth=window.innerWidth||baseWidth;
+    lastVisibleHeight=metrics.visible;
   }
+  syncTabletMode();
 
   function clearFormRestoreMotion(){
     clearTimeout(restoreTimer);restoreTimer=0;
@@ -1276,7 +1358,7 @@ function clearApplyDraft(){
     keyboardOpen=true;
     document.body.classList.add('tablet-keyboard-open');
     applyTabletViewport();
-    scheduleBrandTitlePosition();
+    scheduleBrandTitlePosition(true);
   }
 
   function restoreFormPosition(previousSlideTop){
@@ -1326,12 +1408,11 @@ function clearApplyDraft(){
     closeCheckTimer=0;
     clearTimeout(revealTimer);
     document.body.classList.remove('tablet-keyboard-open');
-    const brandTitle=document.querySelector('#brandPanel .hero h1');
-    if(brandTitle)brandTitle.style.removeProperty('--tablet-brand-title-shift');
-    if(brandTitleFrame){cancelAnimationFrame(brandTitleFrame);brandTitleFrame=0;}
+    resetBrandTitleAdjustments();
     baseHeight=Math.max(baseHeight,metrics.reference,window.innerHeight||0,document.documentElement.clientHeight||0);
-    // 키보드 종료 시 브라우저별로 남아 있는 축소 viewport 값을 버리고 전체 높이를 즉시 적용합니다.
-    applyTabletViewport({visible:baseHeight,reference:baseHeight},true);
+    // 키보드 종료 시 측정값을 모두 버립니다. 이후 레이아웃은 홈 화면과 같은 CSS 기준을 그대로 따릅니다.
+    // (입력창에 포커스가 남은 채 키보드 내리기 버튼만 눌린 경우에도 동일)
+    releaseTabletViewport();
     if(!fieldFocused)stopMonitor();
     if(restoreSlide)restoreFormPosition(previousSlideTop);
     else savedFormScrollTop=null;
@@ -1354,10 +1435,7 @@ function clearApplyDraft(){
     clearTimeout(fallbackTimer);fallbackTimer=0;
     clearTimeout(revealTimer);revealTimer=0;
     document.body.classList.remove('tablet-keyboard-open');
-
-    const brandTitle=document.querySelector('#brandPanel .hero h1');
-    if(brandTitle)brandTitle.style.removeProperty('--tablet-brand-title-shift');
-    if(brandTitleFrame){cancelAnimationFrame(brandTitleFrame);brandTitleFrame=0;}
+    resetBrandTitleAdjustments();
 
     keyboardOpen=false;
     keyboardResizeObserved=false;
@@ -1369,15 +1447,12 @@ function clearApplyDraft(){
     const metrics=viewportMetrics();
     baseHeight=Math.max(baseHeight,metrics.reference,window.innerHeight||0,document.documentElement.clientHeight||0);
     lastVisibleHeight=baseHeight;
-    applyTabletViewport({visible:baseHeight,reference:baseHeight},true);
+    releaseTabletViewport();
 
     // CSS state가 홈 화면 기준으로 다시 계산된 뒤에도 로고 이동값이 남지 않도록 한 번 더 정규화합니다.
     requestAnimationFrame(()=>{
-      if(brandTitle){
-        brandTitle.style.removeProperty('--tablet-brand-title-shift');
-        brandTitle.getBoundingClientRect();
-      }
-      applyTabletViewport({visible:baseHeight,reference:baseHeight},true);
+      resetBrandTitleAdjustments();
+      releaseTabletViewport();
     });
   }
   window.__zeusResetTabletKeyboard=resetTabletKeyboardForNavigation;
@@ -1390,11 +1465,10 @@ function clearApplyDraft(){
     if(keyboardOpen)closeTabletKeyboard(true,true);
     else{
       document.body.classList.remove('tablet-keyboard-open');
-      const brandTitle=document.querySelector('#brandPanel .hero h1');
-      if(brandTitle)brandTitle.style.removeProperty('--tablet-brand-title-shift');
+      resetBrandTitleAdjustments();
       const metrics=viewportMetrics();
       baseHeight=Math.max(baseHeight,metrics.reference,window.innerHeight||0,document.documentElement.clientHeight||0);
-      applyTabletViewport({visible:baseHeight,reference:baseHeight},true);
+      releaseTabletViewport();
     }
     fieldFocused=false;
     stopMonitor();
@@ -1452,6 +1526,13 @@ function clearApplyDraft(){
     const heightChanged=Math.abs(height-lastVisibleHeight)>1;
     lastVisibleHeight=height;
 
+    // 키보드가 닫힌 상태에서 화면 너비가 바뀌었다면(회전·분할 화면) 기준 높이를 새로 읽습니다.
+    const widthNow=window.innerWidth||0;
+    if(!keyboardOpen&&baseWidth&&Math.abs(widthNow-baseWidth)>40){
+      baseHeight=metrics.reference;
+      baseWidth=widthNow;
+    }
+
     const active=isField(document.activeElement);
     if(active&&!fieldFocused){
       fieldFocused=true;
@@ -1471,7 +1552,7 @@ function clearApplyDraft(){
         scheduleClose(false);
       }
       if(keyboardOpen&&(!fromMonitor||heightChanged))scheduleReveal(90);
-      if(keyboardOpen&&(!fromMonitor||heightChanged))scheduleBrandTitlePosition();
+      if(keyboardOpen&&(!fromMonitor||heightChanged))scheduleBrandTitlePosition(heightChanged);
     }else{
       if(keyboardOpen){
         scheduleClose(true);
@@ -1482,10 +1563,8 @@ function clearApplyDraft(){
       }
     }
 
-    const stableMetrics=(!keyboardOpen&&!fieldFocused)
-      ? {visible:baseHeight,reference:baseHeight}
-      : metrics;
-    applyTabletViewport(stableMetrics,false);
+    if(keyboardOpen)applyTabletViewport(metrics);
+    else releaseTabletViewport();
   }
 
   function beginFieldFocus(field){
@@ -1563,7 +1642,7 @@ function clearApplyDraft(){
           stopMonitor();
           const metrics=viewportMetrics();
           baseHeight=Math.max(baseHeight,metrics.reference);
-          applyTabletViewport({visible:baseHeight,reference:baseHeight},true);
+          releaseTabletViewport();
         }
       }
     },35);
@@ -1610,26 +1689,21 @@ function clearApplyDraft(){
     });
   }
 
-  desktopQuery.addEventListener?.('change',()=>{
-    if(desktopQuery.matches&&touchDevice){
-      document.documentElement.classList.add('tablet-viewport-lock');
-      document.body.classList.add('tablet-device');
-    }else{
-      document.documentElement.classList.remove('tablet-viewport-lock');
-      document.body.classList.remove('tablet-device','tablet-keyboard-open');
-      const brandTitle=document.querySelector('#brandPanel .hero h1');
-      if(brandTitle)brandTitle.style.removeProperty('--tablet-brand-title-shift');
-      if(brandTitleFrame){cancelAnimationFrame(brandTitleFrame);brandTitleFrame=0;}
-      keyboardOpen=false;keyboardResizeObserved=false;fieldFocused=false;
-      clearTimeout(fallbackTimer);stopMonitor();
+  // 화면 너비(세로↔가로 회전, 분할 화면)나 입력 장치가 바뀌면 태블릿 여부를 다시 판별합니다.
+  const resyncTabletMode=()=>{
+    syncTabletMode();
+    if(isTabletDesktop&&!keyboardOpen){
+      const metrics=viewportMetrics();
+      baseHeight=metrics.reference;
+      baseWidth=window.innerWidth||baseWidth;
+      lastVisibleHeight=metrics.visible;
+      releaseTabletViewport();
     }
-    const metrics=viewportMetrics();
-    baseHeight=metrics.reference;
-    baseWidth=window.innerWidth||baseWidth;
-    applyTabletViewport(metrics,true);
-  });
+    update(false);
+  };
+  desktopQuery.addEventListener?.('change',resyncTabletMode);
+  [coarseQuery,anyCoarseQuery,fineHoverQuery].forEach(q=>q.addEventListener?.('change',resyncTabletMode));
 
-  applyTabletViewport();
   update();
 })();
 
@@ -1696,6 +1770,7 @@ function positionMobileBrand(){
   if(!layout||!page||!firstButton)return;
   if(!matchMedia('(max-width:899px)').matches||!document.body.classList.contains('home-state')){
     layout.style.removeProperty('--mobile-brand-center-y');
+    requestAnimationFrame(positionHalo);
     return;
   }
   const layoutTop=layout.getBoundingClientRect().top;
@@ -1703,6 +1778,23 @@ function positionMobileBrand(){
   const buttonTop=firstButton.getBoundingClientRect().top;
   const centerY=(pageTop+buttonTop)/2-layoutTop;
   layout.style.setProperty('--mobile-brand-center-y',centerY+'px');
+  requestAnimationFrame(positionHalo);
+}
+
+// 모바일 번개 후광을 로고 이미지의 실제 중심에 맞춥니다. (화면 비율·주소창·회전과 무관)
+function positionHalo(){
+  const halo=document.querySelector('.fx .halo');
+  const logo=$('brandLogo');
+  if(!halo||!logo)return;
+  if(!matchMedia('(max-width:899px)').matches){
+    halo.style.removeProperty('left');
+    halo.style.removeProperty('top');
+    return;
+  }
+  const r=logo.getBoundingClientRect();
+  if(!r.width||!r.height)return;
+  halo.style.left=(r.left+r.width/2)+'px';
+  halo.style.top=(r.top+r.height/2)+'px';
 }
 
 (function watchMobileBrandPosition(){
@@ -1996,7 +2088,6 @@ async function hall(){
 }
 const tapFx=el=>{el.classList.add('tap');setTimeout(()=>el.classList.remove('tap'),600)};
 document.querySelectorAll('.card').forEach(c=>c.addEventListener('pointerdown',()=>tapFx(c)));
-const later=fn=>()=>setTimeout(fn,matchMedia('(hover:none)').matches?220:0);
 function openApplyForm(){
   // 같은 탭에서 홈으로 나갔다 돌아온 경우에는 작성 위치와 답변을 이어서 보여줍니다.
   // 제출이 완료되어 clearApplyDraft()가 실행된 뒤라면 cur=0의 빈 신청서로 시작합니다.
