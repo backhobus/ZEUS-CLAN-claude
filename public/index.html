@@ -715,7 +715,7 @@ body::before{display:none!important}
   }
 }
 
-/* 태블릿 가입 입력 중에는 SINCE 2020을 접고, ZEUS CLAN이 그 자리를 부드럽게 채웁니다. */
+/* 태블릿 키보드가 열리면 SINCE 2020을 접고, ZEUS CLAN은 실제 키보드 상단과 로고 중심의 정중앙으로 이동합니다. */
 @media (min-width:900px){
   body.tablet-device #brandPanel .hero .since{
     display:block;
@@ -732,7 +732,8 @@ body::before{display:none!important}
     will-change:max-height,margin,opacity,transform;
   }
   body.tablet-device #brandPanel .hero h1{
-    transition:transform .42s cubic-bezier(.22,.75,.25,1);
+    transform:translateY(var(--tablet-brand-title-shift,0px));
+    transition:transform .38s cubic-bezier(.22,.75,.25,1);
     will-change:transform;
   }
   body.tablet-device.tablet-keyboard-open #brandPanel .hero .since{
@@ -741,9 +742,6 @@ body::before{display:none!important}
     margin-bottom:0;
     opacity:0;
     transform:translateY(-8px);
-  }
-  body.tablet-device.tablet-keyboard-open #brandPanel .hero h1{
-    transform:translateY(-3px);
   }
 }
 @media(prefers-reduced-motion:reduce){
@@ -1076,6 +1074,7 @@ function clearApplyDraft(){
   let closeCheckTimer=0;
   let fallbackTimer=0;
   let monitorTimer=0;
+  let brandTitleFrame=0;
   let savedFormScrollTop=null;
   let lastVisibleHeight=0;
 
@@ -1089,6 +1088,56 @@ function clearApplyDraft(){
   const currentTop=()=>viewport&&Number.isFinite(viewport.offsetTop)?viewport.offsetTop:0;
   const keyboardOpenThreshold=()=>Math.max(120,baseHeight*.12);
   const keyboardCloseTolerance=()=>Math.max(105,baseHeight*.11);
+
+  function keyboardTopY(metrics=viewportMetrics()){
+    const rect=navigator.virtualKeyboard&&navigator.virtualKeyboard.boundingRect;
+    if(rect&&Number.isFinite(rect.top)&&Number.isFinite(rect.height)&&rect.height>0){
+      return Math.max(0,rect.top);
+    }
+    const viewportHeight=metrics.visible;
+    if(baseHeight-viewportHeight>keyboardOpenThreshold())return Math.max(0,currentTop())+viewportHeight;
+    if(viewport&&Number.isFinite(viewport.height)&&baseHeight-viewport.height>keyboardOpenThreshold()){
+      return Math.max(0,viewport.offsetTop||0)+viewport.height;
+    }
+    // 키보드 높이를 제공하지 않는 WebView용 보조 추정치. 실제 높이 정보가 있으면 위의 값이 우선합니다.
+    const estimatedHeight=Math.min(360,Math.max(220,baseHeight*.36));
+    return Math.max(0,baseHeight-estimatedHeight);
+  }
+
+  function computedTranslateY(element){
+    const transform=getComputedStyle(element).transform;
+    if(!transform||transform==='none')return 0;
+    const match=transform.match(/^matrix\(([^)]+)\)$/);
+    if(match){const parts=match[1].split(',').map(Number);return Number.isFinite(parts[5])?parts[5]:0;}
+    const match3d=transform.match(/^matrix3d\(([^)]+)\)$/);
+    if(match3d){const parts=match3d[1].split(',').map(Number);return Number.isFinite(parts[13])?parts[13]:0;}
+    return 0;
+  }
+
+  function updateTabletBrandTitlePosition(){
+    if(!isTabletDesktop||!keyboardOpen)return;
+    const logo=document.getElementById('brandLogo');
+    const title=document.querySelector('#brandPanel .hero h1');
+    if(!logo||!title)return;
+    const logoRect=logo.getBoundingClientRect();
+    const titleRect=title.getBoundingClientRect();
+    if(!logoRect.height||!titleRect.height)return;
+    const imageCenterY=logoRect.top+logoRect.height/2;
+    const keyboardTop=keyboardTopY();
+    const targetCenterY=imageCenterY+(keyboardTop-imageCenterY)/2;
+    const naturalTitleCenter=titleRect.top+titleRect.height/2-computedTranslateY(title);
+    const shift=targetCenterY-naturalTitleCenter;
+    title.style.setProperty('--tablet-brand-title-shift',`${Math.round(shift*10)/10}px`);
+  }
+
+  function scheduleBrandTitlePosition(){
+    if(!isTabletDesktop||!keyboardOpen)return;
+    if(brandTitleFrame)cancelAnimationFrame(brandTitleFrame);
+    brandTitleFrame=requestAnimationFrame(()=>{
+      brandTitleFrame=0;
+      updateTabletBrandTitlePosition();
+    });
+  }
 
   baseHeight=viewportMetrics().reference;
   lastVisibleHeight=viewportMetrics().visible;
@@ -1113,6 +1162,7 @@ function clearApplyDraft(){
     keyboardOpen=true;
     document.body.classList.add('tablet-keyboard-open');
     applyTabletViewport();
+    scheduleBrandTitlePosition();
   }
 
   function restoreFormPosition(previousSlideTop){
@@ -1154,8 +1204,13 @@ function clearApplyDraft(){
     keyboardResizeObserved=false;
     clearTimeout(fallbackTimer);
     document.body.classList.remove('tablet-keyboard-open');
+    const brandTitle=document.querySelector('#brandPanel .hero h1');
+    if(brandTitle)brandTitle.style.removeProperty('--tablet-brand-title-shift');
+    if(brandTitleFrame){cancelAnimationFrame(brandTitleFrame);brandTitleFrame=0;}
     baseHeight=Math.max(baseHeight,metrics.reference);
-    applyTabletViewport(metrics,false);
+    // 닫힘이 확정된 뒤에는 일부 WebView가 남겨 둔 축소 viewport 값을 따르지 않고
+    // 키보드가 없을 때의 전체 높이로 되돌려 슬라이드가 원래 프레임에 복귀하게 합니다.
+    applyTabletViewport(metrics,true);
     if(!fieldFocused)stopMonitor();
     restoreFormPosition(previousSlideTop);
   }
@@ -1227,6 +1282,7 @@ function clearApplyDraft(){
         scheduleClose(false);
       }
       if(keyboardOpen&&(!fromMonitor||heightChanged))scheduleReveal(90);
+      if(keyboardOpen&&(!fromMonitor||heightChanged))scheduleBrandTitlePosition();
     }else{
       if(keyboardOpen){
         if(height>=baseHeight-keyboardCloseTolerance())scheduleClose(true);
@@ -1249,14 +1305,9 @@ function clearApplyDraft(){
       if(savedFormScrollTop===null)savedFormScrollTop=formView?formView.scrollTop:0;
     }
     startMonitor();
+    // 포커스만으로 키보드가 열린 것으로 간주하지 않습니다.
+    // 실제 뷰포트 축소 또는 VirtualKeyboard geometrychange가 확인될 때만 화면을 전환합니다.
     clearTimeout(fallbackTimer);
-    // 실제 뷰포트 이벤트가 없는 WebView에서도 키보드가 완전히 뜬 뒤 보조 처리합니다.
-    fallbackTimer=setTimeout(()=>{
-      if(fieldFocused&&document.activeElement===field&&!keyboardOpen){
-        openTabletKeyboard();
-        scheduleReveal(100);
-      }
-    },850);
     update();
   }
 
@@ -1327,7 +1378,11 @@ function clearApplyDraft(){
         scheduleReveal(90);
       }else if(virtualKeyboardWasOpen){
         virtualKeyboardWasOpen=false;
-        scheduleClose(true);
+        clearTimeout(closeCheckTimer);
+        closeCheckTimer=setTimeout(()=>{
+          closeCheckTimer=0;
+          closeTabletKeyboard(true);
+        },320);
       }
     });
   }
@@ -1339,6 +1394,9 @@ function clearApplyDraft(){
     }else{
       document.documentElement.classList.remove('tablet-viewport-lock');
       document.body.classList.remove('tablet-device','tablet-keyboard-open');
+      const brandTitle=document.querySelector('#brandPanel .hero h1');
+      if(brandTitle)brandTitle.style.removeProperty('--tablet-brand-title-shift');
+      if(brandTitleFrame){cancelAnimationFrame(brandTitleFrame);brandTitleFrame=0;}
       keyboardOpen=false;keyboardResizeObserved=false;fieldFocused=false;
       clearTimeout(fallbackTimer);stopMonitor();
     }
