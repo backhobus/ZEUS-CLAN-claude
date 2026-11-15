@@ -857,36 +857,38 @@ body{height:100%;max-height:100dvh;overflow:hidden}
 @media(min-width:900px){
   html,body{height:100%;overflow:hidden}
   body{overflow:clip}
+  /* Original (first-version) sizes are the maximum; everything shrinks proportionally only when the window is shorter than ~600px */
   .wrap{height:100vh;height:100dvh;min-height:0;max-height:100dvh;
-    padding-top:clamp(10px,5vh,48px);padding-bottom:clamp(6px,2vh,24px)}
+    padding-top:clamp(10px,8vh,48px);padding-bottom:clamp(6px,4vh,24px)}
   .desktop-layout{gap:clamp(24px,5vw,56px)}
-  .brand-panel .hero{--logo-size:clamp(84px,27vh,240px)}
-  .brand-panel .hero .since{font-size:clamp(12px,1.9vh,18px);margin:clamp(6px,1.8vh,16px) 0 clamp(3px,1vh,8px)}
-  body.tablet-device #brandPanel .hero .since{margin:clamp(6px,1.8vh,16px) 0 clamp(3px,1vh,8px)}
-  .brand-panel .hero h1{font-size:clamp(26px,5.6vh,50px)}
-  .brand-panel .hero .tag{margin-top:clamp(6px,1.4vh,12px);font-size:clamp(12px,1.8vh,15px)}
-  #brandTag{height:clamp(28px,5vh,44px)}
-  .grid{gap:clamp(10px,2.2vh,20px)}
-  .card{min-height:clamp(58px,15vh,140px)}
-  .card.main{min-height:clamp(76px,21vh,190px)}
-  .foot{padding-top:clamp(4px,1.2vh,12px);font-size:clamp(10px,1.5vh,12px)}
-  body.tablet-device:not(.tablet-keyboard-open) .foot{padding-top:clamp(4px,1vh,8px)}
+  .brand-panel .hero{--logo-size:clamp(96px,40vh,240px)}
+  .brand-panel .hero .since{font-size:clamp(12px,3vh,18px);margin:clamp(6px,2.67vh,16px) 0 clamp(3px,1.33vh,8px)}
+  body.tablet-device #brandPanel .hero .since{margin:clamp(6px,2.67vh,16px) 0 clamp(3px,1.33vh,8px)}
+  .brand-panel .hero h1{font-size:clamp(28px,8.33vh,50px)}
+  .brand-panel .hero .tag{margin-top:clamp(6px,2vh,12px);font-size:clamp(12px,2.5vh,15px)}
+  #brandTag{height:clamp(30px,7.33vh,44px)}
+  .grid{gap:clamp(10px,3.33vh,20px)}
+  .card{min-height:clamp(60px,23.3vh,140px);font-size:clamp(15px,3.33vh,20px)}
+  .card.main{min-height:clamp(80px,31.7vh,190px);font-size:clamp(18px,4.33vh,26px)}
+  .card svg{width:clamp(22px,5.33vh,32px);height:clamp(22px,5.33vh,32px)}
+  .card .arr{font-size:clamp(20px,4.67vh,28px)}
+  .foot{padding-top:clamp(4px,2vh,12px)}
+  body.tablet-device:not(.tablet-keyboard-open) .foot{padding-top:clamp(4px,1.33vh,8px)}
   .right-panel .view:not(#home){max-height:min(86vh,calc(100dvh - 90px))}
-  .panel{padding:clamp(16px,3.4vh,32px) clamp(18px,3vw,36px)}
+  .panel{padding:clamp(16px,5.33vh,32px) clamp(18px,3vw,36px)}
 }
-
 /* Short phone / landscape: lay home out side by side so nothing is clipped or needs scrolling */
 @media(max-width:899px) and (max-height:480px){
   body.home-state .desktop-layout{flex-direction:row;align-items:center;gap:clamp(12px,3vw,28px)}
   body.home-state .brand-panel{flex:1 1 0;min-width:0;padding:0}
   body.home-state #brandPanel .hero{position:static;transform:none;animation:none;top:auto}
-  body.home-state #brandPanel .hero .logo{width:clamp(56px,26dvh,104px);height:clamp(56px,26dvh,104px)}
-  body.home-state #brandPanel .hero .since{font-size:clamp(9px,3dvh,12px);margin:clamp(3px,1.2dvh,6px) 0 2px}
-  body.home-state #brandPanel .hero h1{font-size:clamp(20px,7dvh,30px)}
-  body.home-state #brandPanel .hero .tag{font-size:clamp(9px,2.8dvh,11px);margin-top:clamp(3px,1dvh,6px);padding:3px 8px}
+  body.home-state #brandPanel .hero .logo{width:clamp(64px,34dvh,150px);height:clamp(64px,34dvh,150px)}
+  body.home-state #brandPanel .hero .since{font-size:clamp(10px,3.6dvh,14px);margin:clamp(4px,1.6dvh,8px) 0 2px}
+  body.home-state #brandPanel .hero h1{font-size:clamp(22px,9dvh,38px)}
+  body.home-state #brandPanel .hero .tag{font-size:clamp(10px,3.2dvh,13px);margin-top:clamp(4px,1.4dvh,8px);padding:4px 10px}
   body.home-state .right-panel{flex:1 1 0;min-width:0}
-  #home .card{min-height:clamp(40px,14dvh,60px);padding-top:6px;padding-bottom:6px}
-  #home .card.main{min-height:clamp(52px,18dvh,72px)}
+  #home .card{min-height:clamp(44px,19dvh,76px);padding-top:6px;padding-bottom:6px}
+  #home .card.main{min-height:clamp(58px,26dvh,100px);font-size:clamp(16px,5.5dvh,22px)}
 }
 </style>
 <!-- Main emblem normalized to symmetric transparent bounds for optical centering. -->
