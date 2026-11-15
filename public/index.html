@@ -637,14 +637,25 @@ body::before{display:none!important}
 }
 
 
-/* 데스크톱·태블릿 좌측 로고 후광: 기존 크기는 유지하고 좌측 잘림만 방지 */
+/* 데스크톱·태블릿 좌측 로고 후광: 크기와 중심은 유지하고
+   상위 요소의 페인팅 순서/오버플로에 의해 잘리지 않도록 별도 레이어로 표시 */
 @media (min-width: 900px) {
+  .desktop-layout,
   .brand-panel,
   .brand-panel .hero {
     overflow: visible !important;
   }
+  .brand-panel .hero {
+    isolation: isolate;
+  }
   .brand-panel .hero::before {
-    left: calc(50% + clamp(24px, 3vw, 48px));
+    z-index: 0;
+    left: 50%;
+    /* width/height는 기존 .hero::before 값을 그대로 사용 */
+  }
+  .brand-panel .hero > * {
+    position: relative;
+    z-index: 1;
   }
 }
 </style>
