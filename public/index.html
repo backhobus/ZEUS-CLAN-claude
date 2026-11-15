@@ -127,7 +127,7 @@ body{overflow-x:clip}
   html,body{width:100%;height:100%;overflow:hidden}
   body{min-height:0;overscroll-behavior:none}
   .wrap{
-    height:var(--mobile-viewport-height,100dvh);
+    height:var(--app-h,100%);
     min-height:0;
     padding:max(8px,env(safe-area-inset-top,0px)) 14px max(12px,env(safe-area-inset-bottom,0px));
     display:flex;
@@ -853,12 +853,12 @@ body:not(.calm) .fx{animation:zeusFxIn .8s ease both}
 
 /* ===== No-scroll fit: page always fits the viewport, content scales with viewport height ===== */
 html{height:100%;overflow:hidden;overscroll-behavior:none}
-body{height:100%;overflow:hidden}
+body{height:100%;max-height:var(--app-h,100%);overflow:hidden}
 @media(min-width:900px){
   html,body{height:100%;overflow:hidden}
   body{overflow:clip}
   /* Original (first-version) sizes are the maximum; everything shrinks proportionally only when the window is shorter than ~600px */
-  .wrap{height:100vh;height:100dvh;min-height:0;
+  .wrap{height:100vh;height:100dvh;min-height:0;max-height:100dvh;
     padding-top:clamp(10px,8vh,48px);padding-bottom:clamp(6px,4vh,24px)}
   .desktop-layout{gap:clamp(24px,5vw,56px)}
   .brand-panel .hero{--logo-size:clamp(96px,40vh,240px)}
@@ -877,61 +877,6 @@ body{height:100%;overflow:hidden}
   .right-panel .view:not(#home){max-height:min(86vh,calc(100dvh - 90px))}
   .panel{padding:clamp(16px,5.33vh,32px) clamp(18px,3vw,36px)}
 }
-
-/* ===== Tablet / large portrait: bigger logo, texts and buttons that scale with the device ===== */
-@media(min-width:600px) and (max-width:899px) and (min-height:700px){
-  .wrap{max-width:min(90vw,700px)}
-  body.home-state #brandPanel .hero .logo{width:clamp(150px,min(29vw,22vh),270px);height:clamp(150px,min(29vw,22vh),270px)}
-  body.home-state #brandPanel .hero .since{font-size:clamp(13px,1.9vw,19px);margin:clamp(8px,1.4vh,16px) 0 clamp(4px,.8vh,8px)}
-  body.home-state #brandPanel .hero h1{font-size:clamp(36px,7.4vw,62px)}
-  body.home-state #brandPanel .hero .tag{font-size:clamp(12px,2vw,18px);margin-top:clamp(6px,1.1vh,13px);padding:clamp(5px,.8vh,9px) clamp(12px,2vw,20px)}
-  .grid{gap:clamp(8px,1.2vh,14px)}
-  #home .card{min-height:clamp(88px,10vh,128px);font-size:clamp(16px,2.7vw,22px);gap:clamp(8px,1.3vw,12px);border-radius:16px}
-  #home .card.main{min-height:clamp(104px,12vh,160px);font-size:clamp(19px,3.3vw,28px)}
-  #home .card svg{width:clamp(22px,3.2vw,30px);height:clamp(22px,3.2vw,30px)}
-  #home .card .arr{font-size:clamp(19px,3vw,27px)}
-  .foot{font-size:clamp(10px,1.6vw,12px)}
-}
-@supports (height:1dvh){
-  @media(min-width:600px) and (max-width:899px) and (min-height:700px){
-    body.home-state #brandPanel .hero .logo{width:clamp(150px,min(29vw,22dvh),270px);height:clamp(150px,min(29vw,22dvh),270px)}
-    #home .card{min-height:clamp(88px,10dvh,128px)}
-    #home .card.main{min-height:clamp(104px,12dvh,160px)}
-  }
-}
-/* Large tablets in portrait that still use the two-column layout (e.g. 12.9" iPad) */
-@media(min-width:900px) and (orientation:portrait){
-  .brand-panel .hero{--logo-size:clamp(190px,min(25vw,26vh),270px)}
-  .brand-panel .hero .since{font-size:clamp(13px,1.9vw,20px)}
-  .brand-panel .hero h1{font-size:clamp(40px,5.2vw,56px)}
-  .brand-panel .hero .tag{font-size:clamp(13px,1.6vw,17px)}
-  #brandTag{height:clamp(34px,3.7vw,46px)}
-  .card{min-height:clamp(110px,11vh,150px);font-size:clamp(17px,2.1vw,22px)}
-  .card.main{min-height:clamp(146px,15vh,205px);font-size:clamp(22px,2.7vw,29px)}
-}
-
-/* ===== Touch tablets in landscape =====
-   - decorative glow is never clipped by the (keyboard-shrunk) page box
-   - while the soft keyboard is open the brand block is sized from the space that is really left (--layout-h, set by JS)
-   - footer sits flush at the bottom edge */
-@media(min-width:900px){
-  body.tablet-device{overflow:visible}
-  body.tablet-device .wrap{padding-bottom:max(4px,env(safe-area-inset-bottom,0px))}
-  body.tablet-device:not(.tablet-keyboard-open) .foot{padding:4px 0 max(2px,env(safe-area-inset-bottom,0px))}
-  body.tablet-device #brandPanel .hero .logo{transition:width .38s cubic-bezier(.22,.75,.25,1),height .38s cubic-bezier(.22,.75,.25,1)}
-  body.tablet-device #brandPanel .hero h1{transition:transform .20s cubic-bezier(.22,.75,.25,1),opacity .18s ease,font-size .38s cubic-bezier(.22,.75,.25,1)}
-  body.tablet-device #brandPanel .hero .since{transition:opacity .16s ease,transform .20s cubic-bezier(.22,.75,.25,1),max-height .34s ease,margin .34s ease}
-  body.tablet-device #brandTag{transition:opacity .32s ease,transform .42s cubic-bezier(.22,.75,.25,1),height .34s ease,margin .34s ease,padding .34s ease,border-width .34s ease}
-  body.tablet-device.tablet-keyboard-open #brandPanel .hero .since{max-height:0;margin-top:0;margin-bottom:0}
-  body.tablet-device.tablet-keyboard-open #brandTag{height:0;margin-top:0;padding-top:0;padding-bottom:0;border-width:0;overflow:hidden}
-  body.tablet-device.tablet-keyboard-open .brand-panel .hero{--logo-size:clamp(88px,calc(var(--layout-h,320px)*.6),240px)}
-  body.tablet-device.tablet-keyboard-open .brand-panel .hero h1{font-size:clamp(26px,calc(var(--layout-h,320px)*.15),50px)}
-  body.tablet-device.tablet-keyboard-open .right-panel #form.view.on{max-height:var(--layout-h,100%)}
-}
-@media(min-width:900px) and (prefers-reduced-motion:reduce){
-  body.tablet-device #brandPanel .hero .logo,body.tablet-device #brandPanel .hero .since,body.tablet-device #brandTag{transition:none!important}
-}
-
 /* Short phone / landscape: lay home out side by side so nothing is clipped or needs scrolling */
 @media(max-width:899px) and (max-height:480px){
   body.home-state .desktop-layout{flex-direction:row;align-items:center;gap:clamp(12px,3vw,28px)}
@@ -945,6 +890,12 @@ body{height:100%;overflow:hidden}
   #home .card{min-height:clamp(44px,19dvh,76px);padding-top:6px;padding-bottom:6px}
   #home .card.main{min-height:clamp(58px,26dvh,100px);font-size:clamp(16px,5.5dvh,22px)}
 }
+
+/* ===== Footer pinned to the very bottom on every device ===== */
+:root{--app-h:100%}
+@supports (height:100dvh){:root{--app-h:100dvh}}
+body:not(.keyboard-open):not(.tablet-keyboard-open) .wrap{padding-bottom:0!important}
+.foot{flex:0 0 auto!important;margin-top:auto!important;padding-bottom:max(6px,env(safe-area-inset-bottom,0px))!important}
 </style>
 <!-- Main emblem normalized to symmetric transparent bounds for optical centering. -->
 </head>
@@ -1293,6 +1244,36 @@ function smoothLayout(mutate){
   updateViewport();
 })();
 
+/* Keep the layout exactly as tall as the area the user can really see, so the footer sits at the very bottom in every browser/device.
+   visualViewport.height is deliberately NOT used here: some in-app browsers (e.g. KakaoTalk) report it smaller than the visible area even without a keyboard. */
+(function fitAppHeight(){
+  const root=document.documentElement,body=document.body;
+  const isField=el=>!!(el&&el.matches&&el.matches('input,textarea'));
+  const typing=()=>body.classList.contains('keyboard-open')||body.classList.contains('tablet-keyboard-open')||isField(document.activeElement);
+  let frame=0;
+  function apply(){
+    frame=0;
+    if(typing())return;
+    const vv=window.visualViewport;
+    if(vv&&vv.scale>1.02)return;
+    const vals=[window.innerHeight,root.clientHeight].filter(v=>Number.isFinite(v)&&v>0);
+    if(!vals.length)return;
+    const h=Math.round(Math.min(...vals))+'px';
+    if(root.style.getPropertyValue('--app-h')!==h)root.style.setProperty('--app-h',h);
+  }
+  const schedule=()=>{if(!frame)frame=requestAnimationFrame(apply);};
+  const settle=()=>{schedule();[120,360,800].forEach(ms=>setTimeout(schedule,ms));};
+  window.addEventListener('resize',schedule,{passive:true});
+  window.addEventListener('orientationchange',settle,{passive:true});
+  window.addEventListener('pageshow',settle);
+  window.addEventListener('load',settle);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')settle();});
+  document.addEventListener('focusout',()=>setTimeout(settle,250));
+  if(window.visualViewport)window.visualViewport.addEventListener('resize',schedule,{passive:true});
+  if(typeof MutationObserver!=='undefined')new MutationObserver(settle).observe(body,{attributes:true,attributeFilter:['class']});
+  settle();
+})();
+
 (function setupTabletKeyboardAndViewport(){
   const desktopQuery=matchMedia('(min-width:900px)');
   const viewport=window.visualViewport||null;
@@ -1402,9 +1383,7 @@ function smoothLayout(mutate){
     const titleRect=title.getBoundingClientRect();
     if(!titleRect.height)return;
 
-    const heroEl=document.querySelector('#brandPanel .hero');
-    const heroShift=heroEl?computedTranslateY(heroEl):0;
-    const imageBottomY=logoRect.bottom-heroShift;
+    const imageBottomY=logoRect.bottom;
     const keyboardTop=keyboardTopY();
     if(keyboardTop===null){setBrandTitleHidden(true);return;}
     const gap=keyboardTop-imageBottomY;
@@ -1414,7 +1393,7 @@ function smoothLayout(mutate){
     setBrandTitleHidden(false);
 
     const targetCenterY=imageBottomY+gap/2;
-    const naturalTitleCenter=titleRect.top+titleRect.height/2-computedTranslateY(title)-heroShift;
+    const naturalTitleCenter=titleRect.top+titleRect.height/2-computedTranslateY(title);
     const shift=targetCenterY-naturalTitleCenter;
     title.style.setProperty('--tablet-brand-title-shift',`${Math.round(shift*10)/10}px`);
   }
@@ -1439,12 +1418,6 @@ function smoothLayout(mutate){
 
   function applyTabletViewport(metrics=viewportMetrics()){
     if(!isTabletDesktop||!keyboardOpen)return;
-    // Browsers/WebViews that shrink the layout viewport themselves (Android in-app browsers such as KakaoTalk,
-    // Chrome "resizes-content") already give position:fixed the right box -> let CSS fill it (no JS height).
-    // Only compensate when just the visual viewport shrank (iOS Safari, Chrome default mode).
-    const innerH=window.innerHeight||0;
-    const vvH=viewport&&Number.isFinite(viewport.height)?viewport.height:0;
-    if(!vvH||innerH-vvH<48){releaseTabletViewport();return;}
     const height=Math.max(1,Math.round(metrics.visible));
     const top=Math.max(0,Math.round(currentTop()));
     root.style.setProperty('--tablet-visual-height',height+'px');
@@ -2352,89 +2325,6 @@ startHallPrefetch().catch(()=>{});
     const m=W<900;setTimeout(strike,(m?500:800)+Math.random()*(m?1100:1400));
   }
   strike();requestAnimationFrame(frame);
-})();
-
-/* Smoothly glide the logo/brand block whenever its layout position changes on tablets
-   (keyboard opening/closing, back to home, state changes) instead of jumping. */
-(function brandGlide(){
-  const hero=document.querySelector('#brandPanel .hero');
-  if(!hero||!hero.animate)return;
-  const body=document.body,root=document.documentElement;
-  const reduce=matchMedia('(prefers-reduced-motion:reduce)');
-  let cache=null,anim=null,pending=false;
-  function offset(){
-    const t=getComputedStyle(hero).transform;
-    if(!t||t==='none')return {x:0,y:0};
-    const m=t.match(/^matrix\(([^)]+)\)$/);
-    if(m){const a=m[1].split(',').map(Number);return {x:a[4]||0,y:a[5]||0};}
-    const m3=t.match(/^matrix3d\(([^)]+)\)$/);
-    if(m3){const a=m3[1].split(',').map(Number);return {x:a[12]||0,y:a[13]||0};}
-    return {x:0,y:0};
-  }
-  function measure(){
-    const r=hero.getBoundingClientRect();
-    if(!r.width||!r.height)return null;
-    const o=offset();
-    return {x:r.left-o.x,y:r.top-o.y,w:window.innerWidth};
-  }
-  function check(){
-    pending=false;
-    const m=measure();
-    if(!m){cache=null;return;}
-    const active=body.classList.contains('tablet-device')&&!reduce.matches;
-    if(!active){
-      if(anim){anim.cancel();anim=null;}
-      cache=m;return;
-    }
-    if(cache&&Math.abs(cache.w-m.w)<2&&(Math.abs(cache.x-m.x)>1||Math.abs(cache.y-m.y)>1)){
-      const o=offset();
-      const dx=cache.x+o.x-m.x,dy=cache.y+o.y-m.y;
-      if(anim){anim.cancel();anim=null;}
-      const a=hero.animate(
-        [{transform:`translate(${dx}px,${dy}px)`},{transform:'translate(0,0)'}],
-        {duration:460,easing:'cubic-bezier(.22,.75,.25,1)'}
-      );
-      anim=a;
-      const done=()=>{if(anim===a)anim=null;};
-      a.onfinish=done;a.oncancel=done;
-    }
-    cache=m;
-  }
-  function schedule(){check();}
-  const mo=new MutationObserver(schedule);
-  mo.observe(body,{attributes:true,attributeFilter:['class','style']});
-  mo.observe(root,{attributes:true,attributeFilter:['class','style']});
-  const wrap=document.querySelector('.wrap');
-  if(window.ResizeObserver&&wrap){new ResizeObserver(schedule).observe(wrap);}
-  window.addEventListener('resize',schedule,{passive:true});
-  if(window.visualViewport)window.visualViewport.addEventListener('resize',schedule,{passive:true});
-  window.addEventListener('load',()=>{cache=measure();},{once:true});
-  cache=measure();
-})();
-
-/* Live height of the usable stage (px). Drives keyboard-mode sizing of the brand block in every browser. */
-(function trackLayoutHeight(){
-  const layout=document.getElementById('desktopLayout');
-  if(!layout)return;
-  const set=()=>document.documentElement.style.setProperty('--layout-h',Math.round(layout.clientHeight)+'px');
-  if(window.ResizeObserver)new ResizeObserver(set).observe(layout);
-  window.addEventListener('resize',set,{passive:true});
-  if(window.visualViewport)window.visualViewport.addEventListener('resize',set,{passive:true});
-  set();
-})();
-
-/* Add #vvdebug (or ?vvdebug) to the URL to show live viewport numbers - handy to diagnose in-app browsers. */
-(function vvDebug(){
-  if(!/[?&#]vvdebug/.test(location.href))return;
-  const d=document.createElement('div');
-  d.style.cssText='position:fixed;left:6px;bottom:6px;z-index:99999;background:rgba(0,0,0,.75);color:#7CFC8A;font:11px/1.35 monospace;padding:5px 7px;border-radius:6px;pointer-events:none;white-space:pre';
-  document.body.appendChild(d);
-  const u=()=>{const v=window.visualViewport;
-    d.textContent=[`inner  ${innerWidth}x${innerHeight}`,`client ${document.documentElement.clientWidth}x${document.documentElement.clientHeight}`,
-      v?`vv     ${Math.round(v.width)}x${Math.round(v.height)} top ${Math.round(v.offsetTop)} x${v.scale.toFixed(2)}`:'vv     n/a',
-      `body   ${Math.round(document.body.getBoundingClientRect().height)}`,`stage  ${document.getElementById('desktopLayout').clientHeight}`,
-      document.body.className].join('\n');};
-  setInterval(u,300);u();
 })();
 </script>
 </body>
