@@ -133,7 +133,7 @@ h1{font-size:50px}
 .halo{display:none}
 body{overflow-x:clip}
 .hero{position:relative}
-.hero::before{content:"";position:absolute;left:50%;top:130px;width:780px;height:780px;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,200,60,.42),rgba(255,170,0,.12) 42%,transparent 68%);pointer-events:none;z-index:-1}
+.hero::before{content:"";position:absolute;left:50%;top:130px;width:min(780px,calc(50vw - 80px));height:min(780px,calc(50vw - 80px));transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,200,60,.42),rgba(255,170,0,.12) 42%,transparent 68%);pointer-events:none;z-index:-1}
 body::before{background:radial-gradient(circle at 27% 34%,rgba(255,214,80,.3),transparent 45%)}
 }
 body.calm::before,.calm .fx{display:none}
@@ -634,6 +634,18 @@ body::before{display:none!important}
     scroll-behavior:smooth;
   }
   body.tablet-device.tablet-keyboard-open .foot{display:none!important}
+}
+
+
+/* 데스크톱·태블릿 좌측 로고 후광: 기존 크기는 유지하고 좌측 잘림만 방지 */
+@media (min-width: 900px) {
+  .brand-panel,
+  .brand-panel .hero {
+    overflow: visible !important;
+  }
+  .brand-panel .hero::before {
+    left: calc(50% + clamp(24px, 3vw, 48px));
+  }
 }
 </style>
 <!-- Main emblem normalized to symmetric transparent bounds for optical centering. -->
