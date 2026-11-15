@@ -877,6 +877,31 @@ body{height:100%;max-height:100dvh;overflow:hidden}
   .right-panel .view:not(#home){max-height:min(86vh,calc(100dvh - 90px))}
   .panel{padding:clamp(16px,5.33vh,32px) clamp(18px,3vw,36px)}
 }
+
+/* ===== Tablet / large portrait: bigger logo, texts and buttons that scale with the device ===== */
+@media(min-width:600px) and (max-width:899px) and (min-height:700px){
+  .wrap{max-width:min(92vw,760px)}
+  body.home-state #brandPanel .hero .logo{width:clamp(160px,min(36vw,27dvh),330px);height:clamp(160px,min(36vw,27dvh),330px)}
+  body.home-state #brandPanel .hero .since{font-size:clamp(14px,2.3vw,22px);margin:clamp(10px,1.8dvh,20px) 0 clamp(5px,1dvh,10px)}
+  body.home-state #brandPanel .hero h1{font-size:clamp(40px,9.6vw,80px)}
+  body.home-state #brandPanel .hero .tag{font-size:clamp(13px,2.4vw,21px);margin-top:clamp(8px,1.4dvh,16px);padding:clamp(6px,.9dvh,10px) clamp(14px,2.4vw,24px)}
+  .grid{gap:clamp(9px,1.4dvh,16px)}
+  #home .card{min-height:clamp(96px,11.5dvh,150px);font-size:clamp(16px,2.9vw,24px);gap:clamp(8px,1.4vw,14px);border-radius:16px}
+  #home .card.main{min-height:clamp(114px,14dvh,190px);font-size:clamp(20px,3.8vw,32px)}
+  #home .card svg{width:clamp(22px,3.6vw,32px);height:clamp(22px,3.6vw,32px)}
+  #home .card .arr{font-size:clamp(20px,3.4vw,30px)}
+  .foot{font-size:clamp(10px,1.7vw,13px)}
+}
+/* Large tablets in portrait that still use the two-column layout (e.g. 12.9" iPad) */
+@media(min-width:900px) and (orientation:portrait){
+  .brand-panel .hero{--logo-size:clamp(200px,min(29vw,30vh),320px)}
+  .brand-panel .hero .since{font-size:clamp(14px,2.1vw,22px)}
+  .brand-panel .hero h1{font-size:clamp(44px,6vw,66px)}
+  .brand-panel .hero .tag{font-size:clamp(14px,1.8vw,19px)}
+  #brandTag{height:clamp(36px,4vw,52px)}
+  .card{min-height:clamp(120px,12.5vh,175px);font-size:clamp(18px,2.4vw,24px)}
+  .card.main{min-height:clamp(160px,17vh,235px);font-size:clamp(24px,3vw,32px)}
+}
 /* Short phone / landscape: lay home out side by side so nothing is clipped or needs scrolling */
 @media(max-width:899px) and (max-height:480px){
   body.home-state .desktop-layout{flex-direction:row;align-items:center;gap:clamp(12px,3vw,28px)}
@@ -1347,7 +1372,9 @@ function smoothLayout(mutate){
     const titleRect=title.getBoundingClientRect();
     if(!titleRect.height)return;
 
-    const imageBottomY=logoRect.bottom;
+    const heroEl=document.querySelector('#brandPanel .hero');
+    const heroShift=heroEl?computedTranslateY(heroEl):0;
+    const imageBottomY=logoRect.bottom-heroShift;
     const keyboardTop=keyboardTopY();
     if(keyboardTop===null){setBrandTitleHidden(true);return;}
     const gap=keyboardTop-imageBottomY;
@@ -1357,7 +1384,7 @@ function smoothLayout(mutate){
     setBrandTitleHidden(false);
 
     const targetCenterY=imageBottomY+gap/2;
-    const naturalTitleCenter=titleRect.top+titleRect.height/2-computedTranslateY(title);
+    const naturalTitleCenter=titleRect.top+titleRect.height/2-computedTranslateY(title)-heroShift;
     const shift=targetCenterY-naturalTitleCenter;
     title.style.setProperty('--tablet-brand-title-shift',`${Math.round(shift*10)/10}px`);
   }
@@ -2289,6 +2316,64 @@ startHallPrefetch().catch(()=>{});
     const m=W<900;setTimeout(strike,(m?500:800)+Math.random()*(m?1100:1400));
   }
   strike();requestAnimationFrame(frame);
+})();
+
+/* Smoothly glide the logo/brand block whenever its layout position changes on tablets
+   (keyboard opening/closing, back to home, state changes) instead of jumping. */
+(function brandGlide(){
+  const hero=document.querySelector('#brandPanel .hero');
+  if(!hero||!hero.animate)return;
+  const body=document.body,root=document.documentElement;
+  const reduce=matchMedia('(prefers-reduced-motion:reduce)');
+  let cache=null,anim=null,pending=false;
+  function offset(){
+    const t=getComputedStyle(hero).transform;
+    if(!t||t==='none')return {x:0,y:0};
+    const m=t.match(/^matrix\(([^)]+)\)$/);
+    if(m){const a=m[1].split(',').map(Number);return {x:a[4]||0,y:a[5]||0};}
+    const m3=t.match(/^matrix3d\(([^)]+)\)$/);
+    if(m3){const a=m3[1].split(',').map(Number);return {x:a[12]||0,y:a[13]||0};}
+    return {x:0,y:0};
+  }
+  function measure(){
+    const r=hero.getBoundingClientRect();
+    if(!r.width||!r.height)return null;
+    const o=offset();
+    return {x:r.left-o.x,y:r.top-o.y,w:window.innerWidth};
+  }
+  function check(){
+    pending=false;
+    const m=measure();
+    if(!m){cache=null;return;}
+    const active=body.classList.contains('tablet-device')&&!reduce.matches;
+    if(!active){
+      if(anim){anim.cancel();anim=null;}
+      cache=m;return;
+    }
+    if(cache&&Math.abs(cache.w-m.w)<2&&(Math.abs(cache.x-m.x)>1||Math.abs(cache.y-m.y)>1)){
+      const o=offset();
+      const dx=cache.x+o.x-m.x,dy=cache.y+o.y-m.y;
+      if(anim){anim.cancel();anim=null;}
+      const a=hero.animate(
+        [{transform:`translate(${dx}px,${dy}px)`},{transform:'translate(0,0)'}],
+        {duration:460,easing:'cubic-bezier(.22,.75,.25,1)'}
+      );
+      anim=a;
+      const done=()=>{if(anim===a)anim=null;};
+      a.onfinish=done;a.oncancel=done;
+    }
+    cache=m;
+  }
+  function schedule(){check();}
+  const mo=new MutationObserver(schedule);
+  mo.observe(body,{attributes:true,attributeFilter:['class','style']});
+  mo.observe(root,{attributes:true,attributeFilter:['class','style']});
+  const wrap=document.querySelector('.wrap');
+  if(window.ResizeObserver&&wrap){new ResizeObserver(schedule).observe(wrap);}
+  window.addEventListener('resize',schedule,{passive:true});
+  if(window.visualViewport)window.visualViewport.addEventListener('resize',schedule,{passive:true});
+  window.addEventListener('load',()=>{cache=measure();},{once:true});
+  cache=measure();
 })();
 </script>
 </body>
