@@ -1746,16 +1746,20 @@ const uidOk=v=>/^[0-9A-Z]{15,16}$/.test(v)&&!v.includes('O');
 function step(i,options={}){
   cur=i;draftStage='step';const q=Q[i];
   let f;
-  const answerFieldHints=`name="zeus_answer_${q.k}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="text" enterkeyhint="next" aria-autocomplete="none" data-form-type="other" data-lpignore="true" data-1p-ignore="true" data-bwignore="true"`;
+  // 가입 답변 입력은 브라우저 자동완성 대상이 아닙니다.
+  // form/name을 사용하지 않고 비의미적인 id를 사용해 Chrome이 비밀번호·카드·주소 필드로
+  // 재분류하는 것을 최대한 억제합니다. autocomplete 차단 속성은 개별 필드에도 유지합니다.
+  const answerFieldHints=`autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="text" enterkeyhint="next" aria-autocomplete="none" data-form-type="other" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-gramm="false" data-enable-grammarly="false"`;
   if(q.t==='yn')f=`<div class="yn"><button data-v="예">예</button><button data-v="아니요">아니요</button></div>`;
-  else if(q.t==='area')f=`<textarea id="f" ${answerFieldHints} ${q.sm?'style="min-height:84px"':''} ${q.ph?`placeholder="${esc(q.ph)}"`:''}></textarea>`;
-  else f=`<input type="text" id="f" ${answerFieldHints} ${q.ph?`placeholder="${esc(q.ph)}"`:''}>`;
-  const answerFieldForm=q.t==='yn'?f:`<form id="answerForm" class="answer-form" autocomplete="off" autocapitalize="off" spellcheck="false" novalidate onsubmit="return false">${f}</form>`;
+  else if(q.t==='area')f=`<textarea id="zeusAnswerField" ${answerFieldHints} ${q.sm?'style="min-height:84px"':''} ${q.ph?`placeholder="${esc(q.ph)}"`:''}></textarea>`;
+  else f=`<input type="text" id="zeusAnswerField" ${answerFieldHints} ${q.ph?`placeholder="${esc(q.ph)}"`:''}>`;
+  // 네이티브 form 래퍼를 제거해 Chrome Autofill이 비밀번호/결제/주소 폼으로 탐지할 단서를 없앱니다.
+  const answerFieldForm=q.t==='yn'?f:`<div class="answer-form" role="group" aria-label="답변 입력">${f}</div>`;
   $('stage').innerHTML=`
    <h2>${q.q}</h2>${answerFieldForm}<p class="err" id="err"></p>
    <div class="nav ${i===0?'one':''} ${fromConfirm?'edit-return':''}">${i===0||fromConfirm?'':'<button class="b" id="prev">이전</button>'}<button class="b go" id="next">다음</button></div>`;
   const err=$('err'),hide=()=>err.classList.remove('on');
-  const f1=$('f');
+  const f1=$('zeusAnswerField');
   const read=()=>{if(f1){const value=q.sm?f1.value.replace(/\s*\n\s*/g,' ').trim():f1.value.trim();A[q.k]=q.k==='uid'?value.toUpperCase():value}};
   
   if(f1){
