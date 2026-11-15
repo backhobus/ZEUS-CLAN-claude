@@ -1193,7 +1193,7 @@ function clearApplyDraft(){
   let restoreTimer=0;
   let brandTitleHidden=false;
   let brandTitleTimers=[];
-  const BRAND_TITLE_MARGIN=14; // 제목 위(로고)·아래(키보드)에 반드시 남길 최소 여백(px)
+  const BRAND_TITLE_MARGIN=6; // 제목 위(로고)·아래(키보드)에 남길 최소 여백(px). 실제로 겹칠 때만 숨기도록 작게 유지
 
   const isField=el=>!!(el&&el.matches&&el.matches('input,textarea'));
   function viewportMetrics(){
@@ -1276,7 +1276,7 @@ function clearApplyDraft(){
     if(keyboardTop===null){setBrandTitleHidden(true);return;}
     const gap=keyboardTop-imageBottomY;
     const needed=titleRect.height+BRAND_TITLE_MARGIN*2;
-    const fits=brandTitleHidden?gap>=needed+18:gap>=needed;
+    const fits=brandTitleHidden?gap>=needed+10:gap>=needed;
     if(!fits){setBrandTitleHidden(true);return;}
     setBrandTitleHidden(false);
 
