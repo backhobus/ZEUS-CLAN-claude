@@ -40,8 +40,8 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;background:ra
 h1{font:800 clamp(24px,8vw,48px) Orbitron,'Noto Sans KR',sans-serif;letter-spacing:.04em;line-height:1.15;margin:0;color:#f4ecd2;text-shadow:0 0 16px rgba(255,208,100,.4),0 0 35px rgba(255,190,60,.2)}
 .tag{margin:10px auto 0;font-size:13.5px;color:#b9c6ea;padding:6px 16px;border:1px solid rgba(150,170,230,.35);border-radius:999px;display:inline-block;background:rgba(120,140,220,.08)}.tag .y{color:#f5cf55;font-weight:700}.tag .p{color:#b98cff;font-weight:700}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.card{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:10px;text-align:center;min-height:98px;padding:12px;border-radius:16px;border:1.5px solid var(--cb);background:var(--cg);color:#f6ecc8;font:700 16px 'Noto Sans KR',sans-serif;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;--cb:#5d5632;--cg:linear-gradient(135deg,#1d1c17,#101317);--gl:rgba(233,196,106,.28)}
-.card::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.16) 50%,transparent 65%);transform:translateX(-120%);pointer-events:none}
+.card{position:relative;isolation:isolate;overflow:visible;display:flex;align-items:center;justify-content:center;gap:10px;text-align:center;min-height:98px;padding:12px;border-radius:16px;border:1.5px solid var(--cb);background:var(--cg);color:#f6ecc8;font:700 16px 'Noto Sans KR',sans-serif;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;--cb:#5d5632;--cg:linear-gradient(135deg,#1d1c17,#101317);--gl:rgba(233,196,106,.28)}
+.card::before{content:"";position:absolute;z-index:-1;left:-18%;right:-18%;top:30%;bottom:-52%;border-radius:50%;background:radial-gradient(ellipse at 50% 42%,var(--gl) 0%,transparent 72%);filter:blur(18px);opacity:0;transform:translate3d(0,7px,0) scale(.92);transition:opacity .25s ease,transform .25s ease;pointer-events:none}.card::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.16) 50%,transparent 65%);transform:translateX(-120%);pointer-events:none}
 .card svg{width:24px;height:24px;flex:none}
 .card .arr{color:#b9964a;font-size:20px;transition:transform .3s ease}
 .card.main{grid-column:1/-1;min-height:120px;font-size:20px;--cb:#e1c04f;--cg:linear-gradient(90deg,#4a3a14,#13110c 50%,#4a3a14);--gl:rgba(225,192,79,.35)}
@@ -49,8 +49,8 @@ h1{font:800 clamp(24px,8vw,48px) Orbitron,'Noto Sans KR',sans-serif;letter-spaci
 .card .ic{color:#f2cf5a}.card.dc .ic{color:#8f95ff}
 @keyframes sheen{to{transform:translateX(120%)}}
 @keyframes wob{0%,100%{transform:rotate(0)}30%{transform:rotate(-12deg) scale(1.15)}70%{transform:rotate(8deg) scale(1.1)}}
-@media(hover:hover){.card:hover{transform:translateY(-3px);box-shadow:0 8px 28px var(--gl);border-color:#fff3c4}.card:hover::after{animation:sheen .8s ease}.card:hover .ic{animation:wob .6s ease}.card:hover .arr{transform:translateX(6px)}}
-.card:active,.card.tap{transform:scale(.97);box-shadow:0 0 26px var(--gl);border-color:#fff3c4}
+@media(hover:hover){.card:hover{transform:translateY(-3px);box-shadow:0 10px 30px var(--gl);border-color:#fff3c4}.card:hover::before{opacity:1;transform:translate3d(0,0,0) scale(1)}.card:hover::after{animation:sheen .8s ease}.card:hover .ic{animation:wob .6s ease}.card:hover .arr{transform:translateX(6px)}}
+.card:active,.card.tap{transform:scale(.97);box-shadow:0 0 26px var(--gl);border-color:#fff3c4}.card:active::before,.card.tap::before{opacity:.9;transform:translate3d(0,0,0) scale(1)}
 .card.tap::after{animation:sheen .6s ease}.card.tap .ic{animation:wob .5s ease}.card.tap .arr{transform:translateX(6px)}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 16px;backdrop-filter:blur(6px)}
 .privacy-note{margin:0 0 16px;padding:10px 12px;border:1px solid rgba(233,196,106,.18);border-radius:9px;background:rgba(0,0,0,.16);color:var(--mut);font-size:12px;line-height:1.65;word-break:keep-all}
@@ -243,6 +243,10 @@ body::before{display:none!important}
 
 
 /* 데스크톱: 좌측 브랜드 영역은 고정하고 우측 콘텐츠만 전환 */
+@media(min-width:900px){
+  body.home-state .right-panel{overflow:visible}
+}
+
 @media(min-width:900px){
   .wrap{height:100vh;min-height:100vh;display:flex;flex-direction:column}
   .desktop-layout{
@@ -767,6 +771,14 @@ body::before{display:none!important}
 /* Chrome의 자동완성 판단을 명확하게 하되 입력창의 기본 배치는 유지 */
 .answer-form{display:block;margin:0;padding:0;border:0;background:transparent}
 
+
+/* PC·패드 홈 메뉴의 hover 후광은 버튼 아래쪽과 좌우로 자연스럽게 퍼지도록 패널 클리핑을 해제합니다. */
+@media (min-width:900px){
+  body.home-state .right-panel,
+  body.home-state #home.view.on,
+  body.home-state #home .grid{overflow:visible!important}
+  body.home-state .card{overflow:visible!important}
+}
 </style>
 <!-- Main emblem normalized to symmetric transparent bounds for optical centering. -->
 </head>
@@ -1248,28 +1260,44 @@ function clearApplyDraft(){
   function resetTabletKeyboardForNavigation(){
     if(!isTabletDesktop)return;
     clearFormRestoreMotion();
+
+    // 화면 전환 중 먼저 포커스를 해제합니다. 일부 WebView는 blur 뒤늦게 viewport resize를 보내므로,
+    // 아래에서 전체 화면 높이를 확정하고 이후의 일시적인 축소 이벤트도 다시 적용하지 않습니다.
     const active=document.activeElement;
     if(isField(active)){
       try{active.blur();}catch(error){}
     }
     if(keyboardOpen)closeTabletKeyboard(true,false);
-    else{
-      clearTimeout(closeCheckTimer);closeCheckTimer=0;
-      clearTimeout(fallbackTimer);
-      clearTimeout(revealTimer);
-      document.body.classList.remove('tablet-keyboard-open');
-      const brandTitle=document.querySelector('#brandPanel .hero h1');
-      if(brandTitle)brandTitle.style.removeProperty('--tablet-brand-title-shift');
-      if(brandTitleFrame){cancelAnimationFrame(brandTitleFrame);brandTitleFrame=0;}
-      keyboardResizeObserved=false;
-      virtualKeyboardWasOpen=false;
-      savedFormScrollTop=null;
-      const metrics=viewportMetrics();
-      baseHeight=Math.max(baseHeight,metrics.reference,window.innerHeight||0,document.documentElement.clientHeight||0);
-      applyTabletViewport({visible:baseHeight,reference:baseHeight},true);
-    }
+
+    clearTimeout(closeCheckTimer);closeCheckTimer=0;
+    clearTimeout(fallbackTimer);fallbackTimer=0;
+    clearTimeout(revealTimer);revealTimer=0;
+    document.body.classList.remove('tablet-keyboard-open');
+
+    const brandTitle=document.querySelector('#brandPanel .hero h1');
+    if(brandTitle)brandTitle.style.removeProperty('--tablet-brand-title-shift');
+    if(brandTitleFrame){cancelAnimationFrame(brandTitleFrame);brandTitleFrame=0;}
+
+    keyboardOpen=false;
+    keyboardResizeObserved=false;
+    virtualKeyboardWasOpen=false;
     fieldFocused=false;
+    savedFormScrollTop=null;
     stopMonitor();
+
+    const metrics=viewportMetrics();
+    baseHeight=Math.max(baseHeight,metrics.reference,window.innerHeight||0,document.documentElement.clientHeight||0);
+    lastVisibleHeight=baseHeight;
+    applyTabletViewport({visible:baseHeight,reference:baseHeight},true);
+
+    // CSS state가 홈 화면 기준으로 다시 계산된 뒤에도 로고 이동값이 남지 않도록 한 번 더 정규화합니다.
+    requestAnimationFrame(()=>{
+      if(brandTitle){
+        brandTitle.style.removeProperty('--tablet-brand-title-shift');
+        brandTitle.getBoundingClientRect();
+      }
+      applyTabletViewport({visible:baseHeight,reference:baseHeight},true);
+    });
   }
   window.__zeusResetTabletKeyboard=resetTabletKeyboardForNavigation;
   function dismissTabletKeyboard(){
@@ -1365,14 +1393,18 @@ function clearApplyDraft(){
       if(keyboardOpen&&(!fromMonitor||heightChanged))scheduleBrandTitlePosition();
     }else{
       if(keyboardOpen){
-        if(height>=baseHeight-keyboardCloseTolerance())scheduleClose(true);
-        else scheduleClose(true);
+        scheduleClose(true);
       }else if(!fieldFocused){
+        // 키보드를 닫은 직후 일부 인앱 브라우저가 이전의 축소 viewport 크기를 늦게 다시 전달합니다.
+        // 포커스와 키보드 상태가 모두 해제된 화면에서는 그 값으로 페이지 높이를 줄이지 않습니다.
         baseHeight=Math.max(baseHeight,metrics.reference);
       }
     }
 
-    applyTabletViewport(metrics,false);
+    const stableMetrics=(!keyboardOpen&&!fieldFocused)
+      ? {visible:baseHeight,reference:baseHeight}
+      : metrics;
+    applyTabletViewport(stableMetrics,false);
   }
 
   function beginFieldFocus(field){
@@ -1611,15 +1643,16 @@ function positionMobileBrand(){
 })();
 
 function show(id){
-  if(id!=='form'&&typeof window.__zeusResetTabletKeyboard==='function'){
-    window.__zeusResetTabletKeyboard();
-  }
+  const resetTablet=id!=='form'&&typeof window.__zeusResetTabletKeyboard==='function';
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));
   const isHome=id==='home';
   const isContentView=!isHome;
   document.body.classList.toggle('home-state',isHome);
   document.body.classList.toggle('hall-state',id==='hallV');
   document.body.classList.toggle('calm',id==='form'||id==='hallV'||id==='doneV');
+
+  // 목적 화면의 레이아웃 클래스가 적용된 뒤 키보드·브랜드 보정값을 초기화합니다.
+  if(resetTablet)window.__zeusResetTabletKeyboard();
   updateBrandTag(isContentView);
   const wrap=document.querySelector('.wrap');
   if(wrap)wrap.scrollTop=0;
