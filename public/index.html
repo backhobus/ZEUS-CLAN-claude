@@ -2056,7 +2056,7 @@ function startHallPrefetch(){
     hallImageItems.sort((a,b)=>Number(b.modifiedAt||0)-Number(a.modifiedAt||0));
     hallImageElements=hallImageItems.map((item,index)=>{
       const img=document.createElement('img');
-      img.alt='불러오는 중';
+      img.alt='ZEUS';
       img.draggable=true;
       img.decoding='async';
       img.loading='eager';
