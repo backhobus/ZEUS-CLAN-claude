@@ -661,6 +661,98 @@ body::before{display:none!important}
     z-index: 1;
   }
 }
+
+
+/* 태블릿 명예의 전당: 실제 보이는 뷰포트 안에 상단 제목을 고정하고 목록만 스크롤 */
+@media (min-width:900px){
+  body.tablet-device.hall-state .desktop-layout{
+    align-items:stretch;
+  }
+  body.tablet-device.hall-state .right-panel{
+    align-items:stretch;
+    justify-content:flex-start;
+    min-height:0;
+    height:100%;
+    overflow:hidden;
+    padding-top:16px;
+    padding-bottom:16px;
+  }
+  body.tablet-device.hall-state #hallV.view.on{
+    display:flex;
+    flex:1 1 0%;
+    flex-direction:column;
+    min-height:0;
+    max-height:100%;
+    margin:0 auto;
+    overflow:hidden;
+  }
+  body.tablet-device.hall-state #hallV>.panel{
+    display:flex;
+    flex:1 1 auto;
+    flex-direction:column;
+    min-height:0;
+    max-height:100%;
+    overflow:hidden;
+    box-sizing:border-box;
+  }
+  body.tablet-device.hall-state #hallV .top{
+    flex:0 0 auto;
+    margin-top:0;
+  }
+  body.tablet-device.hall-state #hallV .hall{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    align-content:start;
+    flex:1 1 0%;
+    min-height:0;
+    max-height:none;
+    overflow-x:hidden;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-y:contain;
+    touch-action:pan-y;
+    padding-bottom:max(12px,env(safe-area-inset-bottom,0px));
+  }
+}
+
+/* 태블릿 가입 입력 중에는 SINCE 2020을 접고, ZEUS CLAN이 그 자리를 부드럽게 채웁니다. */
+@media (min-width:900px){
+  body.tablet-device #brandPanel .hero .since{
+    display:block;
+    max-height:40px;
+    margin:16px 0 8px;
+    overflow:hidden;
+    opacity:1;
+    transform:translateY(0);
+    transition:
+      max-height .42s cubic-bezier(.22,.75,.25,1),
+      margin .42s cubic-bezier(.22,.75,.25,1),
+      opacity .24s ease,
+      transform .42s cubic-bezier(.22,.75,.25,1);
+    will-change:max-height,margin,opacity,transform;
+  }
+  body.tablet-device #brandPanel .hero h1{
+    transition:transform .42s cubic-bezier(.22,.75,.25,1);
+    will-change:transform;
+  }
+  body.tablet-device.tablet-keyboard-open #brandPanel .hero .since{
+    max-height:0;
+    margin-top:0;
+    margin-bottom:0;
+    opacity:0;
+    transform:translateY(-8px);
+  }
+  body.tablet-device.tablet-keyboard-open #brandPanel .hero h1{
+    transform:translateY(-3px);
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  body.tablet-device #brandPanel .hero .since,
+  body.tablet-device #brandPanel .hero h1{
+    transition:none!important;
+  }
+}
+
 </style>
 <!-- Main emblem normalized to symmetric transparent bounds for optical centering. -->
 </head>
