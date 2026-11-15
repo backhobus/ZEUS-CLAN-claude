@@ -40,7 +40,7 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;background:ra
 h1{font:800 clamp(24px,8vw,48px) Orbitron,'Noto Sans KR',sans-serif;letter-spacing:.04em;line-height:1.15;margin:0;color:#f4ecd2;text-shadow:0 0 16px rgba(255,208,100,.4),0 0 35px rgba(255,190,60,.2)}
 .tag{margin:10px auto 0;font-size:13.5px;color:#b9c6ea;padding:6px 16px;border:1px solid rgba(150,170,230,.35);border-radius:999px;display:inline-block;background:rgba(120,140,220,.08)}.tag .y{color:#f5cf55;font-weight:700}.tag .p{color:#b98cff;font-weight:700}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.card{position:relative;isolation:isolate;overflow:visible;display:flex;align-items:center;justify-content:center;gap:10px;text-align:center;min-height:98px;padding:12px;border-radius:16px;border:1.5px solid var(--cb);background:var(--cg);color:#f6ecc8;font:700 16px 'Noto Sans KR',sans-serif;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;--cb:#5d5632;--cg:linear-gradient(135deg,#1d1c17,#101317);--gl:rgba(233,196,106,.28)}
+.card{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:10px;text-align:center;min-height:98px;padding:12px;border-radius:16px;border:1.5px solid var(--cb);background:var(--cg);color:#f6ecc8;font:700 16px 'Noto Sans KR',sans-serif;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;--cb:#5d5632;--cg:linear-gradient(135deg,#1d1c17,#101317);--gl:rgba(233,196,106,.28)}
 .card::before{content:"";position:absolute;z-index:-1;left:-18%;right:-18%;top:30%;bottom:-52%;border-radius:50%;background:radial-gradient(ellipse at 50% 42%,var(--gl) 0%,transparent 72%);filter:blur(18px);opacity:0;transform:translate3d(0,7px,0) scale(.92);transition:opacity .25s ease,transform .25s ease;pointer-events:none}.card::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.16) 50%,transparent 65%);transform:translateX(-120%);pointer-events:none}
 .card svg{width:24px;height:24px;flex:none}
 .card .arr{color:#b9964a;font-size:20px;transition:transform .3s ease}
@@ -243,10 +243,6 @@ body::before{display:none!important}
 
 
 /* 데스크톱: 좌측 브랜드 영역은 고정하고 우측 콘텐츠만 전환 */
-@media(min-width:900px){
-  body.home-state .right-panel{overflow:visible}
-}
-
 @media(min-width:900px){
   .wrap{height:100vh;min-height:100vh;display:flex;flex-direction:column}
   .desktop-layout{
@@ -772,13 +768,98 @@ body::before{display:none!important}
 .answer-form{display:block;margin:0;padding:0;border:0;background:transparent}
 
 
-/* PC·패드 홈 메뉴의 hover 후광은 버튼 아래쪽과 좌우로 자연스럽게 퍼지도록 패널 클리핑을 해제합니다. */
+
+/* 패드 데스크톱 레이아웃에서도 휴대폰과 같은 방식으로 하단 저작권 문구를 고정 표시합니다. */
 @media (min-width:900px){
-  body.home-state .right-panel,
-  body.home-state #home.view.on,
-  body.home-state #home .grid{overflow:visible!important}
-  body.home-state .card{overflow:visible!important}
+  body.tablet-device .wrap{
+    display:flex;
+    flex-direction:column;
+    height:100%;
+    min-height:0;
+    max-height:100%;
+  }
+  body.tablet-device .desktop-layout{
+    flex:1 1 0%;
+    min-height:0;
+  }
+  body.tablet-device:not(.tablet-keyboard-open) .foot{
+    display:block!important;
+    visibility:visible!important;
+    opacity:1!important;
+    flex:0 0 auto;
+    width:100%;
+    margin-top:auto;
+    padding-top:12px;
+    padding-bottom:max(2px,env(safe-area-inset-bottom,0px));
+    position:relative;
+    z-index:2;
+    white-space:nowrap;
+  }
+  body.tablet-device.tablet-keyboard-open .foot{
+    display:none!important;
+    visibility:hidden!important;
+  }
 }
+
+/* 패드 명예의 전당: 패널 자체는 화면 안에 고정하고 사진 그리드만 내부 스크롤합니다. */
+@media (min-width:900px){
+  body.tablet-device.hall-state .desktop-layout{
+    align-items:stretch;
+    grid-template-rows:minmax(0,1fr);
+    min-height:0;
+  }
+  body.tablet-device.hall-state .right-panel{
+    box-sizing:border-box;
+    align-self:stretch;
+    height:100%;
+    min-height:0;
+    padding-top:12px;
+    padding-bottom:12px;
+    overflow:hidden;
+  }
+  body.tablet-device.hall-state #hallV.view.on{
+    display:flex;
+    flex:1 1 0%;
+    flex-direction:column;
+    width:100%;
+    height:100%;
+    min-height:0;
+    max-height:100%;
+    margin:0 auto;
+    overflow:hidden;
+  }
+  body.tablet-device.hall-state #hallV>.panel{
+    display:flex;
+    flex:1 1 0%;
+    flex-direction:column;
+    width:100%;
+    height:100%;
+    min-height:0;
+    max-height:100%;
+    box-sizing:border-box;
+    overflow:hidden;
+  }
+  body.tablet-device.hall-state #hallV .top{
+    flex:0 0 auto;
+  }
+  body.tablet-device.hall-state #hallV .hall{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    align-content:start;
+    flex:1 1 0%;
+    height:0;
+    min-height:0;
+    max-height:none;
+    overflow-x:hidden;
+    overflow-y:auto;
+    box-sizing:border-box;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-y:contain;
+    touch-action:pan-y;
+    padding-bottom:max(16px,env(safe-area-inset-bottom,0px));
+  }
+}
+
 </style>
 <!-- Main emblem normalized to symmetric transparent bounds for optical centering. -->
 </head>
