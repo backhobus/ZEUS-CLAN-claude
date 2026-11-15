@@ -971,64 +971,102 @@ function clearApplyDraft(){
   updateViewport();
 })();
 
-// 태블릿은 화면 폭이 넓어 데스크톱 레이아웃을 사용하므로,
-// 모바일 전용 키보드 처리와 별도로 키보드가 열렸을 때 하단 문구만 숨깁니다.
+// 터치 태블릿은 데스크톱 레이아웃을 유지하면서 브라우저별 가상 키보드 상태를 감지합니다.
 (function setupTabletKeyboardAndViewport(){
   const desktopQuery=matchMedia('(min-width:900px)');
   const viewport=window.visualViewport||null;
   const coarsePointer=matchMedia('(pointer:coarse)').matches||matchMedia('(any-pointer:coarse)').matches;
   const touchDevice=(Number(navigator.maxTouchPoints)||0)>0||('ontouchstart' in window)||coarsePointer||/Android|iPad|Tablet/i.test(navigator.userAgent||'');
   const isTabletDesktop=desktopQuery.matches&&touchDevice;
+
   let baseHeight=0;
   let baseWidth=window.innerWidth||0;
   let fieldFocused=false;
   let keyboardOpen=false;
   let keyboardResizeObserved=false;
+  let virtualKeyboardWasOpen=false;
   let revealTimer=0;
   let closeCheckTimer=0;
+  let monitorTimer=0;
+  let savedFormScrollTop=null;
+  let lastVisibleHeight=0;
 
   const isField=el=>!!(el&&el.matches&&el.matches('input,textarea'));
-  // 브라우저마다 가상 키보드가 visualViewport 또는 innerHeight 중 한쪽에만 반영될 수 있어
-  // 둘 중 더 작은 실제 표시 높이를 사용합니다.
-  const currentHeight=()=>{
-    const values=[window.innerHeight,viewport&&viewport.height].filter(v=>Number.isFinite(v)&&v>0);
-    return values.length?Math.min(...values):window.innerHeight;
-  };
+  function viewportMetrics(){
+    const values=[window.innerHeight,document.documentElement&&document.documentElement.clientHeight,viewport&&viewport.height]
+      .filter(v=>Number.isFinite(v)&&v>0);
+    if(!values.length)return {visible:window.innerHeight||1,reference:window.innerHeight||1};
+    return {visible:Math.min(...values),reference:Math.max(...values)};
+  }
   const currentTop=()=>viewport&&Number.isFinite(viewport.offsetTop)?viewport.offsetTop:0;
+  const keyboardOpenThreshold=()=>Math.max(120,baseHeight*.12);
+  const keyboardCloseTolerance=()=>Math.max(105,baseHeight*.11);
 
-  baseHeight=currentHeight();
+  baseHeight=viewportMetrics().reference;
+  lastVisibleHeight=viewportMetrics().visible;
 
   if(isTabletDesktop){
     document.documentElement.classList.add('tablet-viewport-lock');
     document.body.classList.add('tablet-device');
   }
 
-  function applyTabletViewport(){
+  function applyTabletViewport(metrics=viewportMetrics()){
     if(!isTabletDesktop)return;
-    const height=Math.max(1,Math.round(currentHeight()));
+    const height=Math.max(1,Math.round(metrics.visible));
     const top=Math.max(0,Math.round(currentTop()));
     document.documentElement.style.setProperty('--tablet-visual-height',height+'px');
     document.documentElement.style.setProperty('--tablet-visual-top',top+'px');
   }
 
   function openTabletKeyboard(){
-    if(!isTabletDesktop)return;
-    if(!keyboardOpen){
-      keyboardOpen=true;
-      keyboardResizeObserved=false;
-      document.body.classList.add('tablet-keyboard-open');
-    }
+    if(!isTabletDesktop||keyboardOpen)return;
+    const formView=document.getElementById('form');
+    savedFormScrollTop=formView?formView.scrollTop:0;
+    keyboardOpen=true;
+    document.body.classList.add('tablet-keyboard-open');
+  }
+
+  function restoreFormPosition(previousSlideTop){
+    const formView=document.getElementById('form');
+    const target=Number.isFinite(savedFormScrollTop)?savedFormScrollTop:0;
+    savedFormScrollTop=null;
+    if(!formView)return;
+
+    // 키보드가 열린 동안 이동한 스크롤 위치와 슬라이드의 화면상 위치를 함께 복원합니다.
+    requestAnimationFrame(()=>{
+      const slide=formView.classList.contains('on')?formView:null;
+      if(slide&&Number.isFinite(previousSlideTop)){
+        const naturalTop=slide.getBoundingClientRect().top;
+        const delta=previousSlideTop-naturalTop;
+        if(Math.abs(delta)>1){
+          slide.style.transition='none';
+          slide.style.transform=`translateY(${delta}px)`;
+          slide.getBoundingClientRect();
+          requestAnimationFrame(()=>{
+            slide.style.transition='transform .38s cubic-bezier(.22,.75,.25,1)';
+            slide.style.transform='translateY(0)';
+            setTimeout(()=>{
+              slide.style.removeProperty('transition');
+              slide.style.removeProperty('transform');
+            },430);
+          });
+        }
+      }
+      formView.scrollTo({top:target,behavior:'smooth'});
+    });
   }
 
   function closeTabletKeyboard(){
-    if(!isTabletDesktop)return;
+    if(!isTabletDesktop||!keyboardOpen)return;
+    const activeSlide=document.querySelector('#form.view.on');
+    const previousSlideTop=activeSlide?activeSlide.getBoundingClientRect().top:null;
     keyboardOpen=false;
     keyboardResizeObserved=false;
     document.body.classList.remove('tablet-keyboard-open');
-    baseHeight=currentHeight();
-    const formView=document.getElementById('form');
-    if(formView)formView.scrollTo({top:0,behavior:'smooth'});
-    applyTabletViewport();
+    const metrics=viewportMetrics();
+    baseHeight=Math.max(baseHeight,metrics.reference);
+    applyTabletViewport(metrics);
+    restoreFormPosition(previousSlideTop);
   }
 
   function revealFocusedField(){
@@ -1040,13 +1078,11 @@ function clearApplyDraft(){
 
     const rect=field.getBoundingClientRect();
     const visibleTop=currentTop()+14;
-    const visibleBottom=currentTop()+currentHeight()-18;
+    const visibleBottom=currentTop()+viewportMetrics().visible-18;
     const center=rect.top+rect.height/2;
     const visibleCenter=(visibleTop+visibleBottom)/2;
     const delta=center-visibleCenter;
-    if(Math.abs(delta)>22){
-      scroller.scrollBy({top:delta,behavior:'smooth'});
-    }
+    if(Math.abs(delta)>22)scroller.scrollBy({top:delta,behavior:'smooth'});
   }
 
   function scheduleReveal(delay=90){
@@ -1054,49 +1090,66 @@ function clearApplyDraft(){
     revealTimer=setTimeout(()=>requestAnimationFrame(revealFocusedField),delay);
   }
 
-  function update(){
+  function startMonitor(){
+    if(monitorTimer||!isTabletDesktop)return;
+    // 일부 인앱 브라우저는 키보드 닫힘 때 resize 이벤트를 보내지 않으므로
+    // 입력란에 포커스가 있는 동안 실제 표시 높이를 주기적으로 확인합니다.
+    monitorTimer=setInterval(()=>update(true),180);
+  }
+  function stopMonitor(){
+    if(monitorTimer){clearInterval(monitorTimer);monitorTimer=0;}
+  }
+
+  function update(fromMonitor=false){
     if(!isTabletDesktop)return;
-    applyTabletViewport();
-    const height=currentHeight();
-    // 일부 WebView에서는 resize가 focusin보다 먼저 발생합니다. activeElement도 함께 확인해
-    // 축소된 키보드 높이를 정상 화면의 기준 높이로 덮어쓰지 않게 합니다.
-    if(isField(document.activeElement)){
+    const metrics=viewportMetrics();
+    const height=metrics.visible;
+    const heightChanged=Math.abs(height-lastVisibleHeight)>1;
+    lastVisibleHeight=height;
+
+    if(isField(document.activeElement)&&!fieldFocused){
       fieldFocused=true;
+      keyboardResizeObserved=false;
       openTabletKeyboard();
+      startMonitor();
     }
 
     if(fieldFocused){
       const reduction=baseHeight-height;
-      if(reduction>75)keyboardResizeObserved=true;
-      if(keyboardOpen&&keyboardResizeObserved&&height>=baseHeight-75){
+      if(reduction>keyboardOpenThreshold()){
+        keyboardResizeObserved=true;
+        if(!keyboardOpen)openTabletKeyboard();
+      }
+      // 키보드를 닫아도 입력란 포커스는 남는 브라우저가 있어,
+      // 포커스 해제 대신 뷰포트가 원래 높이로 돌아왔는지 확인합니다.
+      if(keyboardOpen&&keyboardResizeObserved&&height>=baseHeight-keyboardCloseTolerance()){
         closeTabletKeyboard();
         return;
       }
-      if(keyboardOpen)scheduleReveal(90);
-    }else if(keyboardOpen){
-      if(keyboardResizeObserved&&height>=baseHeight-75){
-        closeTabletKeyboard();
-        return;
-      }
+      if(keyboardOpen&&(!fromMonitor||heightChanged))scheduleReveal(90);
     }else{
-      // 주소창이 접히며 뷰포트가 커지는 경우에는 기준 높이도 갱신합니다.
-      // 화면 회전으로 폭이 크게 바뀌면 새 화면 크기를 기준으로 다시 설정합니다.
+      if(keyboardOpen){
+        closeTabletKeyboard();
+        return;
+      }
       const width=window.innerWidth||baseWidth;
       if(Math.abs(width-baseWidth)>80){
-        baseHeight=height;
+        baseHeight=metrics.reference;
         baseWidth=width;
       }else{
-        baseHeight=Math.max(baseHeight,height);
+        baseHeight=Math.max(baseHeight,metrics.reference);
       }
     }
+
+    applyTabletViewport(metrics);
   }
 
   function handleFieldFocus(event){
     if(!isTabletDesktop||!isField(event.target))return;
+    if(!fieldFocused)keyboardResizeObserved=false;
     fieldFocused=true;
-    // 키보드 표시 이벤트가 늦거나 발생하지 않는 카카오 인앱 WebView에서도
-    // 브랜드 애니메이션과 하단 문구 숨김을 즉시 시작합니다.
     openTabletKeyboard();
+    startMonitor();
     applyTabletViewport();
     scheduleReveal(360);
   }
@@ -1104,6 +1157,23 @@ function clearApplyDraft(){
   document.addEventListener('focusin',handleFieldFocus);
   // focusin이 누락되는 일부 WebView에 대비한 캡처 단계 fallback.
   document.addEventListener('focus',handleFieldFocus,true);
+  // 키보드를 숨긴 뒤 같은 입력란을 다시 눌러도 focus 이벤트가 없을 수 있습니다.
+  document.addEventListener('pointerdown',event=>{
+    if(!isTabletDesktop||!isField(event.target))return;
+    if(document.activeElement===event.target){
+      fieldFocused=true;
+      openTabletKeyboard();
+      startMonitor();
+      scheduleReveal(280);
+    }
+  },true);
+  document.addEventListener('touchstart',event=>{
+    const target=event.target;
+    if(!isTabletDesktop||!isField(target)||document.activeElement!==target)return;
+    fieldFocused=true;
+    openTabletKeyboard();
+    startMonitor();
+  },{capture:true,passive:true});
 
   document.addEventListener('focusout',event=>{
     if(!isField(event.target))return;
@@ -1111,39 +1181,58 @@ function clearApplyDraft(){
     closeCheckTimer=setTimeout(()=>{
       fieldFocused=isField(document.activeElement);
       if(fieldFocused){
-        openTabletKeyboard();
+        startMonitor();
         update();
         scheduleReveal(120);
       }else{
-        // 입력란 포커스가 없어졌다면 가상 키보드도 닫히는 것으로 처리합니다.
+        stopMonitor();
         closeTabletKeyboard();
+        keyboardResizeObserved=false;
+        const metrics=viewportMetrics();
+        baseHeight=Math.max(baseHeight,metrics.reference);
+        applyTabletViewport(metrics);
       }
-    },180);
+    },220);
   });
 
   if(viewport){
-    viewport.addEventListener('resize',update,{passive:true});
-    viewport.addEventListener('scroll',update,{passive:true});
+    viewport.addEventListener('resize',()=>update(false),{passive:true});
+    viewport.addEventListener('scroll',()=>update(false),{passive:true});
   }
-  window.addEventListener('resize',update,{passive:true});
+  window.addEventListener('resize',()=>update(false),{passive:true});
+  window.addEventListener('orientationchange',()=>setTimeout(()=>{
+    if(!fieldFocused){
+      const metrics=viewportMetrics();
+      baseHeight=metrics.reference;
+      baseWidth=window.innerWidth||baseWidth;
+    }
+    update(false);
+  },350),{passive:true});
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible')update(false);
+  });
+  window.addEventListener('pageshow',()=>update(false));
 
-  // Virtual Keyboard API가 지원되는 WebView에서는 키보드 자체의 표시/숨김 이벤트도 사용합니다.
+  // Chromium 계열 WebView에서 제공하는 Virtual Keyboard API도 함께 사용합니다.
   const virtualKeyboard=navigator.virtualKeyboard;
   if(virtualKeyboard&&typeof virtualKeyboard.addEventListener==='function'){
     virtualKeyboard.addEventListener('geometrychange',()=>{
       const keyboardHeight=virtualKeyboard.boundingRect&&virtualKeyboard.boundingRect.height||0;
       if(keyboardHeight>0){
+        virtualKeyboardWasOpen=true;
         keyboardResizeObserved=true;
+        if(!fieldFocused)fieldFocused=isField(document.activeElement);
         openTabletKeyboard();
+        startMonitor();
         scheduleReveal(90);
-      }else if(keyboardOpen){
+      }else if(virtualKeyboardWasOpen){
+        virtualKeyboardWasOpen=false;
         closeTabletKeyboard();
       }
     });
   }
 
   desktopQuery.addEventListener?.('change',()=>{
-    // 화면 회전으로 태블릿의 가로·세로 폭이 바뀌어도 데스크톱 레이아웃 기준은 그대로 둡니다.
     if(desktopQuery.matches&&touchDevice){
       document.documentElement.classList.add('tablet-viewport-lock');
       document.body.classList.add('tablet-device');
@@ -1151,10 +1240,12 @@ function clearApplyDraft(){
       document.documentElement.classList.remove('tablet-viewport-lock');
       document.body.classList.remove('tablet-device','tablet-keyboard-open');
       keyboardOpen=false;keyboardResizeObserved=false;fieldFocused=false;
+      stopMonitor();
     }
-    baseHeight=currentHeight();
+    const metrics=viewportMetrics();
+    baseHeight=metrics.reference;
     baseWidth=window.innerWidth||baseWidth;
-    applyTabletViewport();
+    applyTabletViewport(metrics);
   });
 
   applyTabletViewport();
