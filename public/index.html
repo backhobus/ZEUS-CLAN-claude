@@ -76,7 +76,6 @@ input:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(23
 .done{text-align:center;padding:36px 10px}
 .done h2{font-size:22px;color:var(--gold2)}.done p{color:var(--mut);margin:0}
 
-/* 수정된 명예의 전당 그리드 및 이미지 스타일 */
 .hall{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:12px}.hall img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.045);content-visibility:auto;-webkit-touch-callout:default!important;-webkit-user-select:auto;user-select:auto;-webkit-user-drag:element;user-drag:element;touch-action:pan-y;cursor:context-menu}
 
 .empty{text-align:center;color:var(--mut);padding:24px 0;font-size:15px}
@@ -124,7 +123,6 @@ body{overflow-x:clip}
 .fx canvas{position:absolute;inset:0;width:100%;height:100%}
 
 
-/* 모바일: 화면별 중앙 정렬, 하단 문구 보호, 키보드가 열린 경우에만 스크롤 */
 @media(max-width:899px){
   html,body{width:100%;height:100%;overflow:hidden}
   body{min-height:0;overscroll-behavior:none}
@@ -181,7 +179,6 @@ body{overflow-x:clip}
   .empty{padding:14px 0}
   .hall{gap:8px}
 
-  /* 키보드가 열리면 보이는 화면에 래퍼를 맞추고, 박스 전체가 함께 이동하도록 한다. */
   body.keyboard-open .wrap{
     position:fixed;
     left:0;
@@ -200,7 +197,6 @@ body{overflow-x:clip}
   body.keyboard-open .foot{display:none}
 }
 
-/* 높이가 짧은 휴대폰에서는 첫 화면 소개 영역을 가로형으로 배치 */
 @media(max-width:899px) and (max-height:620px){
   .wrap{padding-top:max(6px,env(safe-area-inset-top,0px));padding-bottom:max(10px,env(safe-area-inset-bottom,0px))}
   body.home-state .brand-panel{padding-top:10px}
@@ -219,7 +215,6 @@ body{overflow-x:clip}
 }
 
 
-/* 데스크톱: 좌측 브랜드 영역은 고정하고 우측 콘텐츠만 전환 */
 @media(min-width:900px){
   .wrap{height:100vh;min-height:100vh;display:flex;flex-direction:column}
   .desktop-layout{
@@ -254,7 +249,6 @@ body{overflow-x:clip}
   .right-panel #hallV .hall{max-height:62vh;overflow-y:auto}
 }
 
-/* 모바일: 브랜드 영역은 메인 화면에서만 기존처럼 보이고, 절차 화면은 전체 너비 사용 */
 @media(max-width:899px){
   .desktop-layout{display:flex;flex:1 0 auto;flex-direction:column;min-height:0;width:100%;overflow:visible}
   .brand-panel{display:none;flex:0 0 auto;min-width:0}
@@ -265,7 +259,6 @@ body{overflow-x:clip}
   #home .grid{width:100%}
   .right-panel .view:not(#home){width:100%;max-width:none;margin-block:auto}
 
-  /* 명예의 전당에서는 화면 프레임은 고정하고 이미지 목록만 세로 스크롤합니다. */
   body.hall-state .desktop-layout{flex:1 1 auto;min-height:0;overflow:hidden}
   body.hall-state .right-panel{flex:1 1 auto;min-height:0;justify-content:flex-start;overflow:hidden}
   body.hall-state #hallV.view.on{display:flex;flex:1 1 auto;min-height:0;max-height:100%;margin:0;overflow:hidden}
@@ -276,7 +269,6 @@ body{overflow-x:clip}
 
 #brandTag{transition:opacity .5s ease,transform .5s ease}
 #brandTag.tag-fade{opacity:0;transform:translateY(5px)}
-/* 데스크톱에서는 테두리는 고정하고 내부 문구만 전환 */
 @media(min-width:900px){
   #brandTag{transition:none}
   #brandTagText{display:inline-block;transition:opacity .5s ease,transform .5s ease}
@@ -286,7 +278,6 @@ body{overflow-x:clip}
 
 
 
-/* 실제 로고 그림의 투명 여백을 대칭으로 정규화했으므로 이미지와 원형 테두리를 같은 중심에 배치 */
 #brandPanel .hero .logo{
   display:block;
   margin-left:auto;
@@ -296,7 +287,6 @@ body{overflow-x:clip}
   transform:none;
 }
 
-/* 신청 완료 화면: 메인과 동일한 로고를 패널 상단 중앙에 배치 */
 #doneV .done{
   display:flex;
   flex-direction:column;
@@ -327,7 +317,6 @@ body{overflow-x:clip}
 
 
 
-/* 신청 완료 화면: 콘텐츠 높이에 맞춘 컴팩트 카드 */
 #doneV.view.on{
   height:auto!important;
   min-height:0!important;
@@ -386,7 +375,6 @@ body{overflow-x:clip}
 
 
 
-/* 모바일 메인: 브랜드 영역을 상단 절반의 중앙에 두고 메뉴 영역과 균형 있게 배치 */
 @media(max-width:899px){
   body.home-state .desktop-layout{
     display:flex;
@@ -446,7 +434,6 @@ body{overflow-x:clip}
   body.home-state #home .grid{width:100%}
 }
 
-/* 짧은 휴대폰 화면에서도 브랜드 영역을 중앙에 두되, 콘텐츠가 겹치지 않도록 크기 조정 */
 @media(max-width:899px) and (max-height:620px){
   body.home-state #brandPanel .hero .logo{
     width:clamp(104px,17dvh,124px);
@@ -468,7 +455,6 @@ body{overflow-x:clip}
 
 
 
-/* 데스크톱 브랜드 문구: 원래 문구의 자연 너비를 유지하고, 문구 변경 후에도 같은 테두리 크기 고정 */
 @media (min-width:900px){
   #brandTag{
     box-sizing:border-box;
@@ -487,7 +473,6 @@ body{overflow-x:clip}
   }
 }
 
-/* 데스크톱 최종 확인 화면: 개인정보 안내문과 제출 버튼 사이 불필요한 세로 여백 제거 */
 @media (min-width:900px){
   .right-panel #form .privacy-note{
     margin-bottom:4px;
@@ -503,8 +488,6 @@ body{overflow-x:clip}
   }
 }
 
-/* 모바일 홈: 로고 묶음만 페이지 맨 위와 첫 번째 메뉴 버튼 상단 사이의 정중앙에 배치.
-   브랜드 패널의 flex 공간은 그대로 유지하므로 버튼 세트의 위치에는 영향을 주지 않습니다. */
 @media(max-width:899px){
   body.home-state .desktop-layout{position:relative}
   body.home-state #brandPanel .hero{
@@ -521,7 +504,6 @@ body{overflow-x:clip}
 
 
 
-/* 모바일 홈 메뉴 버튼: 화면에서 더 넉넉하고 꽉 차 보이도록 높이 확대 */
 @media(max-width:899px){
   #home .card{min-height:clamp(76px,12dvh,96px);padding-top:12px;padding-bottom:12px}
   #home .card.main{min-height:clamp(94px,15dvh,114px)}
@@ -533,15 +515,12 @@ body{overflow-x:clip}
 
 
 
-/* 모든 화면에서 저작권 문구를 화면의 최하단에 배치 */
 @media (min-width: 900px) {
   .wrap { display:flex; flex-direction:column; }
   .desktop-layout { flex:1 1 0%; min-height:0; }
   .foot { flex:0 0 auto; margin-top:auto; }
 }
 @media (min-width: 900px) {
-  /* 태블릿이 데스크톱 레이아웃으로 표시된 상태에서 가상 키보드가 열리면
-     하단 문구가 키보드 위로 이동해 보이지 않도록 잠시 숨깁니다. */
   body.tablet-keyboard-open .foot { visibility:hidden!important; }
 }
 @media (max-width: 899px) {
@@ -564,11 +543,8 @@ body{overflow-x:clip}
   body.keyboard-open .foot { display:none; }
 }
 
-/* 터치 태블릿은 데스크톱 레이아웃을 유지하되, 주소창·가상 키보드의 실제 표시 영역에 고정 */
 @media (min-width:900px){
   html.tablet-viewport-lock{height:100%;overflow:hidden;overscroll-behavior:none}
-  /* 평상시(키보드 닫힘): JS가 측정한 값 없이 CSS만으로 화면을 가득 채웁니다.
-     홈 화면·키보드를 내린 뒤의 화면이 항상 같은 기준을 쓰므로 로고 세트 위치가 어긋나지 않습니다. */
   body.tablet-device{
     position:fixed;
     left:0;right:0;top:0;bottom:0;
@@ -578,7 +554,6 @@ body{overflow-x:clip}
     overflow:hidden;
     overscroll-behavior:none;
   }
-  /* 키보드가 열린 동안에만 실제로 보이는 영역(키보드·자동완성 줄 제외)에 맞춥니다. */
   body.tablet-device.tablet-keyboard-open{
     bottom:auto;
     top:var(--tablet-visual-top,0px);
@@ -588,8 +563,6 @@ body{overflow-x:clip}
     height:100%;
     min-height:0;
     max-height:100%;
-    /* 래퍼의 경계(최대 너비 1180px)에서 로고 후광이 잘리는 것을 방지합니다.
-       페이지 자체는 body.tablet-device가 뷰포트에 고정되어 있으므로 스크롤은 생기지 않습니다. */
     overflow:visible;
   }
   body.tablet-device .fx{
@@ -623,8 +596,6 @@ body{overflow-x:clip}
 }
 
 
-/* 데스크톱·태블릿 좌측 로고 후광: 후광 크기와 로고 기준 중심을 그대로 유지합니다.
-   상위 래퍼(.wrap)의 overflow:hidden이 최대 너비 컨테이너 경계에서 후광을 자르던 원인을 제거했습니다. */
 @media (min-width: 900px) {
   .desktop-layout,
   .brand-panel,
@@ -647,7 +618,6 @@ body{overflow-x:clip}
 }
 
 
-/* 태블릿 명예의 전당: 실제 보이는 뷰포트 안에 상단 제목을 고정하고 목록만 스크롤 */
 @media (min-width:900px){
   body.tablet-device.hall-state .desktop-layout{
     align-items:stretch;
@@ -699,7 +669,6 @@ body{overflow-x:clip}
   }
 }
 
-/* 태블릿 키보드가 열리면 SINCE 2020을 접고, ZEUS CLAN을 로고 이미지 하단과 키보드 상단 사이의 정중앙에 배치합니다. */
 @media (min-width:900px){
   body.tablet-device #brandPanel .hero .since{
     display:block;
@@ -717,10 +686,8 @@ body{overflow-x:clip}
     transition:transform .20s cubic-bezier(.22,.75,.25,1),opacity .18s ease;
     will-change:transform,opacity;
   }
-  /* 키보드(자동완성 줄 포함) 때문에 로고와 겹칠 만큼 공간이 부족하면 ZEUS CLAN 글자를 숨깁니다. */
   body.tablet-device.tablet-brand-title-hidden #brandPanel .hero h1{opacity:0}
   body.tablet-device.tablet-keyboard-open #brandPanel .hero .since{
-    /* 높이와 여백은 유지해 제목의 기준 좌표가 애니메이션 도중 바뀌지 않게 합니다. */
     opacity:0;
     transform:translateY(-8px);
   }
@@ -732,7 +699,6 @@ body{overflow-x:clip}
   }
 }
 
-/* 태블릿 키보드가 열리면 WHERE YOUR LEGEND BEGINS도 부드럽게 숨기고, 닫히면 복귀합니다. */
 @media (min-width:900px){
   body.tablet-device #brandTag{
     opacity:1;
@@ -750,12 +716,10 @@ body{overflow-x:clip}
   body.tablet-device #brandTag{transition:none!important}
 }
 
-/* Chrome의 자동완성 판단을 명확하게 하되 입력창의 기본 배치는 유지 */
 .answer-form{display:block;margin:0;padding:0;border:0;background:transparent}
 
 
 
-/* 패드 데스크톱 레이아웃에서도 휴대폰과 같은 방식으로 하단 저작권 문구를 고정 표시합니다. */
 @media (min-width:900px){
   body.tablet-device .wrap{
     display:flex;
@@ -787,7 +751,6 @@ body{overflow-x:clip}
   }
 }
 
-/* 패드 명예의 전당: 패널 자체는 화면 안에 고정하고 사진 그리드만 내부 스크롤합니다. */
 @media (min-width:900px){
   body.tablet-device.hall-state .desktop-layout{
     align-items:stretch;
@@ -847,10 +810,6 @@ body{overflow-x:clip}
 }
 
 
-/* ───────── 데스크톱·패드: 버튼 호버/탭 후광이 직각으로 잘리지 않도록 ─────────
-   원인 1) .card{overflow:hidden}이 카드 아래로 번지는 후광(::before)을 카드 경계에서 잘랐음
-   원인 2) .right-panel{overflow:hidden}이 좌우 가장자리 카드의 box-shadow 후광을 패널 경계에서 잘랐음
-   → 카드는 overflow를 풀고(반짝임은 배경 위치 이동으로 카드 안에만 표시), 홈 화면에서는 우측 패널도 넘침을 허용합니다. */
 @media (min-width:900px){
   .card{overflow:visible}
   .card:hover,.card.tap{z-index:3}
@@ -860,14 +819,36 @@ body{overflow-x:clip}
   body.home-state .right-panel #home.view.on{overflow:visible}
 }
 
-/* 패드: ZEUS CLAN • ALL RIGHTS RESERVED 문구를 휴대폰과 같은 간격으로 화면 맨 아래에 배치합니다.
-   (패드는 데스크톱용 하단 여백 24px + 문구 여백이 더해져 휴대폰보다 위에 떠 있었음) */
 @media (min-width:900px){
   body.tablet-device .wrap{padding-bottom:max(12px,env(safe-area-inset-bottom,0px))}
   body.tablet-device:not(.tablet-keyboard-open) .foot{
     padding:8px 0 max(2px,env(safe-area-inset-bottom,0px));
     margin-top:auto;
   }
+}
+
+@keyframes zeusViewIn{from{opacity:0;transform:translateY(10px)}}
+@keyframes zeusViewOut{to{opacity:0;transform:translateY(-8px) scale(.988)}}
+@keyframes zeusHeroIn{from{opacity:0;transform:translateY(calc(-50% + 18px)) scale(.94)}}
+@keyframes zeusCardIn{from{opacity:0;transform:translateY(20px) scale(.97)}}
+@keyframes zeusFxIn{from{opacity:0}}
+body:not(.calm) .fx{animation:zeusFxIn .8s ease both}
+@media(max-width:899px){
+  .view.on:not(#home){animation:zeusViewIn .38s cubic-bezier(.22,.75,.25,1)}
+  .view.on.leaving:not(#home){animation:zeusViewOut .17s ease-in forwards;pointer-events:none}
+  #home.view.on{animation:none}
+  body.home-state #brandPanel .hero{animation:zeusHeroIn .7s cubic-bezier(.22,.75,.25,1) backwards}
+  #home .grid>.card{animation:zeusCardIn .6s cubic-bezier(.22,.75,.25,1) backwards}
+  #home .grid>.card:nth-child(1){animation-delay:.12s}
+  #home .grid>.card:nth-child(2){animation-delay:.2s}
+  #home .grid>.card:nth-child(3){animation-delay:.28s}
+  .fx .halo{transition:top .45s cubic-bezier(.22,.75,.25,1),left .45s cubic-bezier(.22,.75,.25,1)}
+}
+@media(prefers-reduced-motion:reduce){
+  body:not(.calm) .fx,
+  .view.on:not(#home),.view.on.leaving:not(#home),
+  body.home-state #brandPanel .hero,#home .grid>.card{animation:none!important}
+  .fx .halo{transition:none!important}
 }
 </style>
 <!-- Main emblem normalized to symmetric transparent bounds for optical centering. -->
@@ -932,8 +913,6 @@ const CFG={
 };
 let hallLoading=false;
 const HALL_IMAGE_CONCURRENCY=4;
-// 명예의 전당 이미지는 현재 페이지 메모리에서만 미리 불러옵니다.
-// Cache API / localStorage / sessionStorage에는 이미지 데이터를 저장하지 않습니다.
 let hallMetadataPromise=null;
 let hallImageItems=[];
 let hallImageElements=[];
@@ -950,8 +929,6 @@ const Q=[
 const $=id=>document.getElementById(id);
 const brandLogoEl=$('brandLogo'),doneLogoEl=$('doneLogo');
 if(brandLogoEl&&doneLogoEl)doneLogoEl.src=brandLogoEl.src;
-// 가입신청 답변은 현재 탭의 메모리에만 보관합니다. 브라우저 저장소나 서버에 임시저장하지 않습니다.
-// 따라서 다른 탭·브라우저·기기 이용자와 답변이 공유되지 않으며, 같은 탭에서 홈으로 이동해도 유지됩니다.
 const A={};
 let cur=0;
 let fromConfirm=false;
@@ -962,8 +939,57 @@ function clearApplyDraft(){
   cur=0;fromConfirm=false;draftStage='step';
 }
 
-// 모바일 가상 키보드: 실제 표시 영역이 줄어든 것을 확인한 뒤에만 레이아웃을 전환합니다.
-// 포커스 직후 레이아웃을 먼저 바꾸면 일부 WebView가 키보드 표시를 취소하는 현상을 방지합니다.
+const SUPPORTS_FLIP=(function(){
+  try{
+    return !!(window.CSS&&CSS.supports&&CSS.supports('translate','1px 1px')
+      &&typeof Element.prototype.animate==='function'
+      &&typeof Element.prototype.getAnimations==='function');
+  }catch(error){return false;}
+})();
+let flipDepth=0;
+function flipTargets(){
+  const list=[];
+  const view=document.querySelector('.view.on');
+  if(!view)return list;
+  if(view.id==='home'){
+    const grid=view.querySelector('.grid');
+    const hero=document.querySelector('#brandPanel .hero');
+    if(grid)list.push(grid);
+    if(hero&&hero.getClientRects().length)list.push(hero);
+  }else{
+    const panel=view.querySelector('.panel');
+    if(panel)list.push(panel);
+  }
+  return list;
+}
+function smoothLayout(mutate){
+  const canAnimate=SUPPORTS_FLIP&&flipDepth===0
+    &&matchMedia('(max-width:899px)').matches
+    &&!matchMedia('(prefers-reduced-motion:reduce)').matches;
+  if(!canAnimate){mutate();return;}
+  const targets=flipTargets();
+  const firsts=targets.map(el=>el.getBoundingClientRect());
+  targets.forEach(el=>el.getAnimations().forEach(a=>{if(a.id==='zeus-flip')a.cancel();}));
+  flipDepth++;
+  try{
+    mutate();
+    if(typeof positionMobileBrand==='function')positionMobileBrand();
+  }finally{flipDepth--;}
+  targets.forEach((el,i)=>{
+    if(!el.isConnected)return;
+    const first=firsts[i];
+    if(!first||(!first.width&&!first.height))return;
+    const last=el.getBoundingClientRect();
+    const dx=first.left-last.left,dy=first.top-last.top;
+    if(Math.abs(dx)<1&&Math.abs(dy)<1)return;
+    const dist=Math.hypot(dx,dy);
+    el.animate(
+      [{translate:dx+'px '+dy+'px'},{translate:'0px 0px'}],
+      {duration:Math.round(Math.min(520,Math.max(300,260+dist*.8))),easing:'cubic-bezier(.22,.75,.25,1)',id:'zeus-flip'}
+    );
+  });
+}
+
 (function setupMobileKeyboard(){
   const mobileQuery=matchMedia('(max-width:899px)');
   const viewport=window.visualViewport||null;
@@ -985,18 +1011,37 @@ function clearApplyDraft(){
   const visibleTop=()=>viewport&&Number.isFinite(viewport.offsetTop)?viewport.offsetTop:0;
 
   function applyViewport(height=visibleHeight(),offsetTop=visibleTop()){
-    document.documentElement.style.setProperty('--mobile-viewport-height',Math.max(1,Math.round(height))+'px');
-    document.documentElement.style.setProperty('--visual-viewport-top',Math.max(0,Math.round(offsetTop))+'px');
+    const h=Math.max(1,Math.round(height));
+    const t=Math.max(0,Math.round(offsetTop));
+    const root=document.documentElement;
+    const write=()=>{
+      root.style.setProperty('--mobile-viewport-height',h+'px');
+      root.style.setProperty('--visual-viewport-top',t+'px');
+    };
+    const prev=parseFloat(root.style.getPropertyValue('--mobile-viewport-height'));
+    if(keyboardDetected&&Number.isFinite(prev)&&Math.abs(h-prev)>=48)smoothLayout(write);
+    else write();
   }
 
-  function centerField(el){
+  function flipOffsetY(el){
+    const panel=el.closest&&el.closest('.panel');
+    if(!panel)return 0;
+    const value=getComputedStyle(panel).translate;
+    if(!value||value==='none')return 0;
+    const y=parseFloat(value.split(/\s+/)[1]);
+    return Number.isFinite(y)?y:0;
+  }
+  function centerField(el,instant=false){
     if(!mobileQuery.matches||!isField(el)||document.activeElement!==el||!keyboardDetected)return;
     const container=wrap();
     if(!container)return;
     const rect=el.getBoundingClientRect();
     const center=visibleTop()+visibleHeight()/2;
-    const delta=rect.top+rect.height/2-center;
-    if(Math.abs(delta)>8)container.scrollBy({top:delta,behavior:'smooth'});
+    const delta=rect.top+rect.height/2-flipOffsetY(el)-center;
+    if(Math.abs(delta)>8){
+      if(instant)container.scrollTop+=delta;
+      else container.scrollBy({top:delta,behavior:'smooth'});
+    }
   }
 
   function scheduleCenter(el,delay=120){
@@ -1007,8 +1052,11 @@ function clearApplyDraft(){
   function openKeyboard(){
     if(!mobileQuery.matches||keyboardDetected)return;
     keyboardDetected=true;
-    document.body.classList.add('keyboard-open');
-    applyViewport();
+    smoothLayout(()=>{
+      document.body.classList.add('keyboard-open');
+      applyViewport();
+      if(focusedField)centerField(focusedField,true);
+    });
     if(focusedField){scheduleCenter(focusedField,100);scheduleCenter(focusedField,320);}
   }
 
@@ -1023,12 +1071,14 @@ function clearApplyDraft(){
     keyboardDetected=false;
     clearTimeout(closeTimer);
     clearTimeout(fallbackTimer);
-    document.body.classList.remove('keyboard-open');
     baseHeight=Math.max(baseHeight,height);
     if(height>=baseHeight-75)baseHeight=height;
-    applyViewport(height,0);
-    const container=wrap();
-    if(container)container.scrollTo({top:0,behavior:'smooth'});
+    smoothLayout(()=>{
+      document.body.classList.remove('keyboard-open');
+      applyViewport(height,0);
+      const container=wrap();
+      if(container)container.scrollTop=0;
+    });
     if(!isField(document.activeElement)){
       focusedField=null;
       stopMonitor();
@@ -1092,7 +1142,6 @@ function clearApplyDraft(){
     focusedField=el;
     startMonitor();
     clearTimeout(fallbackTimer);
-    // visualViewport를 변경하지 않는 일부 인앱 브라우저에만 늦은 보정 적용.
     fallbackTimer=setTimeout(()=>{
       if(document.activeElement===focusedField&&!keyboardDetected){
         openKeyboard();
@@ -1149,9 +1198,6 @@ function clearApplyDraft(){
   updateViewport();
 })();
 
-// 터치 태블릿은 데스크톱 레이아웃을 유지하면서 실제 키보드 표시 영역에 맞춰 조정합니다.
-// 포커스만으로 레이아웃을 바꾸지 않고, 뷰포트 축소/Virtual Keyboard API를 확인한 뒤 전환해
-// 카카오톡 등 일부 WebView에서 키보드가 열리다 취소되는 현상을 줄입니다.
 (function setupTabletKeyboardAndViewport(){
   const desktopQuery=matchMedia('(min-width:900px)');
   const viewport=window.visualViewport||null;
@@ -1160,11 +1206,6 @@ function clearApplyDraft(){
   const anyCoarseQuery=matchMedia('(any-pointer:coarse)');
   const fineHoverQuery=matchMedia('(hover:hover) and (pointer:fine)');
 
-  // 기기를 고정값으로 판별하지 않고, 실행 중에 입력 방식·화면 너비를 다시 읽어 판단합니다.
-  // - iPad / 갤럭시 탭 / 기타 안드로이드 태블릿 / 데스크톱 모드로 열린 태블릿 모두 대상
-  // - iPadOS는 Mac처럼 보이는 UA를 보내므로 터치 지점 수로 구분
-  // - 마우스·트랙패드가 주 입력인 터치 노트북은 데스크톱으로 취급
-  // - 세로(<900px)로 열었다가 가로(≥900px)로 돌려도 다시 판별
   function detectTouchTablet(){
     const ua=navigator.userAgent||'';
     const points=Number(navigator.maxTouchPoints)||0;
@@ -1193,7 +1234,7 @@ function clearApplyDraft(){
   let restoreTimer=0;
   let brandTitleHidden=false;
   let brandTitleTimers=[];
-  const BRAND_TITLE_MARGIN=6; // 제목 위(로고)·아래(키보드)에 남길 최소 여백(px). 실제로 겹칠 때만 숨기도록 작게 유지
+  const BRAND_TITLE_MARGIN=6;
 
   const isField=el=>!!(el&&el.matches&&el.matches('input,textarea'));
   function viewportMetrics(){
@@ -1212,7 +1253,6 @@ function clearApplyDraft(){
       return Math.max(0,rect.top);
     }
 
-    // WebView마다 먼저 줄어드는 화면 높이 값이 다르므로 실제로 줄어든 측정값을 모두 확인합니다.
     const threshold=keyboardOpenThreshold();
     const candidates=[];
     if(viewport&&Number.isFinite(viewport.height)&&baseHeight-viewport.height>threshold){
@@ -1229,7 +1269,6 @@ function clearApplyDraft(){
     if(candidates.length)return Math.min(...candidates);
     if(baseHeight-metrics.visible>threshold)return Math.max(0,currentTop())+metrics.visible;
 
-    // 키보드 위치를 측정할 수 없으면 임의로 추정하지 않습니다. (호출부에서 제목을 숨김)
     return null;
   }
 
@@ -1249,7 +1288,6 @@ function clearApplyDraft(){
     document.body.classList.toggle('tablet-brand-title-hidden',hidden);
   }
 
-  // 제목 이동값·숨김 상태·예약된 재측정을 한 번에 원상복구합니다.
   function resetBrandTitleAdjustments(){
     const title=document.querySelector('#brandPanel .hero h1');
     if(title)title.style.removeProperty('--tablet-brand-title-shift');
@@ -1269,8 +1307,6 @@ function clearApplyDraft(){
     const titleRect=title.getBoundingClientRect();
     if(!titleRect.height)return;
 
-    // 로고 이미지 하단 ~ 키보드(자동완성 버튼 줄 포함) 상단 사이에 제목이 여백까지 들어갈 수 있는지 확인합니다.
-    // 들어가지 않으면 로고를 침범하는 대신 제목을 숨깁니다. (히스테리시스로 경계에서 깜빡임 방지)
     const imageBottomY=logoRect.bottom;
     const keyboardTop=keyboardTopY();
     if(keyboardTop===null){setBrandTitleHidden(true);return;}
@@ -1286,7 +1322,6 @@ function clearApplyDraft(){
     title.style.setProperty('--tablet-brand-title-shift',`${Math.round(shift*10)/10}px`);
   }
 
-  // settle=true: 키보드 자동완성 줄(비밀번호·카드·위치 버튼)처럼 뒤늦게 높이가 바뀌는 경우를 위해 몇 번 더 재측정합니다.
   function scheduleBrandTitlePosition(settle=false){
     if(!isTabletDesktop||!keyboardOpen)return;
     if(brandTitleFrame)cancelAnimationFrame(brandTitleFrame);
@@ -1305,9 +1340,6 @@ function clearApplyDraft(){
   baseHeight=viewportMetrics().reference;
   lastVisibleHeight=viewportMetrics().visible;
 
-  // 키보드가 열려 있는 동안에만 실제 표시 영역(높이·상단 오프셋)을 JS로 측정해 적용합니다.
-  // 키보드가 닫힌 평상시에는 값을 전혀 남기지 않아, CSS가 홈 화면과 똑같은 방식으로 화면을 채웁니다.
-  // (카카오톡 등 인앱 브라우저에서 키보드를 내린 뒤 이전에 측정한 값이 남아 위치가 어긋나던 문제 방지)
   function applyTabletViewport(metrics=viewportMetrics()){
     if(!isTabletDesktop||!keyboardOpen)return;
     const height=Math.max(1,Math.round(metrics.visible));
@@ -1369,7 +1401,6 @@ function clearApplyDraft(){
 
     clearFormRestoreMotion();
 
-    // 뷰포트와 CSS 상태가 복원된 같은 프레임에서 스크롤을 되돌린 뒤 FLIP 방식으로 위치를 보정합니다.
     formView.scrollTop=target;
     const slide=formView.classList.contains('on')?formView:null;
     if(!slide||!Number.isFinite(previousSlideTop))return;
@@ -1410,21 +1441,16 @@ function clearApplyDraft(){
     document.body.classList.remove('tablet-keyboard-open');
     resetBrandTitleAdjustments();
     baseHeight=Math.max(baseHeight,metrics.reference,window.innerHeight||0,document.documentElement.clientHeight||0);
-    // 키보드 종료 시 측정값을 모두 버립니다. 이후 레이아웃은 홈 화면과 같은 CSS 기준을 그대로 따릅니다.
-    // (입력창에 포커스가 남은 채 키보드 내리기 버튼만 눌린 경우에도 동일)
     releaseTabletViewport();
     if(!fieldFocused)stopMonitor();
     if(restoreSlide)restoreFormPosition(previousSlideTop);
     else savedFormScrollTop=null;
   }
 
-  // 화면을 홈/명예의 전당/완료 화면으로 전환할 때 키보드 상태와 로고 보정값을 반드시 초기화합니다.
   function resetTabletKeyboardForNavigation(){
     if(!isTabletDesktop)return;
     clearFormRestoreMotion();
 
-    // 화면 전환 중 먼저 포커스를 해제합니다. 일부 WebView는 blur 뒤늦게 viewport resize를 보내므로,
-    // 아래에서 전체 화면 높이를 확정하고 이후의 일시적인 축소 이벤트도 다시 적용하지 않습니다.
     const active=document.activeElement;
     if(isField(active)){
       try{active.blur();}catch(error){}
@@ -1449,7 +1475,6 @@ function clearApplyDraft(){
     lastVisibleHeight=baseHeight;
     releaseTabletViewport();
 
-    // CSS state가 홈 화면 기준으로 다시 계산된 뒤에도 로고 이동값이 남지 않도록 한 번 더 정규화합니다.
     requestAnimationFrame(()=>{
       resetBrandTitleAdjustments();
       releaseTabletViewport();
@@ -1505,7 +1530,6 @@ function clearApplyDraft(){
   }
 
   function scheduleClose(force=false){
-    // 반복 resize 이벤트는 타이머를 미루지 않습니다. 화면 높이가 복원됐거나 입력 포커스가 사라지면 즉시 복귀합니다.
     if(closeCheckTimer)return;
     closeCheckTimer=setTimeout(()=>{
       closeCheckTimer=0;
@@ -1526,7 +1550,6 @@ function clearApplyDraft(){
     const heightChanged=Math.abs(height-lastVisibleHeight)>1;
     lastVisibleHeight=height;
 
-    // 키보드가 닫힌 상태에서 화면 너비가 바뀌었다면(회전·분할 화면) 기준 높이를 새로 읽습니다.
     const widthNow=window.innerWidth||0;
     if(!keyboardOpen&&baseWidth&&Math.abs(widthNow-baseWidth)>40){
       baseHeight=metrics.reference;
@@ -1557,8 +1580,6 @@ function clearApplyDraft(){
       if(keyboardOpen){
         scheduleClose(true);
       }else if(!fieldFocused){
-        // 키보드를 닫은 직후 일부 인앱 브라우저가 이전의 축소 viewport 크기를 늦게 다시 전달합니다.
-        // 포커스와 키보드 상태가 모두 해제된 화면에서는 그 값으로 페이지 높이를 줄이지 않습니다.
         baseHeight=Math.max(baseHeight,metrics.reference);
       }
     }
@@ -1577,8 +1598,6 @@ function clearApplyDraft(){
       if(savedFormScrollTop===null)savedFormScrollTop=formView?formView.scrollTop:0;
     }
     startMonitor();
-    // 포커스만으로 키보드가 열린 것으로 간주하지 않습니다.
-    // 실제 뷰포트 축소 또는 VirtualKeyboard geometrychange가 확인될 때만 화면을 전환합니다.
     clearTimeout(fallbackTimer);
     update();
   }
@@ -1599,7 +1618,6 @@ function clearApplyDraft(){
     if(!isTabletDesktop||!keyboardOpen||isField(event.target))return;
     const control=event.target&&event.target.closest&&event.target.closest('button,a,select,[contenteditable="true"]');
     if(control)return;
-    // 입력란 밖의 빈 화면을 눌러 키보드를 내리는 WebView는 포커스를 유지하기도 하므로 직접 blur를 요청합니다.
     const active=document.activeElement;
     if(isField(active)){
       try{active.blur();}catch(error){}
@@ -1689,7 +1707,6 @@ function clearApplyDraft(){
     });
   }
 
-  // 화면 너비(세로↔가로 회전, 분할 화면)나 입력 장치가 바뀌면 태블릿 여부를 다시 판별합니다.
   const resyncTabletMode=()=>{
     syncTabletMode();
     if(isTabletDesktop&&!keyboardOpen){
@@ -1720,8 +1737,6 @@ function updateBrandTag(isContentView){
   const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const desktop=matchMedia('(min-width:900px)').matches;
 
-  // 데스크톱에서 최초 전환 직전의 원래 문구 너비를 저장합니다.
-  // 따라서 테두리 너비는 기존 디자인 그대로이며, 이후 문구가 바뀌어도 고정됩니다.
   if(desktop){
     if(tag.dataset.widthLocked!=='true'){
       const originalWidth=tag.getBoundingClientRect().width;
@@ -1731,7 +1746,6 @@ function updateBrandTag(isContentView){
       }
     }
   }else{
-    // 모바일에서는 인라인 고정 너비를 제거하여 기존 반응형 동작을 유지합니다.
     tag.style.width='';
     delete tag.dataset.widthLocked;
   }
@@ -1745,7 +1759,6 @@ function updateBrandTag(isContentView){
   }
 
   if(desktop){
-    // 바깥 태그와 테두리는 그대로 두고 문구만 페이드 전환합니다.
     tag.classList.remove('tag-fade');
     text.classList.add('tag-text-fade');
     brandTagTimer=setTimeout(()=>{
@@ -1755,7 +1768,6 @@ function updateBrandTag(isContentView){
     return;
   }
 
-  // 모바일의 기존 전환 방식은 유지합니다.
   text.classList.remove('tag-text-fade');
   tag.classList.add('tag-fade');
   brandTagTimer=setTimeout(()=>{
@@ -1781,7 +1793,6 @@ function positionMobileBrand(){
   requestAnimationFrame(positionHalo);
 }
 
-// 모바일 번개 후광을 로고 이미지의 실제 중심에 맞춥니다. (화면 비율·주소창·회전과 무관)
 function positionHalo(){
   const halo=document.querySelector('.fx .halo');
   const logo=$('brandLogo');
@@ -1815,21 +1826,34 @@ function positionHalo(){
   schedule();
 })();
 
+let showTimer=0;
 function show(id){
+  clearTimeout(showTimer);showTimer=0;
+  const current=document.querySelector('.view.on');
+  const leaveSmoothly=id==='home'&&current&&current.id!=='home'
+    &&matchMedia('(max-width:899px)').matches
+    &&!matchMedia('(prefers-reduced-motion:reduce)').matches;
+  if(!leaveSmoothly){showNow(id);return;}
+  current.classList.add('leaving');
+  const active=document.activeElement;
+  if(active&&active.matches&&active.matches('input,textarea')){try{active.blur();}catch(error){}}
+  showTimer=setTimeout(()=>{showTimer=0;showNow('home');},170);
+}
+function showNow(id){
   const resetTablet=id!=='form'&&typeof window.__zeusResetTabletKeyboard==='function';
-  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));
+  document.querySelectorAll('.view').forEach(v=>{v.classList.remove('leaving');v.classList.toggle('on',v.id===id)});
   const isHome=id==='home';
   const isContentView=!isHome;
   document.body.classList.toggle('home-state',isHome);
   document.body.classList.toggle('hall-state',id==='hallV');
   document.body.classList.toggle('calm',id==='form'||id==='hallV'||id==='doneV');
 
-  // 목적 화면의 레이아웃 클래스가 적용된 뒤 키보드·브랜드 보정값을 초기화합니다.
   if(resetTablet)window.__zeusResetTabletKeyboard();
   updateBrandTag(isContentView);
   const wrap=document.querySelector('.wrap');
   if(wrap)wrap.scrollTop=0;
   scrollTo(0,0);
+  positionMobileBrand();
   requestAnimationFrame(()=>requestAnimationFrame(positionMobileBrand));
 }
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -1838,14 +1862,10 @@ const uidOk=v=>/^[0-9A-Z]{15,16}$/.test(v)&&!v.includes('O');
 function step(i,options={}){
   cur=i;draftStage='step';const q=Q[i];
   let f;
-  // 가입 답변 입력은 브라우저 자동완성 대상이 아닙니다.
-  // form/name을 사용하지 않고 비의미적인 id를 사용해 Chrome이 비밀번호·카드·주소 필드로
-  // 재분류하는 것을 최대한 억제합니다. autocomplete 차단 속성은 개별 필드에도 유지합니다.
   const answerFieldHints=`autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="text" enterkeyhint="next" aria-autocomplete="none" data-form-type="other" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-gramm="false" data-enable-grammarly="false"`;
   if(q.t==='yn')f=`<div class="yn"><button data-v="예">예</button><button data-v="아니요">아니요</button></div>`;
   else if(q.t==='area')f=`<textarea id="zeusAnswerField" ${answerFieldHints} ${q.sm?'style="min-height:84px"':''} ${q.ph?`placeholder="${esc(q.ph)}"`:''}></textarea>`;
   else f=`<input type="text" id="zeusAnswerField" ${answerFieldHints} ${q.ph?`placeholder="${esc(q.ph)}"`:''}>`;
-  // 네이티브 form 래퍼를 제거해 Chrome Autofill이 비밀번호/결제/주소 폼으로 탐지할 단서를 없앱니다.
   const answerFieldForm=q.t==='yn'?f:`<div class="answer-form" role="group" aria-label="답변 입력">${f}</div>`;
   $('stage').innerHTML=`
    <h2>${q.q}</h2>${answerFieldForm}<p class="err" id="err"></p>
@@ -1898,8 +1918,6 @@ function step(i,options={}){
     if(fromConfirm){fromConfirm=false;confirmV()}else if(i<4)step(i+1);else confirmV();
   };
   show('form');
-  // 가입 버튼의 사용자 클릭과 같은 이벤트 흐름 안에서 즉시 포커스합니다.
-  // setTimeout/requestAnimationFrame으로 미루면 iOS·Android에서 키보드 자동 표시가 차단될 수 있습니다.
   if(f1&&q.t!=='area'&&!options.skipAutofocus){
     try{f1.focus({preventScroll:true});}catch(error){f1.focus();}
   }
@@ -2022,8 +2040,6 @@ function pumpHallImageQueue(){
   }
 }
 
-// 홈페이지 접속 시 목록을 먼저 받고, 이미지 전체를 최대 4장씩 백그라운드에서 준비합니다.
-// 미리 받은 이미지 엘리먼트는 현재 페이지가 살아 있는 동안에만 재사용하며 영구 저장하지 않습니다.
 function startHallPrefetch(){
   if(hallMetadataPromise)return hallMetadataPromise;
   hallMetadataPromise=(async()=>{
@@ -2037,11 +2053,10 @@ function startHallPrefetch(){
     if(!response.ok||result.error||!Array.isArray(result.images))throw new Error('hall_list_failed');
 
     hallImageItems=result.images.filter(item=>item&&/^[a-zA-Z0-9_-]{10,200}$/.test(String(item.id||'')));
-    // Google Drive 파일 수정 날짜(modifiedAt)가 가장 최신인 순서를 브라우저에서도 보장합니다.
     hallImageItems.sort((a,b)=>Number(b.modifiedAt||0)-Number(a.modifiedAt||0));
     hallImageElements=hallImageItems.map((item,index)=>{
       const img=document.createElement('img');
-      img.alt='명예의 전당';
+      img.alt='불러오는 중';
       img.draggable=true;
       img.decoding='async';
       img.loading='eager';
@@ -2065,15 +2080,13 @@ async function hall(){
   const box=$('hallList');
   if(hallLoading)return;
   hallLoading=true;
-  box.innerHTML='<div class="empty">기록 목록을 불러오는 중...</div>';
+  box.innerHTML='<div class="empty">불러오는 중...</div>';
   try{
     const images=await startHallPrefetch();
     if(images.length===0){
-      box.innerHTML='<div class="empty">등록된 기록이 없습니다.</div>';
+      box.innerHTML='<div class="empty">수상 내역이 없습니다.</div>';
       return;
     }
-    // 이미 백그라운드에서 시작한 이미지 요청을 그대로 화면에 연결합니다.
-    // 새 요청이나 이미지 데이터의 영구 저장은 발생하지 않습니다.
     hallImageElements.forEach((img,index)=>{
       if(index<4&&img.dataset.loadState!=='loaded')img.fetchPriority='high';
     });
@@ -2081,7 +2094,7 @@ async function hall(){
     hallImageElements.forEach(img=>fragment.appendChild(img));
     box.replaceChildren(fragment);
   }catch(error){
-    box.innerHTML='<div class="empty">기록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</div>';
+    box.innerHTML='<div class="empty">수상 내역을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</div>';
   }finally{
     hallLoading=false;
   }
@@ -2089,18 +2102,14 @@ async function hall(){
 const tapFx=el=>{el.classList.add('tap');setTimeout(()=>el.classList.remove('tap'),600)};
 document.querySelectorAll('.card').forEach(c=>c.addEventListener('pointerdown',()=>tapFx(c)));
 function openApplyForm(){
-  // 같은 탭에서 홈으로 나갔다 돌아온 경우에는 작성 위치와 답변을 이어서 보여줍니다.
-  // 제출이 완료되어 clearApplyDraft()가 실행된 뒤라면 cur=0의 빈 신청서로 시작합니다.
   if(draftStage==='confirm'&&!fromConfirm){
     confirmV();
   }else{
     step(cur);
   }
 }
-// 가입신청서는 지연 실행 없이 클릭 즉시 열어 모바일 터치 이벤트 누락을 방지합니다.
 $('goForm').addEventListener('click',openApplyForm);
 $('goHall').addEventListener('click',hall);
-// 첫 화면이 표시되자마자 명예의 전당 목록과 이미지를 백그라운드에서 미리 불러옵니다.
 startHallPrefetch().catch(()=>{});
 ['contextmenu','selectstart','dragstart'].forEach(t=>document.addEventListener(t,e=>{
   const hallImage=e.target&&e.target.closest?e.target.closest('#hallList img'):null;
@@ -2108,9 +2117,6 @@ startHallPrefetch().catch(()=>{});
   if(!(e.target.closest&&e.target.closest('input,textarea')))e.preventDefault();
 }));$('hallBack').onclick=()=>show('home');$('formBack').onclick=()=>{show('home')};$('doneBack').onclick=()=>{clearApplyDraft();fromConfirm=false;show('home')};
 
-// 새로고침 이후에는 신청서 입력을 복원하지 않습니다. 다음 이용자는 항상 새 신청을 시작합니다.
-
-// 모바일 기기의 시스템/브라우저 뒤로가기를 화면 내 뒤로가기 동작에 연결합니다.
 (function setupMobileBackNavigation(){
   const touchDevice=(Number(navigator.maxTouchPoints)||0)>0||('ontouchstart' in window);
   const isTabletDesktop=matchMedia('(min-width:900px)').matches&&touchDevice;
@@ -2127,14 +2133,12 @@ startHallPrefetch().catch(()=>{});
     }catch(e){}
   };
 
-  // 첫 뒤로가기를 웹페이지 이탈 대신 앱 내부 이동으로 받을 수 있도록 준비합니다.
   armBackTrap();
 
   window.addEventListener('popstate',()=>{
     const activeView=document.querySelector('.view.on');
     if(!activeView)return;
 
-    // 태블릿에서 키보드가 열린 채 시스템 뒤로가기가 들어오면 페이지 이동보다 키보드 상태 복원을 먼저 처리합니다.
     if(document.body.classList.contains('tablet-keyboard-open')){
       if(typeof window.__zeusDismissTabletKeyboard==='function')window.__zeusDismissTabletKeyboard();
       armBackTrap();
@@ -2145,20 +2149,16 @@ startHallPrefetch().catch(()=>{});
     if(activeView.id==='form'){
       const previousButton=$('prev');
       if(previousButton){
-        // 가입신청 단계에서는 화면의 '이전' 버튼과 동일하게 동작합니다.
         previousButton.click();
         handled=true;
       }else if(fromConfirm){
-        // 최종 확인에서 수정 화면으로 들어온 경우 최종 확인으로 돌아갑니다.
         fromConfirm=false;
         confirmV();
         handled=true;
       }else if($('send')){
-        // 최종 확인 화면에는 이전 버튼이 없으므로 마지막 입력 단계로 돌아갑니다.
         step(4);
         handled=true;
       }else{
-        // 첫 번째 작성 단계에서 시스템 뒤로가기를 누르면 홈으로 이동하되 작성 내용은 같은 탭에 유지합니다.
         show('home');
         handled=true;
       }
@@ -2167,7 +2167,6 @@ startHallPrefetch().catch(()=>{});
       handled=true;
     }
 
-    // 처리한 경우에만 다음 시스템 뒤로가기도 앱 내부에서 받을 수 있게 다시 등록합니다.
     if(handled)armBackTrap();
   });
 })();
