@@ -724,22 +724,17 @@ body::before{display:none!important}
     overflow:hidden;
     opacity:1;
     transform:translateY(0);
-    transition:
-      max-height .20s cubic-bezier(.22,.75,.25,1),
-      margin .20s cubic-bezier(.22,.75,.25,1),
-      opacity .16s ease,
-      transform .20s cubic-bezier(.22,.75,.25,1);
-    will-change:max-height,margin,opacity,transform;
+    visibility:visible;
+    transition:opacity .16s ease,transform .20s cubic-bezier(.22,.75,.25,1);
+    will-change:opacity,transform;
   }
   body.tablet-device #brandPanel .hero h1{
-    transform:translateY(var(--tablet-brand-title-shift,0px));
+    transform:translate3d(0,var(--tablet-brand-title-shift,0px),0);
     transition:transform .20s cubic-bezier(.22,.75,.25,1);
     will-change:transform;
   }
   body.tablet-device.tablet-keyboard-open #brandPanel .hero .since{
-    max-height:0;
-    margin-top:0;
-    margin-bottom:0;
+    /* 높이와 여백은 유지해 제목의 기준 좌표가 애니메이션 도중 바뀌지 않게 합니다. */
     opacity:0;
     transform:translateY(-8px);
   }
@@ -1075,9 +1070,10 @@ function clearApplyDraft(){
   let fallbackTimer=0;
   let monitorTimer=0;
   let brandTitleFrame=0;
-  let brandTitleSettleTimer=0;
   let savedFormScrollTop=null;
   let lastVisibleHeight=0;
+  let restoreFrame=0;
+  let restoreTimer=0;
 
   const isField=el=>!!(el&&el.matches&&el.matches('input,textarea'));
   function viewportMetrics(){
@@ -1172,20 +1168,22 @@ function clearApplyDraft(){
     document.documentElement.style.setProperty('--tablet-visual-top',top+'px');
   }
 
+  function clearFormRestoreMotion(){
+    clearTimeout(restoreTimer);restoreTimer=0;
+    if(restoreFrame){cancelAnimationFrame(restoreFrame);restoreFrame=0;}
+    const formView=document.getElementById('form');
+    if(formView){formView.style.removeProperty('transition');formView.style.removeProperty('transform');}
+  }
+
   function openTabletKeyboard(){
     if(!isTabletDesktop||keyboardOpen)return;
+    clearFormRestoreMotion();
     const formView=document.getElementById('form');
     if(savedFormScrollTop===null)savedFormScrollTop=formView?formView.scrollTop:0;
     keyboardOpen=true;
     document.body.classList.add('tablet-keyboard-open');
     applyTabletViewport();
-    clearTimeout(brandTitleSettleTimer);
     scheduleBrandTitlePosition();
-    // SINCE 2020 접힘이 끝난 뒤 실제 로고 하단 좌표로 한 번 더 보정합니다.
-    brandTitleSettleTimer=setTimeout(()=>{
-      brandTitleSettleTimer=0;
-      scheduleBrandTitlePosition();
-    },230);
   }
 
   function restoreFormPosition(previousSlideTop){
@@ -1194,51 +1192,105 @@ function clearApplyDraft(){
     savedFormScrollTop=null;
     if(!formView)return;
 
-    requestAnimationFrame(()=>{
-      // 스크롤 복원은 즉시 처리하고, 화면에 보이는 슬라이드 박스만 짧게 애니메이션합니다.
-      formView.scrollTop=target;
-      const slide=formView.classList.contains('on')?formView:null;
-      if(slide&&Number.isFinite(previousSlideTop)){
-        const naturalTop=slide.getBoundingClientRect().top;
-        const delta=previousSlideTop-naturalTop;
-        if(Math.abs(delta)>1){
-          slide.style.transition='none';
-          slide.style.transform=`translate3d(0,${delta}px,0)`;
-          slide.getBoundingClientRect();
-          requestAnimationFrame(()=>{
-            slide.style.transition='transform .18s cubic-bezier(.2,.75,.25,1)';
-            slide.style.transform='translate3d(0,0,0)';
-            setTimeout(()=>{
-              slide.style.removeProperty('transition');
-              slide.style.removeProperty('transform');
-            },220);
-          });
-        }
-      }
+    clearFormRestoreMotion();
+
+    // 뷰포트와 CSS 상태가 복원된 같은 프레임에서 스크롤을 되돌린 뒤 FLIP 방식으로 위치를 보정합니다.
+    formView.scrollTop=target;
+    const slide=formView.classList.contains('on')?formView:null;
+    if(!slide||!Number.isFinite(previousSlideTop))return;
+
+    const naturalTop=slide.getBoundingClientRect().top;
+    const delta=previousSlideTop-naturalTop;
+    if(Math.abs(delta)<=1)return;
+
+    slide.style.transition='none';
+    slide.style.transform=`translate3d(0,${delta}px,0)`;
+    slide.getBoundingClientRect();
+    restoreFrame=requestAnimationFrame(()=>{
+      restoreFrame=0;
+      slide.style.transition='transform .18s cubic-bezier(.2,.75,.25,1)';
+      slide.style.transform='translate3d(0,0,0)';
+      restoreTimer=setTimeout(()=>{
+        restoreTimer=0;
+        slide.style.removeProperty('transition');
+        slide.style.removeProperty('transform');
+      },210);
     });
   }
 
-  function closeTabletKeyboard(force=false){
+  function closeTabletKeyboard(force=false,restoreSlide=true){
     if(!isTabletDesktop||!keyboardOpen)return;
-    const activeSlide=document.querySelector('#form.view.on');
+    const activeSlide=restoreSlide?document.querySelector('#form.view.on'):null;
     const previousSlideTop=activeSlide?activeSlide.getBoundingClientRect().top:null;
     const metrics=viewportMetrics();
     if(!force&&metrics.visible<baseHeight-keyboardCloseTolerance())return;
+
     keyboardOpen=false;
     keyboardResizeObserved=false;
+    virtualKeyboardWasOpen=false;
     clearTimeout(fallbackTimer);
+    clearTimeout(closeCheckTimer);
+    closeCheckTimer=0;
+    clearTimeout(revealTimer);
     document.body.classList.remove('tablet-keyboard-open');
     const brandTitle=document.querySelector('#brandPanel .hero h1');
     if(brandTitle)brandTitle.style.removeProperty('--tablet-brand-title-shift');
     if(brandTitleFrame){cancelAnimationFrame(brandTitleFrame);brandTitleFrame=0;}
-    clearTimeout(brandTitleSettleTimer);brandTitleSettleTimer=0;
-    baseHeight=Math.max(baseHeight,metrics.reference);
-    // 닫힘이 확정된 뒤에는 일부 WebView가 남겨 둔 축소 viewport 값을 따르지 않고
-    // 키보드가 없을 때의 전체 높이로 되돌려 슬라이드가 원래 프레임에 복귀하게 합니다.
-    applyTabletViewport(metrics,true);
+    baseHeight=Math.max(baseHeight,metrics.reference,window.innerHeight||0,document.documentElement.clientHeight||0);
+    // 키보드 종료 시 브라우저별로 남아 있는 축소 viewport 값을 버리고 전체 높이를 즉시 적용합니다.
+    applyTabletViewport({visible:baseHeight,reference:baseHeight},true);
     if(!fieldFocused)stopMonitor();
-    restoreFormPosition(previousSlideTop);
+    if(restoreSlide)restoreFormPosition(previousSlideTop);
+    else savedFormScrollTop=null;
   }
+
+  // 화면을 홈/명예의 전당/완료 화면으로 전환할 때 키보드 상태와 로고 보정값을 반드시 초기화합니다.
+  function resetTabletKeyboardForNavigation(){
+    if(!isTabletDesktop)return;
+    clearFormRestoreMotion();
+    const active=document.activeElement;
+    if(isField(active)){
+      try{active.blur();}catch(error){}
+    }
+    if(keyboardOpen)closeTabletKeyboard(true,false);
+    else{
+      clearTimeout(closeCheckTimer);closeCheckTimer=0;
+      clearTimeout(fallbackTimer);
+      clearTimeout(revealTimer);
+      document.body.classList.remove('tablet-keyboard-open');
+      const brandTitle=document.querySelector('#brandPanel .hero h1');
+      if(brandTitle)brandTitle.style.removeProperty('--tablet-brand-title-shift');
+      if(brandTitleFrame){cancelAnimationFrame(brandTitleFrame);brandTitleFrame=0;}
+      keyboardResizeObserved=false;
+      virtualKeyboardWasOpen=false;
+      savedFormScrollTop=null;
+      const metrics=viewportMetrics();
+      baseHeight=Math.max(baseHeight,metrics.reference,window.innerHeight||0,document.documentElement.clientHeight||0);
+      applyTabletViewport({visible:baseHeight,reference:baseHeight},true);
+    }
+    fieldFocused=false;
+    stopMonitor();
+  }
+  window.__zeusResetTabletKeyboard=resetTabletKeyboardForNavigation;
+  function dismissTabletKeyboard(){
+    if(!isTabletDesktop)return;
+    const active=document.activeElement;
+    if(isField(active)){
+      try{active.blur();}catch(error){}
+    }
+    if(keyboardOpen)closeTabletKeyboard(true,true);
+    else{
+      document.body.classList.remove('tablet-keyboard-open');
+      const brandTitle=document.querySelector('#brandPanel .hero h1');
+      if(brandTitle)brandTitle.style.removeProperty('--tablet-brand-title-shift');
+      const metrics=viewportMetrics();
+      baseHeight=Math.max(baseHeight,metrics.reference,window.innerHeight||0,document.documentElement.clientHeight||0);
+      applyTabletViewport({visible:baseHeight,reference:baseHeight},true);
+    }
+    fieldFocused=false;
+    stopMonitor();
+  }
+  window.__zeusDismissTabletKeyboard=dismissTabletKeyboard;
 
   function revealFocusedField(){
     if(!isTabletDesktop||!keyboardOpen||!fieldFocused)return;
@@ -1270,16 +1322,18 @@ function clearApplyDraft(){
   }
 
   function scheduleClose(force=false){
-    // 반복되는 viewport 이벤트마다 타이머를 다시 늦추지 않고 최초 닫힘 감지를 유지합니다.
+    // 반복 resize 이벤트는 타이머를 미루지 않습니다. 화면 높이가 복원됐거나 입력 포커스가 사라지면 즉시 복귀합니다.
     if(closeCheckTimer)return;
     closeCheckTimer=setTimeout(()=>{
       closeCheckTimer=0;
       const metrics=viewportMetrics();
       const stillFocused=isField(document.activeElement);
-      if(metrics.visible>=baseHeight-keyboardCloseTolerance()||(!stillFocused&&force)){
+      const vk=navigator.virtualKeyboard;
+      const vkClosed=virtualKeyboardWasOpen&&(!vk||!vk.boundingRect||vk.boundingRect.height<=0);
+      if(metrics.visible>=baseHeight-keyboardCloseTolerance()||(!stillFocused&&force)||vkClosed){
         closeTabletKeyboard(true);
       }
-    },85);
+    },45);
   }
 
   function update(fromMonitor=false){
@@ -1349,27 +1403,57 @@ function clearApplyDraft(){
     if(isTabletDesktop&&isField(target)&&document.activeElement===target)beginFieldFocus(target);
   },{capture:true,passive:true});
 
+  document.addEventListener('pointerdown',event=>{
+    if(!isTabletDesktop||!keyboardOpen||isField(event.target))return;
+    const control=event.target&&event.target.closest&&event.target.closest('button,a,select,[contenteditable="true"]');
+    if(control)return;
+    // 입력란 밖의 빈 화면을 눌러 키보드를 내리는 WebView는 포커스를 유지하기도 하므로 직접 blur를 요청합니다.
+    const active=document.activeElement;
+    if(isField(active)){
+      try{active.blur();}catch(error){}
+    }
+  },true);
+
+  document.addEventListener('pointerup',event=>{
+    if(!isTabletDesktop||!keyboardOpen||isField(event.target))return;
+    setTimeout(()=>{
+      if(!keyboardOpen)return;
+      update(false);
+      const metrics=viewportMetrics();
+      if(metrics.visible>=baseHeight-keyboardCloseTolerance()||!isField(document.activeElement))scheduleClose(true);
+    },55);
+  },{capture:true,passive:true});
+
+  window.addEventListener('keydown',event=>{
+    if(!keyboardOpen)return;
+    if(event.key==='Escape'||event.key==='BrowserBack'||event.key==='GoBack'){
+      setTimeout(()=>{if(keyboardOpen)dismissTabletKeyboard();},25);
+    }
+  },true);
+
   document.addEventListener('focusout',event=>{
     if(!isField(event.target))return;
     clearTimeout(closeCheckTimer);
     closeCheckTimer=setTimeout(()=>{
+      closeCheckTimer=0;
       fieldFocused=isField(document.activeElement);
       if(fieldFocused){
         startMonitor();
         update();
-        scheduleReveal(120);
+        scheduleReveal(90);
       }else{
         clearTimeout(fallbackTimer);
         if(keyboardOpen)scheduleClose(true);
         else{
           keyboardResizeObserved=false;
+          virtualKeyboardWasOpen=false;
           stopMonitor();
           const metrics=viewportMetrics();
           baseHeight=Math.max(baseHeight,metrics.reference);
-          applyTabletViewport(metrics,true);
+          applyTabletViewport({visible:baseHeight,reference:baseHeight},true);
         }
       }
-    },85);
+    },35);
   });
 
   if(viewport){
@@ -1408,7 +1492,7 @@ function clearApplyDraft(){
         closeCheckTimer=setTimeout(()=>{
           closeCheckTimer=0;
           closeTabletKeyboard(true);
-        },85);
+        },35);
       }
     });
   }
@@ -1423,7 +1507,6 @@ function clearApplyDraft(){
       const brandTitle=document.querySelector('#brandPanel .hero h1');
       if(brandTitle)brandTitle.style.removeProperty('--tablet-brand-title-shift');
       if(brandTitleFrame){cancelAnimationFrame(brandTitleFrame);brandTitleFrame=0;}
-      clearTimeout(brandTitleSettleTimer);brandTitleSettleTimer=0;
       keyboardOpen=false;keyboardResizeObserved=false;fieldFocused=false;
       clearTimeout(fallbackTimer);stopMonitor();
     }
@@ -1528,6 +1611,9 @@ function positionMobileBrand(){
 })();
 
 function show(id){
+  if(id!=='form'&&typeof window.__zeusResetTabletKeyboard==='function'){
+    window.__zeusResetTabletKeyboard();
+  }
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));
   const isHome=id==='home';
   const isContentView=!isHome;
@@ -1838,6 +1924,13 @@ startHallPrefetch().catch(()=>{});
   window.addEventListener('popstate',()=>{
     const activeView=document.querySelector('.view.on');
     if(!activeView)return;
+
+    // 태블릿에서 키보드가 열린 채 시스템 뒤로가기가 들어오면 페이지 이동보다 키보드 상태 복원을 먼저 처리합니다.
+    if(document.body.classList.contains('tablet-keyboard-open')){
+      if(typeof window.__zeusDismissTabletKeyboard==='function')window.__zeusDismissTabletKeyboard();
+      armBackTrap();
+      return;
+    }
 
     let handled=false;
     if(activeView.id==='form'){
