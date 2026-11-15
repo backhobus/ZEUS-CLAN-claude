@@ -127,7 +127,7 @@ body{overflow-x:clip}
   html,body{width:100%;height:100%;overflow:hidden}
   body{min-height:0;overscroll-behavior:none}
   .wrap{
-    height:var(--app-h,100%);
+    height:var(--mobile-viewport-height,100dvh);
     min-height:0;
     padding:max(8px,env(safe-area-inset-top,0px)) 14px max(12px,env(safe-area-inset-bottom,0px));
     display:flex;
@@ -853,7 +853,7 @@ body:not(.calm) .fx{animation:zeusFxIn .8s ease both}
 
 /* ===== No-scroll fit: page always fits the viewport, content scales with viewport height ===== */
 html{height:100%;overflow:hidden;overscroll-behavior:none}
-body{height:100%;max-height:var(--app-h,100%);overflow:hidden}
+body{height:100%;max-height:100dvh;overflow:hidden}
 @media(min-width:900px){
   html,body{height:100%;overflow:hidden}
   body{overflow:clip}
@@ -890,12 +890,6 @@ body{height:100%;max-height:var(--app-h,100%);overflow:hidden}
   #home .card{min-height:clamp(44px,19dvh,76px);padding-top:6px;padding-bottom:6px}
   #home .card.main{min-height:clamp(58px,26dvh,100px);font-size:clamp(16px,5.5dvh,22px)}
 }
-
-/* ===== Footer pinned to the very bottom on every device ===== */
-:root{--app-h:100%}
-@supports (height:100dvh){:root{--app-h:100dvh}}
-body:not(.keyboard-open):not(.tablet-keyboard-open) .wrap{padding-bottom:0!important}
-.foot{flex:0 0 auto!important;margin-top:auto!important;padding-bottom:max(6px,env(safe-area-inset-bottom,0px))!important}
 </style>
 <!-- Main emblem normalized to symmetric transparent bounds for optical centering. -->
 </head>
@@ -1242,36 +1236,6 @@ function smoothLayout(mutate){
   }
   applyViewport();
   updateViewport();
-})();
-
-/* Keep the layout exactly as tall as the area the user can really see, so the footer sits at the very bottom in every browser/device.
-   visualViewport.height is deliberately NOT used here: some in-app browsers (e.g. KakaoTalk) report it smaller than the visible area even without a keyboard. */
-(function fitAppHeight(){
-  const root=document.documentElement,body=document.body;
-  const isField=el=>!!(el&&el.matches&&el.matches('input,textarea'));
-  const typing=()=>body.classList.contains('keyboard-open')||body.classList.contains('tablet-keyboard-open')||isField(document.activeElement);
-  let frame=0;
-  function apply(){
-    frame=0;
-    if(typing())return;
-    const vv=window.visualViewport;
-    if(vv&&vv.scale>1.02)return;
-    const vals=[window.innerHeight,root.clientHeight].filter(v=>Number.isFinite(v)&&v>0);
-    if(!vals.length)return;
-    const h=Math.round(Math.min(...vals))+'px';
-    if(root.style.getPropertyValue('--app-h')!==h)root.style.setProperty('--app-h',h);
-  }
-  const schedule=()=>{if(!frame)frame=requestAnimationFrame(apply);};
-  const settle=()=>{schedule();[120,360,800].forEach(ms=>setTimeout(schedule,ms));};
-  window.addEventListener('resize',schedule,{passive:true});
-  window.addEventListener('orientationchange',settle,{passive:true});
-  window.addEventListener('pageshow',settle);
-  window.addEventListener('load',settle);
-  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')settle();});
-  document.addEventListener('focusout',()=>setTimeout(settle,250));
-  if(window.visualViewport)window.visualViewport.addEventListener('resize',schedule,{passive:true});
-  if(typeof MutationObserver!=='undefined')new MutationObserver(settle).observe(body,{attributes:true,attributeFilter:['class']});
-  settle();
 })();
 
 (function setupTabletKeyboardAndViewport(){
