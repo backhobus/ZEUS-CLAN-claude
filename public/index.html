@@ -269,6 +269,8 @@ body{overflow-x:clip}
 
 #brandTag{transition:opacity .5s ease,transform .5s ease}
 #brandTag.tag-fade{opacity:0;transform:translateY(5px)}
+#brandTagText{display:inline-block;transition:opacity .5s ease,transform .5s ease}
+#brandTagText.tag-text-fade{opacity:0;transform:translateY(5px)}
 @media(min-width:900px){
   #brandTag{transition:none}
   #brandTagText{display:inline-block;transition:opacity .5s ease,transform .5s ease}
@@ -1117,6 +1119,33 @@ function smoothLayout(mutate){
   });
 }
 
+/* 회전 대응: 방향별 '키보드 없는 전체 높이'를 기록하고, 모르는 방향은 화면 크기로 추정 */
+const zeusFull={l:0,p:0};
+const zeusKind=()=>innerWidth>=900?'l':'p';
+const zeusFieldOn=()=>{const a=document.activeElement;return !!(a&&a.matches&&a.matches('input,textarea'));};
+function zeusSampleFull(){
+  const k=zeusKind(),h=Math.round(innerHeight);
+  if(!(h>0))return;
+  if(!zeusFieldOn()||(zeusFull[k]>0&&h>zeusFull[k]))zeusFull[k]=h;
+}
+function zeusEstFull(k=zeusKind()){
+  if(zeusFull[k]>0)return zeusFull[k];
+  const o=k==='l'?'p':'l',sS=Math.min(screen.width||0,screen.height||0),sL=Math.max(screen.width||0,screen.height||0);
+  if(zeusFull[o]>0&&sS>0){
+    const est=(k==='l'?sS:sL)-((o==='l'?sS:sL)-zeusFull[o]);
+    if(est>200)return Math.round(est);
+  }
+  return Math.round(innerHeight);
+}
+(function(){
+  let t=0;const sched=d=>{clearTimeout(t);t=setTimeout(zeusSampleFull,d);};
+  addEventListener('resize',()=>sched(250),{passive:true});
+  addEventListener('orientationchange',()=>sched(500));
+  addEventListener('load',()=>sched(100));
+  document.addEventListener('focusout',()=>sched(500));
+  zeusSampleFull();
+})();
+
 function zeusVisibleHeight(base){
   const vv=window.visualViewport,ok=v=>Number.isFinite(v)&&v>0;
   const layout=[window.innerHeight,document.documentElement&&document.documentElement.clientHeight].filter(ok);
@@ -1134,6 +1163,7 @@ function zeusVisibleHeight(base){
   let monitorTimer=0;
   let closeTimer=0;
   let fallbackTimer=0;
+  let lastW=innerWidth,kbMin=0;
 
   const isField=el=>!!(el&&el.matches&&el.matches('input,textarea'));
   const wrap=()=>document.querySelector('.wrap');
@@ -1199,7 +1229,7 @@ function zeusVisibleHeight(base){
     if(!keyboardDetected)return;
     const height=visibleHeight();
     if(!force&&height<baseHeight-75)return;
-    keyboardDetected=false;
+    keyboardDetected=false;kbMin=0;
     clearTimeout(closeTimer);
     clearTimeout(fallbackTimer);
     baseHeight=Math.max(baseHeight,height);
@@ -1232,8 +1262,17 @@ function zeusVisibleHeight(base){
       keyboardDetected=false;
       return;
     }
+    if(Math.abs(innerWidth-lastW)>40){
+      /* 회전: 이전 방향의 기준 높이 폐기 (키보드가 올라온 채면 추정 전체 높이 사용) */
+      lastW=innerWidth;kbMin=0;
+      baseHeight=isField(document.activeElement)?Math.max(zeusEstFull(),visibleHeight()):visibleHeight();
+    }
     const height=visibleHeight();
     const active=isField(document.activeElement);
+    if(keyboardDetected){
+      kbMin=kbMin?Math.min(kbMin,height):height;
+      if(height-kbMin>=Math.max(120,kbMin*.25)){baseHeight=height;zeusFull[zeusKind()]=Math.round(innerHeight);}  /* 키보드 내리기 버튼: 높이가 크게 복귀 */
+    }else kbMin=0;
 
     if(active){
       focusedField=document.activeElement;
@@ -1334,13 +1373,23 @@ function zeusVisibleHeight(base){
 (function fitAppHeight(){
   const root=document.documentElement,body=document.body;
   const isField=el=>!!(el&&el.matches&&el.matches('input,textarea'));
-  const typing=()=>body.classList.contains('keyboard-open')||body.classList.contains('tablet-keyboard-open')||isField(document.activeElement);
-  let frame=0;
+  const kbUp=()=>{const e=zeusEstFull();return zeusFieldOn()&&innerHeight<e-Math.max(80,e*.08);};
+  const typing=()=>body.classList.contains('keyboard-open')||body.classList.contains('tablet-keyboard-open')||(zeusFieldOn()&&!(zeusFull[zeusKind()]>0&&!kbUp()));
+  let frame=0,lastW=innerWidth,flipUntil=0;
   function apply(){
     frame=0;
-    if(typing())return;
+    const flipped=Math.abs(innerWidth-lastW)>40||Date.now()<flipUntil;
+    lastW=innerWidth;
+    if(typing()&&!flipped)return;
     const vv=window.visualViewport;
     if(vv&&vv.scale>1.02)return;
+    if(flipped&&typing()){
+      /* 키보드가 올라온/포커스가 남은 채 회전: 새 방향의 전체 높이를 직접 반영 */
+      const est=zeusEstFull(),ih=Math.round(innerHeight),kb=zeusFieldOn()&&ih<est-Math.max(80,est*.08);
+      const hh=(kb?est:ih)+'px';
+      if(root.style.getPropertyValue('--app-h')!==hh)root.style.setProperty('--app-h',hh);
+      return;
+    }
     const vals=[window.innerHeight,root.clientHeight].filter(v=>Number.isFinite(v)&&v>0);
     if(!vals.length)return;
     const h=Math.round(Math.min(...vals))+'px';
@@ -1348,8 +1397,11 @@ function zeusVisibleHeight(base){
   }
   const schedule=()=>{if(!frame)frame=requestAnimationFrame(apply);};
   const settle=()=>{schedule();[120,360,800].forEach(ms=>setTimeout(schedule,ms));};
-  window.addEventListener('resize',schedule,{passive:true});
-  window.addEventListener('orientationchange',settle,{passive:true});
+  window.addEventListener('resize',()=>{
+    if(Math.abs(innerWidth-lastW)>40){flipUntil=Date.now()+1300;[120,360,800,1200].forEach(ms=>setTimeout(schedule,ms));}
+    schedule();
+  },{passive:true});
+  window.addEventListener('orientationchange',()=>{flipUntil=Date.now()+1300;settle();setTimeout(schedule,1200);},{passive:true});
   window.addEventListener('pageshow',settle);
   window.addEventListener('load',settle);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')settle();});
@@ -1395,9 +1447,11 @@ function zeusVisibleHeight(base){
   let restoreTimer=0;
   let brandTitleHidden=false;
   let brandTitleTimers=[];
+  let kbMinH=0;
   const BRAND_TITLE_MARGIN=6;
 
   const isField=el=>!!(el&&el.matches&&el.matches('input,textarea'));
+  const fieldBase=m=>isField(document.activeElement)?Math.max(zeusEstFull('l'),m.reference):m.reference;
   function viewportMetrics(){
     const values=[window.innerHeight,document.documentElement&&document.documentElement.clientHeight,viewport&&viewport.height]
       .filter(v=>Number.isFinite(v)&&v>0);
@@ -1515,7 +1569,7 @@ function zeusVisibleHeight(base){
       releaseTabletViewport();
     }
     const metrics=viewportMetrics();
-    baseHeight=metrics.reference;
+    baseHeight=fieldBase(metrics);
     baseWidth=window.innerWidth||baseWidth;
     lastVisibleHeight=metrics.visible;
   }
@@ -1533,7 +1587,7 @@ function zeusVisibleHeight(base){
     clearFormRestoreMotion();
     const formView=document.getElementById('form');
     if(savedFormScrollTop===null)savedFormScrollTop=formView?formView.scrollTop:0;
-    keyboardOpen=true;
+    keyboardOpen=true;kbMinH=0;
     document.body.classList.add('tablet-keyboard-open');
     applyTabletViewport();
     scheduleBrandTitlePosition(true);
@@ -1577,7 +1631,7 @@ function zeusVisibleHeight(base){
     const metrics=viewportMetrics();
     if(!force&&metrics.visible<baseHeight-keyboardCloseTolerance())return;
 
-    keyboardOpen=false;
+    keyboardOpen=false;kbMinH=0;
     keyboardResizeObserved=false;
     virtualKeyboardWasOpen=false;
     clearTimeout(fallbackTimer);
@@ -1698,9 +1752,13 @@ function zeusVisibleHeight(base){
 
     const widthNow=window.innerWidth||0;
     if(!keyboardOpen&&baseWidth&&Math.abs(widthNow-baseWidth)>40){
-      baseHeight=metrics.reference;
+      baseHeight=fieldBase(metrics);
       baseWidth=widthNow;
     }
+    if(keyboardOpen){
+      kbMinH=kbMinH?Math.min(kbMinH,height):height;
+      if(height-kbMinH>=Math.max(120,kbMinH*.25)&&Math.abs(widthNow-baseWidth)<=40){baseHeight=height;zeusFull.l=Math.round(innerHeight);}  /* 키보드 내리기 버튼 */
+    }else kbMinH=0;
 
     const active=isField(document.activeElement);
     if(active&&!fieldFocused){
@@ -1857,7 +1915,7 @@ function zeusVisibleHeight(base){
     syncTabletMode();
     if(isTabletDesktop&&!keyboardOpen){
       const metrics=viewportMetrics();
-      baseHeight=metrics.reference;
+      baseHeight=fieldBase(metrics);
       baseWidth=window.innerWidth||baseWidth;
       lastVisibleHeight=metrics.visible;
       releaseTabletViewport();
@@ -1877,14 +1935,26 @@ function brandTagIntro(){
   const tag=$('brandTag'),text=$('brandTagText');
   if(!tag||!text)return;
   clearTimeout(brandTagTimer);
-  tag.dataset.mode='home';tag.style.width='';delete tag.dataset.widthLocked;
-  tag.classList.remove('tag-fade');text.classList.remove('tag-text-fade');
-  text.innerHTML=TAG_LEGEND;
+  tag.dataset.mode='home';tag.classList.remove('tag-fade');text.classList.remove('tag-text-fade');
+  tag.style.width='';tag.style.boxSizing='';delete tag.dataset.widthLocked;
+  /* 두 문구를 같은 칸에 겹쳐 두면 테두리가 항상 '영웅, 전설' 문장 폭으로 유지됨 → 글자만 교체 */
+  text.style.display='inline-grid';
+  text.innerHTML='<span style="grid-area:1/1;justify-self:center">'+TAG_LEGEND+'</span><span style="grid-area:1/1;visibility:hidden" aria-hidden="true">'+TAG_HOME+'</span>';
   brandTagTimer=setTimeout(()=>{
-    tag.classList.add('tag-fade');
-    brandTagTimer=setTimeout(()=>{text.innerHTML=TAG_HOME;tag.classList.remove('tag-fade');},500);
+    text.classList.add('tag-text-fade');
+    brandTagTimer=setTimeout(()=>{text.style.display='';text.innerHTML=TAG_HOME;text.classList.remove('tag-text-fade');},500);
   },1000);
 }
+/* 화면 폭이 바뀌면(회전) 고정해 둔 테두리 폭 해제 → 새 화면 기준으로 다시 계산 */
+(function(){
+  let w0=innerWidth;
+  addEventListener('resize',()=>{
+    if(Math.abs(innerWidth-w0)<=1)return;
+    w0=innerWidth;
+    const t=$('brandTag');
+    if(t&&t.dataset.widthLocked){t.style.width='';t.style.boxSizing='';delete t.dataset.widthLocked;}
+  },{passive:true});
+})();
 function updateBrandTag(isContentView){
   const tag=$('brandTag');
   const text=$('brandTagText');
@@ -2479,6 +2549,7 @@ startHallPrefetch().catch(()=>{});
     raf=0;
     const w=innerWidth;
     if(Math.abs(w-w0)>40){w0=w;stable=0;}
+    if(!stable&&w<900&&(body.classList.contains('keyboard-open')||isF(document.activeElement)))stable=zeusEstFull('p');
     const vv=window.visualViewport,vh=vv&&vv.height?Math.min(layoutH(),vv.height):layoutH();
     const kb=stable>0&&vh<stable-Math.max(80,stable*.08);
     const cls=body.classList.contains('keyboard-open');
@@ -2512,6 +2583,7 @@ startHallPrefetch().catch(()=>{});
   if(window.visualViewport)window.visualViewport.addEventListener('resize',go,{passive:true});
   new MutationObserver(go).observe(body,{attributes:true,attributeFilter:['class','data-view']});
   if(typeof ResizeObserver!=='undefined'){const b=document.getElementById('formBox');if(b)new ResizeObserver(go).observe(b);}
+  {let lastApp='';new MutationObserver(()=>{const v=root.style.getPropertyValue('--app-h');if(v!==lastApp){lastApp=v;go();}}).observe(root,{attributes:true,attributeFilter:['style']});}
   window.addEventListener('load',go);go();
   window.__zeusPadUpdate=update;
 })();
