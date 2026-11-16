@@ -691,6 +691,7 @@ body{overflow-x:clip}
     transition:transform .20s cubic-bezier(.22,.75,.25,1),opacity .18s ease;
     will-change:transform,opacity;
   }
+  body.tablet-device.tablet-keyboard-open #brandPanel .hero h1{transition:opacity .18s ease}
   body.tablet-device.tablet-brand-title-hidden #brandPanel .hero h1{opacity:0}
   body.tablet-device.tablet-keyboard-open #brandPanel .hero .since{
     opacity:0;
@@ -1509,8 +1510,10 @@ function zeusVisibleHeight(base){
     document.body.classList.remove('tablet-brand-title-hidden');
   }
 
+  let brandTitleGlideUntil=0;
   function updateTabletBrandTitlePosition(){
     if(!isTabletDesktop||!keyboardOpen)return;
+    const gliding=performance.now()<brandTitleGlideUntil;
     const logo=document.getElementById('brandLogo');
     const title=document.querySelector('#brandPanel .hero h1');
     if(!logo||!title)return;
@@ -1525,13 +1528,19 @@ function zeusVisibleHeight(base){
     const gap=keyboardTop-imageBottomY;
     const needed=titleRect.height+BRAND_TITLE_MARGIN*2;
     const fits=brandTitleHidden?gap>=needed+10:gap>=needed;
-    if(!fits){setBrandTitleHidden(true);return;}
+    if(!fits){if(!gliding)setBrandTitleHidden(true);return;}
     setBrandTitleHidden(false);
 
     const targetCenterY=imageBottomY+gap/2;
     const naturalTitleCenter=titleRect.top+titleRect.height/2-computedTranslateY(title);
     const shift=targetCenterY-naturalTitleCenter;
-    title.style.setProperty('--tablet-brand-title-shift',`${Math.round(shift*10)/10}px`);
+    /* 글자가 새로 나타나듯 보이지 않도록: 로고가 줄어드는 동안 매 프레임 현재 위치에서 목표 위치로 부드럽게 따라감 */
+    let next=shift;
+    if(gliding){
+      const cur=parseFloat(title.style.getPropertyValue('--tablet-brand-title-shift'))||0;
+      next=Math.abs(shift-cur)<.4?shift:cur+(shift-cur)*.16;
+    }
+    title.style.setProperty('--tablet-brand-title-shift',`${Math.round(next*10)/10}px`);
   }
 
   function scheduleBrandTitlePosition(settle=false){
@@ -1543,9 +1552,14 @@ function zeusVisibleHeight(base){
     });
     if(settle){
       brandTitleTimers.forEach(clearTimeout);
-      brandTitleTimers=[140,320,640].map(ms=>setTimeout(()=>{
-        if(keyboardOpen)updateTabletBrandTitlePosition();
-      },ms));
+      brandTitleGlideUntil=performance.now()+900;
+      const loop=()=>{
+        if(!keyboardOpen)return;
+        updateTabletBrandTitlePosition();
+        if(performance.now()<brandTitleGlideUntil)brandTitleTimers=[setTimeout(()=>requestAnimationFrame(loop),0)];
+        else updateTabletBrandTitlePosition();
+      };
+      requestAnimationFrame(loop);
     }
   }
 
