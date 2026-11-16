@@ -961,7 +961,8 @@ body.pad-portrait[data-view="form"] #brandPanel .hero .logo{width:var(--bt-logo,
 body.pad-portrait[data-view="form"] #brandPanel .hero h1{font-size:var(--bt-fs,clamp(32px,5.2vw,50px));margin:var(--bt-mt,10px) 0 0;transition:font-size .5s cubic-bezier(.22,.75,.25,1),margin .5s cubic-bezier(.22,.75,.25,1)}
 body.pad-portrait.keyboard-open:not(.bt-off)[data-view="form"] #form.view.on{padding:0;min-height:0}
 body.pad-portrait .wrap{max-width:clamp(520px,84vw,740px)}
-body.pad-portrait[data-view="form"] .wrap{max-width:clamp(450px,70vw,640px)}
+body.pad-portrait[data-view="form"] .wrap{max-width:clamp(480px,76vw,680px);transition:max-width .5s cubic-bezier(.22,.75,.25,1)}
+body.pad-portrait.keyboard-open[data-view="form"] .wrap{max-width:clamp(440px,68vw,620px)}
 body.pad-portrait[data-view="form"] .desktop-layout{justify-content:center;gap:clamp(14px,3dvh,34px)}
 body.pad-portrait[data-view="form"] .right-panel{flex:0 1 auto;overflow:visible}
 body.pad-portrait[data-view="form"] .brand-panel{padding-top:calc(var(--bt-g) + env(safe-area-inset-top,0px))}
@@ -2564,7 +2565,7 @@ startHallPrefetch().catch(()=>{});
     const box=document.getElementById('formBox');if(!box)return;
     const avail=zeusVisibleHeight(stable),formH=box.offsetHeight,panelW=box.offsetWidth||Math.min(w*.84,740);
     /* 슬라이드(폼) 폭 대비 비율: 키보드 올림 .22 / 내림 .34, 남는 공간에 맞춰 자동 축소 (브랜드 블록 ≈ 로고×1.45) */
-    const pw=Math.max(450,Math.min(w*.7,640));
+    const pw=typing?Math.max(440,Math.min(w*.68,620)):Math.max(480,Math.min(w*.76,680));
     const room=avail-formH-(typing?44:90);
     const want=Math.min(pw*(typing?.46:.5),typing?avail*.3:stable*.3,360);
     const logo=Math.floor(Math.min(want,room*.85/1.45));
