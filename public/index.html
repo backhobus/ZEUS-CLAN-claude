@@ -69,7 +69,6 @@ input:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(23
 .b.go{background:linear-gradient(135deg,#f6dc9b,#e9c46a 55%,#c9973a);color:#1a1305;border:0}
 .b:disabled{opacity:.5}
 
-/* ===== 패드 가로(≥900px): '마지막으로 확인해주세요' 박스를 화면 높이에 맞춰 위아래 여유를 동적으로 줄여 스크롤 제거 ===== */
 @media(min-width:900px){
   #formBox.is-confirm{padding-top:max(8px,calc(clamp(16px,5.33vh,32px)*var(--cf,1)));padding-bottom:max(8px,calc(clamp(16px,5.33vh,32px)*var(--cf,1)))}
   #formBox.is-confirm .top{margin-bottom:max(2px,calc(14px*var(--cf,1)))}
@@ -83,7 +82,6 @@ input:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(23
   #form.view.confirm-fit{overflow-y:hidden!important}
 }
 
-/* ===== 연령대 슬라이드 바 ===== */
 .age{position:relative;padding:0 22px;touch-action:none;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:0;--p:0}
 .age-inner{position:relative;height:28px;margin-top:54px}
 .age-rail{position:absolute;left:0;right:0;top:50%;height:6px;margin-top:-3px;border-radius:999px;background:rgba(255,255,255,.14);overflow:hidden}
@@ -627,7 +625,6 @@ body{overflow-x:clip}
     scroll-behavior:smooth;
     display:flex;flex-direction:column;
   }
-  /* 키보드 올라온 상태: 슬라이드를 화면 최상단~키보드 최상단 사이 세로 중앙에 배치(내용이 길면 위에서부터 스크롤) */
   body.tablet-device.tablet-keyboard-open #form.view.on>#formBox{margin-top:auto;margin-bottom:auto;flex:0 0 auto}
   body.tablet-device.tablet-keyboard-open .foot{display:none!important}
 }
@@ -889,13 +886,11 @@ body:not(.calm) .fx{animation:zeusFxIn .8s ease both}
   .fx .halo{transition:none!important}
 }
 
-/* ===== No-scroll fit: page always fits the viewport, content scales with viewport height ===== */
 html{height:100%;overflow:hidden;overscroll-behavior:none}
 body{height:100%;max-height:var(--app-h,100%);overflow:hidden}
 @media(min-width:900px){
   html,body{height:100%;overflow:hidden}
   body{overflow:clip}
-  /* Original (first-version) sizes are the maximum; everything shrinks proportionally only when the window is shorter than ~600px */
   .wrap{height:100vh;height:100dvh;min-height:0;max-height:100dvh;
     padding-top:clamp(10px,8vh,48px);padding-bottom:clamp(6px,4vh,24px)}
   .desktop-layout{gap:clamp(24px,5vw,56px)}
@@ -915,7 +910,6 @@ body{height:100%;max-height:var(--app-h,100%);overflow:hidden}
   .right-panel .view:not(#home){max-height:min(86vh,calc(100dvh - 90px))}
   .panel{padding:clamp(16px,5.33vh,32px) clamp(18px,3vw,36px)}
 }
-/* Short phone / landscape: lay home out side by side so nothing is clipped or needs scrolling */
 @media(max-width:899px) and (max-height:480px){
   body.home-state .desktop-layout{flex-direction:row;align-items:center;gap:clamp(12px,3vw,28px)}
   body.home-state .brand-panel{flex:1 1 0;min-width:0;padding:0}
@@ -929,13 +923,11 @@ body{height:100%;max-height:var(--app-h,100%);overflow:hidden}
   #home .card.main{min-height:clamp(58px,26dvh,100px);font-size:clamp(16px,5.5dvh,22px)}
 }
 
-/* ===== Footer pinned to the very bottom on every device ===== */
 :root{--app-h:100%}
 @supports (height:100dvh){:root{--app-h:100dvh}}
 body:not(.keyboard-open):not(.tablet-keyboard-open) .wrap{padding-bottom:0!important}
 .foot{flex:0 0 auto!important;margin-top:auto!important;padding-bottom:max(6px,env(safe-area-inset-bottom,0px))!important}
 
-/* ===== Tablet fit: 키보드가 올라와도 로고·타이틀이 작아지지 않도록 '키보드 없는 안정 높이(--stage-h)' 기준으로 크기 결정 ===== */
 :root{--stage-h:100vh}
 @media(min-width:900px){
   body.tablet-device{--avail-h:var(--tablet-visual-height,100dvh)}
@@ -948,14 +940,12 @@ body:not(.keyboard-open):not(.tablet-keyboard-open) .wrap{padding-bottom:0!impor
   body.tablet-device #brandTag{transition:opacity .32s ease,transform .42s cubic-bezier(.22,.75,.25,1),height .5s ease,margin .5s ease,padding .5s ease,border-width .5s ease}
   body.tablet-device.tablet-keyboard-open #brandTag{height:0!important;margin-top:0!important;padding-top:0!important;padding-bottom:0!important;border-width:0;overflow:hidden}
 }
-/* 패드 세로 화면(홈): 화면 폭·높이에 맞춰 로고/문구 확대 */
 @media(min-width:600px) and (max-width:899px) and (min-height:700px){
   body.home-state #brandPanel .hero .logo{width:clamp(150px,min(25dvh,34vw),270px);height:clamp(150px,min(25dvh,34vw),270px)}
   body.home-state #brandPanel .hero .since{font-size:clamp(14px,2.3vw,22px);margin:clamp(12px,1.8dvh,20px) 0 6px}
   body.home-state #brandPanel .hero h1{font-size:clamp(40px,9vw,76px)}
   body.home-state #brandPanel .hero .tag{font-size:clamp(13px,2.3vw,20px);padding:7px 18px;margin-top:clamp(10px,1.6dvh,16px)}
 }
-/* 휴대폰 세로(홈): 패드 세로의 (로고·글자 : 버튼) 비율을 따라 확대. 기준 = 메인 버튼 높이(--hm)·폭 */
 @media(max-width:599px) and (orientation:portrait) and (min-height:621px){
   body.home-state{--hm:clamp(94px,15dvh,114px)}
   body.home-state #brandPanel .hero .logo{width:clamp(132px,min(calc(var(--hm)*1.55),44vw),190px);height:clamp(132px,min(calc(var(--hm)*1.55),44vw),190px)}
@@ -963,16 +953,13 @@ body:not(.keyboard-open):not(.tablet-keyboard-open) .wrap{padding-bottom:0!impor
   body.home-state #brandPanel .hero h1{font-size:clamp(31px,min(10.4vw,calc(var(--hm)*.4)),50px)}
   body.home-state #brandPanel .hero .tag{font-size:clamp(13px,3.6vw,17px);padding:8px 17px;margin-top:clamp(10px,1.6dvh,16px)}
 }
-/* 휴대폰 세로(화면이 낮은 기기): 문구·테두리 조금 확대 */
 @media(max-width:599px) and (orientation:portrait) and (max-height:620px){
   body.home-state #brandPanel .hero .tag{font-size:clamp(11.5px,3.1vw,14px);padding:5px 12px}
 }
 @media(prefers-reduced-motion:reduce){body.tablet-device .brand-panel .hero *,body.tablet-device .brand-panel .hero::before,body.tablet-device #brandTag{transition:none!important}}
 
-/* ===== 줄바꿈 방지 ===== */
 h1,.tag,#brandTag,#brandTagText{white-space:nowrap!important}
 @media(min-width:900px){body .brand-panel .hero h1{font-size:clamp(28px,min(8.33vh,5.2vw),50px)}}
-/* ===== 패드 세로(JS가 body.pad-portrait 부여): 버튼·입력 확대 + 가입신청서 상단 브랜드 ===== */
 body.pad-portrait #home .grid{gap:clamp(12px,1.5dvh,18px)}
 body.pad-portrait #home .card{min-height:calc(var(--pp-h,1000px)*.105);font-size:clamp(21px,3.1vw,27px);border-radius:20px;gap:14px}
 body.pad-portrait #home .card.main{min-height:calc(var(--pp-h,1000px)*.15);font-size:clamp(26px,3.9vw,34px)}
@@ -1006,11 +993,9 @@ body.pad-portrait.keyboard-open[data-view="form"] .wrap{max-width:clamp(440px,68
 body.pad-portrait[data-view="form"] .desktop-layout{justify-content:center;gap:clamp(14px,3dvh,34px)}
 body.pad-portrait[data-view="form"] .right-panel{flex:0 1 auto;overflow:visible}
 body.pad-portrait[data-view="form"] .brand-panel{padding-top:calc(var(--bt-g) + env(safe-area-inset-top,0px))}
-/* 홈↔가입신청서 이동 시 로고/타이틀 FLIP 연결: 기존 등장 애니메이션·전환 해제 */
 body.bt-flip #brandPanel .hero,body.bt-flip.pad-portrait[data-view="form"] .brand-panel{animation:none!important}
 body.bt-flipping #brandPanel,body.bt-flipping #brandPanel .hero .logo,body.bt-flipping #brandPanel .hero h1{transition:none!important;overflow:visible!important}
 @media(prefers-reduced-motion:reduce){body.pad-portrait .brand-panel{animation:none!important;transition:none!important}}
-/* 브랜드 문구: 두 문구를 한 칸에 겹쳐 폭을 항상 긴 문구 기준으로 유지(폭 고정/줄바꿈 오류 방지) */
 #brandTagText{display:inline-grid!important;white-space:nowrap!important}
 #brandTagText>.tg{grid-area:1/1;justify-self:center;white-space:nowrap!important}
 #brandTag[data-face="home"] .tg-legend,#brandTag:not([data-face]) .tg-legend,#brandTag[data-face="legend"] .tg-home{visibility:hidden}
@@ -1086,7 +1071,7 @@ let hallImageActive=0;
 const Q=[
  {k:'nick',l:'닉네임',q:'게임에서 사용하는 닉네임을 알려주세요.',t:'text'},
  {k:'uid',l:'게임 UID',q:'게임 UID를 알려주세요.',t:'text',ph:'예: 428BCBA023C04781'},
- {k:'age',l:'연령대',q:'연령대를 알려주세요.',t:'range',min:17,max:60,note:'가입 절차를 위해서만 사용되며, 외부로 공유되지 않습니다.'},
+ {k:'age',l:'연령대',q:'연령을 알려주세요.',t:'range',min:17,max:60,note:'가입 절차를 위해서만 사용되며, 외부로 공유되지 않습니다.'},
  {k:'why',l:'가입 사유',q:'ZEUS에 가입하고 싶은 사유를 알려주세요.',t:'area'},
  {k:'tour',l:'토너먼트 의향',q:'디스코드에 참가하여 토너먼트에 도전할 의향이 있나요?',t:'yn'}
 ];
@@ -1164,7 +1149,6 @@ function smoothLayout(mutate){
   });
 }
 
-/* 회전 대응: 방향별 '키보드 없는 전체 높이'를 기록하고, 모르는 방향은 화면 크기로 추정 */
 const zeusFull={l:0,p:0};
 const zeusKind=()=>innerWidth>=900?'l':'p';
 const zeusFieldOn=()=>{const a=document.activeElement;return !!(a&&a.matches&&a.matches('input,textarea'));};
@@ -1308,7 +1292,6 @@ function zeusVisibleHeight(base){
       return;
     }
     if(Math.abs(innerWidth-lastW)>40){
-      /* 회전: 이전 방향의 기준 높이 폐기 (키보드가 올라온 채면 추정 전체 높이 사용) */
       lastW=innerWidth;kbMin=0;
       baseHeight=isField(document.activeElement)?Math.max(zeusEstFull(),visibleHeight()):visibleHeight();
     }
@@ -1316,7 +1299,7 @@ function zeusVisibleHeight(base){
     const active=isField(document.activeElement);
     if(keyboardDetected){
       kbMin=kbMin?Math.min(kbMin,height):height;
-      if(height-kbMin>=Math.max(120,kbMin*.25)){baseHeight=height;zeusFull[zeusKind()]=Math.round(innerHeight);}  /* 키보드 내리기 버튼: 높이가 크게 복귀 */
+      if(height-kbMin>=Math.max(120,kbMin*.25)){baseHeight=height;zeusFull[zeusKind()]=Math.round(innerHeight);} 
     }else kbMin=0;
 
     if(active){
@@ -1413,8 +1396,6 @@ function zeusVisibleHeight(base){
   updateViewport();
 })();
 
-/* Keep the layout exactly as tall as the area the user can really see, so the footer sits at the very bottom in every browser/device.
-   visualViewport.height is deliberately NOT used here: some in-app browsers (e.g. KakaoTalk) report it smaller than the visible area even without a keyboard. */
 (function fitAppHeight(){
   const root=document.documentElement,body=document.body;
   const isField=el=>!!(el&&el.matches&&el.matches('input,textarea'));
@@ -1429,7 +1410,6 @@ function zeusVisibleHeight(base){
     const vv=window.visualViewport;
     if(vv&&vv.scale>1.02)return;
     if(flipped&&typing()){
-      /* 키보드가 올라온/포커스가 남은 채 회전: 새 방향의 전체 높이를 직접 반영 */
       const est=zeusEstFull(),ih=Math.round(innerHeight),kb=zeusFieldOn()&&ih<est-Math.max(80,est*.08);
       const hh=(kb?est:ih)+'px';
       if(root.style.getPropertyValue('--app-h')!==hh)root.style.setProperty('--app-h',hh);
@@ -1566,7 +1546,6 @@ function zeusVisibleHeight(base){
     const targetCenterY=imageBottomY+gap/2;
     const naturalTitleCenter=titleRect.top+titleRect.height/2-computedTranslateY(title);
     const shift=targetCenterY-naturalTitleCenter;
-    /* 글자가 새로 나타나듯 보이지 않도록: 로고가 줄어드는 동안 매 프레임 현재 위치에서 목표 위치로 부드럽게 따라감 */
     let next=shift;
     if(gliding){
       const cur=parseFloat(title.style.getPropertyValue('--tablet-brand-title-shift'))||0;
@@ -1815,7 +1794,7 @@ function zeusVisibleHeight(base){
     }
     if(keyboardOpen){
       kbMinH=kbMinH?Math.min(kbMinH,height):height;
-      if(height-kbMinH>=Math.max(120,kbMinH*.25)&&Math.abs(widthNow-baseWidth)<=40){baseHeight=height;zeusFull.l=Math.round(innerHeight);}  /* 키보드 내리기 버튼 */
+      if(height-kbMinH>=Math.max(120,kbMinH*.25)&&Math.abs(widthNow-baseWidth)<=40){baseHeight=height;zeusFull.l=Math.round(innerHeight);} 
     }else kbMinH=0;
 
     const active=isField(document.activeElement);
@@ -1988,7 +1967,6 @@ function zeusVisibleHeight(base){
 
 const TAG_LEGEND='WHERE YOUR LEGEND BEGINS',TAG_HOME='<span class="y">영웅</span>, <span class="p">전설</span> 타이틀 누적 299개 배출';
 const brandPortrait=()=>matchMedia('(max-width:899px) and (orientation:portrait)').matches&&!matchMedia('(prefers-reduced-motion:reduce)').matches;
-/* 세로화면 홈 진입: LEGEND 문구 표시 → 1.5초 뒤 페이드로 영웅·전설 문장 */
 function brandTagIntro(){
   const tag=$('brandTag'),text=$('brandTagText');
   if(!tag||!text)return;
@@ -2092,7 +2070,6 @@ function positionHalo(settled=false){
 })();
 
 let showTimer=0,showTok=0;
-/* 패드 세로: 키보드가 완전히 내려가 화면 높이가 안정될 때까지 기다렸다가 done 실행 (최대 1초) */
 function zeusKbSettle(tok,done){
   const b=document.body,vv=window.visualViewport,t0=performance.now();
   let last=-1,still=0,kicked=false;
@@ -2163,7 +2140,6 @@ function showNow(id){
     const last=zeusBrandRects();
     if(last){
       zeusPlayFlip(flipFirst,last);
-      /* 취소된 이전 애니메이션의 정리 코드가 bt-flipping을 먼저 지우는 경우 복구 */
       setTimeout(()=>{if(document.getAnimations().some(a=>a.id==='zeus-brand-flip'&&a.playState==='running'))document.body.classList.add('bt-flipping');},0);
     }else document.body.classList.remove('bt-flip','bt-flipping');
   }
@@ -2191,7 +2167,6 @@ function initAgeSlider(q,start,onChange){
     root.setAttribute('aria-valuetext',n+'세');
     onChange(n);
   };
-  /* 지수 감쇠(ease-out)로 부드럽게 따라가는 애니메이션 루프 */
   const tick=t=>{
     raf=0;
     const dt=last?Math.min(48,t-last):16;last=t;
@@ -2281,7 +2256,6 @@ function step(i,options={}){
       const UID_MAX=16;
       f1.maxLength=UID_MAX;
       const coarse=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent||'');
-      /* 16글자에서 더 입력하려는 시도 차단 (+ 휴대폰·패드는 키보드 내리기) */
       f1.addEventListener('beforeinput',e=>{
         if(String(e.inputType||'').indexOf('insert')!==0)return;
         const sel=(f1.selectionEnd||0)-(f1.selectionStart||0);
@@ -2345,7 +2319,6 @@ function step(i,options={}){
     try{f1.focus({preventScroll:true});}catch(error){f1.focus();}
   }
 }
-/* 확인 화면 박스 높이 자동 맞춤: 여유(패딩·간격)를 단계적으로 줄이고, 그래도 넘치면 제목을 한 줄로 */
 let fitRaf=0;
 function fitConfirm(){
   const form=$('form'),box=$('formBox'),panel=$('rightPanel');
@@ -2425,7 +2398,7 @@ async function submit(){
     if(!response.ok||!result.ok){
       const messages={
         IP_MISSING:'IP를 확인할 수 없어 가입 신청을 처리할 수 없습니다.',
-        COUNTRY_NOT_ALLOWED:'대한민국에서만 가입 신청을 처리할 수 있습니다.',
+        COUNTRY_NOT_ALLOWED:'현재 네트워크에서는 가입 신청을 처리할 수 없습니다.',
         IP_BLOCKED:'현재 네트워크에서는 가입 신청을 처리할 수 없습니다.',
         INVALID:'입력 내용을 확인한 뒤 다시 신청해 주세요.',
         SERVICE_NOT_CONFIGURED:'서버 설정이 완료되지 않았습니다. 관리자에게 문의해 주세요.',
@@ -2578,13 +2551,10 @@ startHallPrefetch().catch(()=>{});
   const isMobile=matchMedia('(max-width:899px)').matches||/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent||'')||isTabletDesktop;
   if(!isMobile)return;
 
-  /* 뒤로가기 트랩: 홈이 아닌 화면(가입신청서·명예의 전당·완료)에서만 히스토리 항목을 1개 유지한다.
-     - 뒤로가기를 누르면 항목이 소모되고(popstate) → '이전'/'돌아가기'와 같은 동작을 한 뒤 항목을 다시 채운다 (몇 번이든 반복)
-     - 홈 화면에서는 항목이 없으므로 뒤로가기가 브라우저 기본 동작(종료/이전 페이지)으로 처리된다 */
   const KEY='__zeusClanBackTrap';
   const isTrap=st=>!!(st&&typeof st==='object'&&st[KEY]);
   let hasTrap=isTrap(history.state);
-  let pending=0; /* 코드가 직접 호출한 history.back() 중 아직 popstate가 오지 않은 횟수 */
+  let pending=0;
 
   const atHome=()=>{
     const on=document.querySelector('.view.on');
@@ -2596,7 +2566,6 @@ startHallPrefetch().catch(()=>{});
     if(!home&&!hasTrap){
       try{history.pushState({[KEY]:true},'',location.href);hasTrap=true;}catch(e){}
     }else if(home&&hasTrap){
-      /* 앱 안의 버튼으로 홈에 돌아온 경우: 남은 트랩 항목을 소모해 홈에서의 뒤로가기가 정상 종료되게 함 */
       hasTrap=false;pending++;
       try{history.back();}catch(e){pending=Math.max(0,pending-1);}
       setTimeout(()=>{if(pending>0){pending=0;hasTrap=isTrap(history.state);syncTrap();}},700);
@@ -2611,7 +2580,6 @@ startHallPrefetch().catch(()=>{});
     const activeView=document.querySelector('.view.on');
     if(!activeView)return;
 
-    /* 홈 화면에서 뒤로가기: 브라우저 종료(이전 페이지로 이동) */
     if(atHome()){
       try{history.back();}catch(e){}
       return;
@@ -2645,9 +2613,7 @@ startHallPrefetch().catch(()=>{});
     syncTrap();
   });
 
-  /* 화면 전환(홈 ↔ 다른 화면)을 감지해 트랩을 맞춘다 */
   new MutationObserver(syncTrap).observe(document.body,{attributes:true,attributeFilter:['data-view']});
-  /* 사용자 터치 직후에도 한 번 더 확인(브라우저가 사용자 조작 없이 추가된 항목을 건너뛰는 것을 방지) */
   document.addEventListener('pointerdown',syncTrap,{capture:true,passive:true});
   window.addEventListener('pageshow',()=>{hasTrap=isTrap(history.state);syncTrap();});
   syncTrap();
@@ -2709,7 +2675,6 @@ startHallPrefetch().catch(()=>{});
 })();
 </script>
 <script>
-/* 패드 가로모드: 브랜드(로고 묶음) 위치가 바뀌면(키보드 열림/닫힘, 돌아가기 등) 부드럽게 이동 */
 (function brandFlip(){
   const panel=document.getElementById('brandPanel'),hero=panel&&panel.querySelector('.hero');
   if(!hero||typeof hero.animate!=='function'||typeof ResizeObserver==='undefined')return;
@@ -2741,7 +2706,6 @@ startHallPrefetch().catch(()=>{});
 })();
 </script>
 <script>
-/* 패드 세로: 안정 높이 추적 → body.pad-portrait, 가입신청서 상단 브랜드(로고+ZEUS CLAN) 표시/숨김 */
 (function padPortrait(){
   const root=document.documentElement,body=document.body,isF=el=>el&&el.matches&&el.matches('input,textarea');
   let stable=0,w0=innerWidth,raf=0,focusAt=0,noKbAt=0,hadKb=false;
@@ -2765,7 +2729,6 @@ startHallPrefetch().catch(()=>{});
     if(body.dataset.view!=='form')return;
     const box=document.getElementById('formBox');if(!box)return;
     const avail=zeusVisibleHeight(stable),formH=box.offsetHeight,panelW=box.offsetWidth||Math.min(w*.84,740);
-    /* 슬라이드(폼) 폭 대비 비율: 키보드 올림 .22 / 내림 .34, 남는 공간에 맞춰 자동 축소 (브랜드 블록 ≈ 로고×1.45) */
     const pw=typing?Math.max(440,Math.min(w*.68,620)):Math.max(480,Math.min(w*.76,680));
     const room=avail-formH-(typing?44:90);
     const want=Math.min(pw*(typing?.46:.5),typing?avail*.3:stable*.3,360);
