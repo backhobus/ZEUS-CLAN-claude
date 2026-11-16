@@ -904,7 +904,7 @@ body:not(.keyboard-open):not(.tablet-keyboard-open) .wrap{padding-bottom:0!impor
   body.tablet-device .brand-panel .hero{--logo-size:clamp(96px,min(calc(var(--stage-h)*.4),calc(var(--avail-h)*.66)),280px)}
   body.tablet-device .brand-panel .hero .logo{transition:width .5s cubic-bezier(.22,.75,.25,1),height .5s cubic-bezier(.22,.75,.25,1)}
   body.tablet-device .brand-panel .hero::before{transition:top .5s cubic-bezier(.22,.75,.25,1)}
-  body.tablet-device .brand-panel .hero h1{font-size:clamp(28px,min(calc(var(--stage-h)*.0833),calc(var(--avail-h)*.15)),56px);transition:font-size .5s cubic-bezier(.22,.75,.25,1),transform .2s cubic-bezier(.22,.75,.25,1),opacity .18s ease}
+  body.tablet-device .brand-panel .hero h1{font-size:clamp(28px,min(calc(var(--stage-h)*.0833),calc(var(--avail-h)*.15),5.2vw),56px);transition:font-size .5s cubic-bezier(.22,.75,.25,1),transform .2s cubic-bezier(.22,.75,.25,1),opacity .18s ease}
   body.tablet-device #brandPanel .hero .since{font-size:clamp(12px,calc(var(--stage-h)*.03),20px);transition:opacity .16s ease,transform .2s cubic-bezier(.22,.75,.25,1),max-height .5s ease,margin .5s ease}
   body.tablet-device.tablet-keyboard-open #brandPanel .hero .since{max-height:0;margin-top:0;margin-bottom:0}
   body.tablet-device #brandTag{transition:opacity .32s ease,transform .42s cubic-bezier(.22,.75,.25,1),height .5s ease,margin .5s ease,padding .5s ease,border-width .5s ease}
@@ -918,10 +918,50 @@ body:not(.keyboard-open):not(.tablet-keyboard-open) .wrap{padding-bottom:0!impor
   body.home-state #brandPanel .hero .tag{font-size:clamp(13px,2.3vw,20px);padding:7px 18px;margin-top:clamp(10px,1.6dvh,16px)}
 }
 @media(prefers-reduced-motion:reduce){body.tablet-device .brand-panel .hero *,body.tablet-device .brand-panel .hero::before,body.tablet-device #brandTag{transition:none!important}}
+
+/* ===== 줄바꿈 방지 ===== */
+h1,.tag,#brandTag,#brandTagText{white-space:nowrap!important}
+@media(min-width:900px){body .brand-panel .hero h1{font-size:clamp(28px,min(8.33vh,5.2vw),50px)}}
+/* ===== 패드 세로(JS가 body.pad-portrait 부여): 버튼·입력 확대 + 가입신청서 상단 브랜드 ===== */
+body.pad-portrait #home .grid{gap:clamp(12px,1.5dvh,18px)}
+body.pad-portrait #home .card{min-height:calc(var(--pp-h,1000px)*.105);font-size:clamp(21px,3.1vw,27px);border-radius:20px;gap:14px}
+body.pad-portrait #home .card.main{min-height:calc(var(--pp-h,1000px)*.15);font-size:clamp(26px,3.9vw,34px)}
+body.pad-portrait .card svg{width:clamp(28px,4vw,36px);height:clamp(28px,4vw,36px)}
+body.pad-portrait .card .arr{font-size:clamp(24px,3.5vw,30px)}
+body.pad-portrait .panel{padding:clamp(20px,3vw,30px)}
+body.pad-portrait h2{font-size:clamp(21px,3vw,26px);margin-bottom:16px}
+body.pad-portrait input[type=text],body.pad-portrait textarea{font-size:19px;padding:15px 17px;border-radius:12px}
+body.pad-portrait textarea{min-height:130px}
+body.pad-portrait .b{padding:18px 10px;font-size:20px;border-radius:12px}
+body.pad-portrait .yn{gap:14px}
+body.pad-portrait .yn button{padding:20px;font-size:20px;border-radius:12px}
+body.pad-portrait .edit{padding:10px 18px;font-size:16px;border-radius:10px}
+body.pad-portrait .nav{gap:12px;margin-top:16px}
+body.pad-portrait .err{font-size:15px}
+body.pad-portrait .privacy-note{font-size:14px}
+body.pad-portrait .row span{font-size:14px}
+body.pad-portrait .row p{font-size:17px}
+@keyframes btIn{from{max-height:0;opacity:0}}
+body.pad-portrait[data-view="form"] .brand-panel{--bt-g:48px;display:flex;flex:0 0 auto;align-items:center;justify-content:center;padding:var(--bt-g) 0;margin:calc(var(--bt-g)*-1) 0;pointer-events:none;overflow:hidden;max-height:calc(var(--bt-h,230px) + var(--bt-g)*2);opacity:1;transition:max-height .5s cubic-bezier(.22,.75,.25,1),opacity .45s ease}
+body.pad-portrait[data-view="form"]:not(.bt-off) .brand-panel{animation:btIn .6s cubic-bezier(.22,.75,.25,1)}
+body.pad-portrait[data-view="form"].bt-off .brand-panel{max-height:0;opacity:0}
+body.pad-portrait[data-view="form"] #brandPanel .hero{position:static;transform:none;margin:0;width:100%;text-align:center;display:block;animation:none}
+body.pad-portrait[data-view="form"] #brandPanel .hero .since,body.pad-portrait[data-view="form"] #brandPanel .hero .tag{display:none}
+body.pad-portrait[data-view="form"] #brandPanel .hero .logo{width:var(--bt-logo,130px);height:var(--bt-logo,130px);margin:0 auto;transition:width .5s cubic-bezier(.22,.75,.25,1),height .5s cubic-bezier(.22,.75,.25,1)}
+body.pad-portrait[data-view="form"] #brandPanel .hero h1{font-size:var(--bt-fs,clamp(32px,5.2vw,50px));margin:var(--bt-mt,10px) 0 0;transition:font-size .5s cubic-bezier(.22,.75,.25,1),margin .5s cubic-bezier(.22,.75,.25,1)}
+body.pad-portrait.keyboard-open:not(.bt-off)[data-view="form"] #form.view.on{padding:0;min-height:0}
+body.pad-portrait .wrap{max-width:clamp(520px,84vw,740px)}
+body.pad-portrait[data-view="form"] .desktop-layout{justify-content:center;gap:clamp(14px,3dvh,34px)}
+body.pad-portrait[data-view="form"] .right-panel{flex:0 1 auto;overflow:visible}
+body.pad-portrait[data-view="form"] .brand-panel{padding-top:calc(var(--bt-g) + env(safe-area-inset-top,0px))}
+/* 홈↔가입신청서 이동 시 로고/타이틀 FLIP 연결: 기존 등장 애니메이션·전환 해제 */
+body.bt-flip #brandPanel .hero,body.bt-flip.pad-portrait[data-view="form"] .brand-panel{animation:none!important}
+body.bt-flipping #brandPanel,body.bt-flipping #brandPanel .hero .logo,body.bt-flipping #brandPanel .hero h1{transition:none!important;overflow:visible!important}
+@media(prefers-reduced-motion:reduce){body.pad-portrait .brand-panel{animation:none!important;transition:none!important}}
 </style>
 <!-- Main emblem normalized to symmetric transparent bounds for optical centering. -->
 </head>
-<body class="home-state">
+<body class="home-state" data-view="home">
 <div class="fx" aria-hidden="true"><div class="halo"></div>
 <canvas id="bolt"></canvas></div>
 <div class="wrap">
@@ -1037,12 +1077,22 @@ function smoothLayout(mutate){
   if(!canAnimate){mutate();return;}
   const targets=flipTargets();
   const firsts=targets.map(el=>el.getBoundingClientRect());
+  const bFirst=document.body.dataset.view==='form'?zeusBrandRects():null;
+  if(bFirst)document.body.classList.add('bt-flipping');
   targets.forEach(el=>el.getAnimations().forEach(a=>{if(a.id==='zeus-flip')a.cancel();}));
   flipDepth++;
   try{
     mutate();
     if(typeof positionMobileBrand==='function')positionMobileBrand();
+    if(bFirst&&window.__zeusPadUpdate){
+      bFirst.logo.getAnimations().concat(bFirst.h1.getAnimations()).forEach(a=>{if(a.id==='zeus-brand-flip')a.cancel();});
+      window.__zeusPadUpdate();
+    }
   }finally{flipDepth--;}
+  if(bFirst){
+    const bLast=zeusBrandRects();
+    if(bLast)zeusPlayFlip(bFirst,bLast);else document.body.classList.remove('bt-flipping');
+  }
   targets.forEach((el,i)=>{
     if(!el.isConnected)return;
     const first=firsts[i];
@@ -1058,6 +1108,13 @@ function smoothLayout(mutate){
   });
 }
 
+function zeusVisibleHeight(base){
+  const vv=window.visualViewport,ok=v=>Number.isFinite(v)&&v>0;
+  const layout=[window.innerHeight,document.documentElement&&document.documentElement.clientHeight].filter(ok);
+  const lv=layout.length?Math.min(...layout):1;
+  const resized=base>0&&lv<base-Math.max(80,base*.08);
+  return(!resized&&vv&&ok(vv.height))?Math.min(lv,vv.height):lv;
+}
 (function setupMobileKeyboard(){
   const mobileQuery=matchMedia('(max-width:899px)');
   const viewport=window.visualViewport||null;
@@ -1071,11 +1128,7 @@ function smoothLayout(mutate){
 
   const isField=el=>!!(el&&el.matches&&el.matches('input,textarea'));
   const wrap=()=>document.querySelector('.wrap');
-  const visibleHeight=()=>{
-    const values=[window.innerHeight,document.documentElement&&document.documentElement.clientHeight,viewport&&viewport.height]
-      .filter(v=>Number.isFinite(v)&&v>0);
-    return values.length?Math.min(...values):(window.innerHeight||1);
-  };
+  const visibleHeight=()=>zeusVisibleHeight(baseHeight);
   const visibleTop=()=>viewport&&Number.isFinite(viewport.offsetTop)?viewport.offsetTop:0;
 
   function applyViewport(height=visibleHeight(),offsetTop=visibleTop()){
@@ -1339,7 +1392,7 @@ function smoothLayout(mutate){
     const values=[window.innerHeight,document.documentElement&&document.documentElement.clientHeight,viewport&&viewport.height]
       .filter(v=>Number.isFinite(v)&&v>0);
     if(!values.length)return {visible:window.innerHeight||1,reference:window.innerHeight||1};
-    return {visible:Math.min(...values),reference:Math.max(...values)};
+    return {visible:zeusVisibleHeight(baseHeight),reference:Math.max(...values)};
   }
   const currentTop=()=>viewport&&Number.isFinite(viewport.offsetTop)?viewport.offsetTop:0;
   const keyboardOpenThreshold=()=>Math.max(120,baseHeight*.12);
@@ -1351,22 +1404,7 @@ function smoothLayout(mutate){
       return Math.max(0,rect.top);
     }
 
-    const threshold=keyboardOpenThreshold();
-    const candidates=[];
-    if(viewport&&Number.isFinite(viewport.height)&&baseHeight-viewport.height>threshold){
-      candidates.push(Math.max(0,viewport.offsetTop||0)+viewport.height);
-    }
-    const innerHeight=window.innerHeight||0;
-    if(innerHeight>0&&baseHeight-innerHeight>threshold){
-      candidates.push(Math.max(0,currentTop())+innerHeight);
-    }
-    const clientHeight=document.documentElement&&document.documentElement.clientHeight||0;
-    if(clientHeight>0&&baseHeight-clientHeight>threshold){
-      candidates.push(Math.max(0,currentTop())+clientHeight);
-    }
-    if(candidates.length)return Math.min(...candidates);
-    if(baseHeight-metrics.visible>threshold)return Math.max(0,currentTop())+metrics.visible;
-
+    if(baseHeight-metrics.visible>keyboardOpenThreshold())return Math.max(0,currentTop())+metrics.visible;
     return null;
   }
 
@@ -1960,11 +1998,29 @@ function show(id){
   if(active&&active.matches&&active.matches('input,textarea')){try{active.blur();}catch(error){}}
   showTimer=setTimeout(()=>{showTimer=0;showNow('home');},170);
 }
+function zeusBrandRects(){
+  const b=document.body,logo=$('brandLogo'),h1=document.querySelector('#brandPanel h1');
+  if(!logo||!h1||!b.classList.contains('pad-portrait')||b.classList.contains('bt-off'))return null;
+  const c=r=>({x:r.left+r.width/2,y:r.top+r.height/2,w:r.width});
+  return{logo,h1,l:c(logo.getBoundingClientRect()),t:c(h1.getBoundingClientRect()),fs:parseFloat(getComputedStyle(h1).fontSize)||1};
+}
+function zeusPlayFlip(f,l){
+  const b=document.body,o={duration:520,easing:'cubic-bezier(.22,.75,.25,1)'};
+  const mk=(el,p,q,s)=>el.animate([{transformOrigin:'50% 50%',transform:`translate(${p.x-q.x}px,${p.y-q.y}px) scale(${s})`},{transformOrigin:'50% 50%',transform:'none'}],{...o,id:'zeus-brand-flip'});
+  const a=[mk(l.logo,f.l,l.l,f.l.w/l.l.w),mk(l.h1,f.t,l.t,f.fs/l.fs)];
+  l.logo.closest('.hero').querySelectorAll('.since,.tag').forEach(e=>e.animate([{opacity:0},{opacity:1}],{duration:380,delay:160,easing:'ease-out',fill:'backwards'}));
+  Promise.allSettled(a.map(x=>x.finished)).then(()=>{b.classList.remove('bt-flipping');positionHalo(true);});
+}
 function showNow(id){
+  const prevId=document.body.dataset.view;
+  const flipFirst=(prevId==='home'&&id==='form'||prevId==='form'&&id==='home')&&Element.prototype.animate&&!matchMedia('(prefers-reduced-motion:reduce)').matches?zeusBrandRects():null;
+  document.body.classList.toggle('bt-flip',!!flipFirst);
+  if(flipFirst)document.body.classList.add('bt-flipping');
   const resetTablet=id!=='form'&&typeof window.__zeusResetTabletKeyboard==='function';
   document.querySelectorAll('.view').forEach(v=>{v.classList.remove('leaving');v.classList.toggle('on',v.id===id)});
   const isHome=id==='home';
   const isContentView=!isHome;
+  document.body.dataset.view=id;
   document.body.classList.toggle('home-state',isHome);
   document.body.classList.toggle('hall-state',id==='hallV');
   document.body.classList.toggle('calm',id==='form'||id==='hallV'||id==='doneV');
@@ -1976,6 +2032,11 @@ function showNow(id){
   scrollTo(0,0);
   positionMobileBrand();
   requestAnimationFrame(()=>requestAnimationFrame(positionMobileBrand));
+  if(flipFirst){
+    if(window.__zeusPadUpdate)window.__zeusPadUpdate();
+    const last=zeusBrandRects();
+    if(last)zeusPlayFlip(flipFirst,last);else document.body.classList.remove('bt-flip','bt-flipping');
+  }
 }
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const uidOk=v=>/^[0-9A-Z]{15,16}$/.test(v)&&!v.includes('O');
@@ -2379,6 +2440,49 @@ startHallPrefetch().catch(()=>{});
   const arm=()=>setTimeout(()=>{last=pos();armed=true},600);
   last=pos();
   if(document.readyState==='complete')arm();else window.addEventListener('load',arm);
+})();
+</script>
+<script>
+/* 패드 세로: 안정 높이 추적 → body.pad-portrait, 가입신청서 상단 브랜드(로고+ZEUS CLAN) 표시/숨김 */
+(function padPortrait(){
+  const root=document.documentElement,body=document.body,isF=el=>el&&el.matches&&el.matches('input,textarea');
+  let stable=0,w0=innerWidth,raf=0,focusAt=0;
+  const layoutH=()=>Math.min(innerHeight,root.clientHeight||innerHeight);
+  function update(){
+    raf=0;
+    const w=innerWidth;
+    if(Math.abs(w-w0)>40){w0=w;stable=0;}
+    const vv=window.visualViewport,vh=vv&&vv.height?Math.min(layoutH(),vv.height):layoutH();
+    const kb=stable>0&&vh<stable-Math.max(80,stable*.08);
+    const typing=body.classList.contains('keyboard-open');
+    if(!kb&&!typing)stable=layoutH();
+    const pad=w>=600&&w<900&&stable>=700&&stable>w*1.1;
+    body.classList.toggle('pad-portrait',pad);
+    if(!pad){body.classList.remove('bt-off');return;}
+    root.style.setProperty('--pp-h',stable+'px');
+    if(body.dataset.view!=='form')return;
+    const box=document.getElementById('formBox');if(!box)return;
+    const avail=zeusVisibleHeight(stable),formH=box.offsetHeight,panelW=box.offsetWidth||Math.min(w*.84,740);
+    /* 슬라이드(폼) 폭 대비 비율: 키보드 올림 .22 / 내림 .34, 남는 공간에 맞춰 자동 축소 (브랜드 블록 ≈ 로고×1.45) */
+    const want=Math.min(panelW*(typing?.22:.34),stable*(typing?.12:.2),280);
+    const logo=Math.floor(Math.min(want,(avail-formH-60)/1.45));
+    if(logo<84){body.classList.add('bt-off');return;}
+    root.style.setProperty('--bt-logo',logo+'px');
+    root.style.setProperty('--bt-fs',Math.max(26,Math.round(logo*.3))+'px');
+    root.style.setProperty('--bt-mt',Math.round(logo*.06)+'px');
+    root.style.setProperty('--bt-h',Math.ceil(logo*1.5)+16+'px');
+    body.classList.remove('bt-off');
+  }
+  const go=()=>{if(!raf)raf=requestAnimationFrame(update)};
+  window.addEventListener('resize',go,{passive:true});
+  window.addEventListener('orientationchange',()=>setTimeout(go,350));
+  document.addEventListener('focusout',()=>setTimeout(go,300));
+  document.addEventListener('focusin',()=>{focusAt=Date.now();setTimeout(go,950);});
+  if(window.visualViewport)window.visualViewport.addEventListener('resize',go,{passive:true});
+  new MutationObserver(go).observe(body,{attributes:true,attributeFilter:['class','data-view']});
+  if(typeof ResizeObserver!=='undefined'){const b=document.getElementById('formBox');if(b)new ResizeObserver(go).observe(b);}
+  window.addEventListener('load',go);go();
+  window.__zeusPadUpdate=update;
 })();
 </script>
 </body>
