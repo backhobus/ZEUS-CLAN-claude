@@ -68,6 +68,24 @@ input:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(23
 .b{padding:14px 8px;font:700 16px 'Noto Sans KR',sans-serif;border-radius:10px;border:1px solid var(--line);background:rgba(0,0,0,.3);color:var(--gold2);cursor:pointer}
 .b.go{background:linear-gradient(135deg,#f6dc9b,#e9c46a 55%,#c9973a);color:#1a1305;border:0}
 .b:disabled{opacity:.5}
+
+/* ===== 연령대 슬라이드 바 ===== */
+.age{position:relative;padding:0 22px;touch-action:none;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:0;--p:0}
+.age-inner{position:relative;height:28px;margin-top:54px}
+.age-rail{position:absolute;left:0;right:0;top:50%;height:6px;margin-top:-3px;border-radius:999px;background:rgba(255,255,255,.14);overflow:hidden}
+.age-fill{height:100%;width:calc(var(--p)*100%);border-radius:inherit;background:linear-gradient(90deg,#c9973a,#f6dc9b);will-change:width}
+.age-thumb{position:absolute;top:50%;left:calc(var(--p)*100%);width:28px;height:28px;margin:-14px 0 0 -14px;border-radius:50%;background:linear-gradient(135deg,#f6dc9b,#e9c46a 55%,#c9973a);border:2px solid #fff3c4;box-shadow:0 2px 10px rgba(0,0,0,.45),0 0 14px rgba(233,196,106,.45);transition:transform .2s cubic-bezier(.22,.75,.25,1),box-shadow .2s ease;will-change:left}
+.age.drag .age-thumb{transform:scale(1.14);box-shadow:0 3px 14px rgba(0,0,0,.5),0 0 22px rgba(233,196,106,.7)}
+.age:focus-visible .age-thumb{box-shadow:0 0 0 4px rgba(233,196,106,.35),0 2px 10px rgba(0,0,0,.45)}
+.age-bubble{position:absolute;left:50%;bottom:calc(100% + 14px);display:flex;align-items:baseline;justify-content:center;gap:1px;min-width:46px;padding:0 13px;height:32px;line-height:32px;border-radius:999px;color:var(--gold2);background:rgba(14,18,32,.94);border:1px solid rgba(233,196,106,.55);box-shadow:0 8px 20px rgba(0,0,0,.5),0 0 0 4px rgba(233,196,106,.07),inset 0 1px 0 rgba(255,255,255,.08);transform:translateX(-50%);transform-origin:50% 100%;transition:transform .2s cubic-bezier(.22,.75,.25,1),box-shadow .2s ease;pointer-events:none;white-space:nowrap}
+.age-bubble b{font:600 17px/32px 'Noto Sans KR',sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.age-bubble i{font:500 11px/32px 'Noto Sans KR',sans-serif;font-style:normal;color:rgba(246,220,155,.6)}
+.age-bubble::after{content:"";position:absolute;left:50%;top:100%;width:1px;height:9px;margin-left:-.5px;background:linear-gradient(rgba(233,196,106,.75),rgba(233,196,106,0))}
+.age.drag .age-bubble{transform:translateX(-50%) translateY(-2px) scale(1.06);box-shadow:0 10px 24px rgba(0,0,0,.55),0 0 0 5px rgba(233,196,106,.12),inset 0 1px 0 rgba(255,255,255,.1)}
+.age-ends{display:flex;justify-content:space-between;margin-top:6px;font-size:12px;color:var(--mut)}
+.age-note{margin:8px 2px 0;font-size:12px;line-height:1.5;color:var(--mut)}
+@media(prefers-reduced-motion:reduce){.age-thumb,.age-bubble{transition:none}}
+@media(max-width:899px){.age-inner{margin-top:50px}.age-note{margin-top:6px}}
 .row{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.09)}
 .row:last-child{border:0}.row div{min-width:0;flex:1}
 .row span{display:block;font-size:12px;color:var(--gold);margin-bottom:2px}
@@ -1054,7 +1072,7 @@ let hallImageActive=0;
 const Q=[
  {k:'nick',l:'닉네임',q:'게임에서 사용하는 닉네임을 알려주세요.',t:'text'},
  {k:'uid',l:'게임 UID',q:'게임 UID를 알려주세요.',t:'text',ph:'예: 428BCBA023C04781'},
- {k:'age',l:'연령대',q:'연령대를 알려주세요.',t:'area',sm:1,ph:'가입 절차를 위해서만 사용되며, 외부로 공유되지 않습니다.'},
+ {k:'age',l:'연령대',q:'연령대를 알려주세요.',t:'range',min:17,max:60,note:'가입 절차를 위해서만 사용되며, 외부로 공유되지 않습니다.'},
  {k:'why',l:'가입 사유',q:'ZEUS에 가입하고 싶은 사유를 알려주세요.',t:'area'},
  {k:'tour',l:'토너먼트 의향',q:'디스코드에 참가하여 토너먼트에 도전할 의향이 있나요?',t:'yn'}
 ];
@@ -2137,28 +2155,131 @@ function showNow(id){
   }
 }
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const uidOk=v=>/^[0-9A-Z]{15,16}$/.test(v)&&!v.includes('O');
+const uidOk=v=>/^[0-9A-Z]{15,16}$/.test(v)&&!v.includes('O')&&(v.match(/[0-9]/g)||[]).length>=4&&/[A-Z]/.test(v);
+
+function initAgeSlider(q,start,onChange){
+  const root=$('ageSlider'),inner=$('ageInner'),bub=$('ageNum');
+  if(!root||!inner||!bub)return;
+  const min=q.min,max=q.max,span=max-min;
+  const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const clamp=v=>Math.max(min,Math.min(max,v));
+  let cur=start,tgt=start,raf=0,last=0,tau=80,pid=null,downX=0,moved=false,onThumb=false,grab=0,shown=start,committed=start;
+  const paint=()=>{
+    root.style.setProperty('--p',((cur-min)/span).toFixed(5));
+    const n=Math.round(cur);
+    if(n!==shown){shown=n;bub.textContent=n;}
+  };
+  const commit=()=>{
+    const n=Math.round(tgt);
+    if(n===committed)return;
+    committed=n;
+    root.setAttribute('aria-valuenow',n);
+    root.setAttribute('aria-valuetext',n+'세');
+    onChange(n);
+  };
+  /* 지수 감쇠(ease-out)로 부드럽게 따라가는 애니메이션 루프 */
+  const tick=t=>{
+    raf=0;
+    const dt=last?Math.min(48,t-last):16;last=t;
+    cur+=(tgt-cur)*(1-Math.exp(-dt/tau));
+    if(Math.abs(tgt-cur)<.004){cur=tgt;last=0;paint();return;}
+    paint();raf=requestAnimationFrame(tick);
+  };
+  const go=()=>{
+    if(reduce){cur=tgt;paint();return;}
+    if(!raf){last=0;raf=requestAnimationFrame(tick);}
+  };
+  const rect=()=>inner.getBoundingClientRect();
+  const valAt=x=>{const r=rect();return clamp(min+((x-r.left)/Math.max(1,r.width))*span);};
+  const thumbX=()=>{const r=rect();return r.left+((cur-min)/span)*r.width;};
+
+  root.addEventListener('pointerdown',e=>{
+    if(e.pointerType==='mouse'&&e.button!==0)return;
+    e.preventDefault();
+    pid=e.pointerId;
+    try{root.setPointerCapture(pid);}catch(_){}
+    downX=e.clientX;moved=false;
+    onThumb=Math.abs(e.clientX-thumbX())<=24;
+    root.classList.add('drag');
+    if(onThumb){grab=thumbX()-e.clientX;tau=40;}
+    else{grab=0;tau=85;tgt=Math.round(valAt(e.clientX));commit();go();}
+  });
+  root.addEventListener('pointermove',e=>{
+    if(e.pointerId!==pid)return;
+    if(!moved&&Math.abs(e.clientX-downX)>3){moved=true;tau=40;}
+    if(!moved&&!onThumb)return;
+    tgt=valAt(e.clientX+grab);
+    commit();go();
+  });
+  const end=e=>{
+    if(e.pointerId!==pid)return;
+    pid=null;
+    root.classList.remove('drag');
+    try{root.releasePointerCapture(e.pointerId);}catch(_){}
+    tau=80;tgt=Math.round(tgt);commit();go();
+  };
+  root.addEventListener('pointerup',end);
+  root.addEventListener('pointercancel',end);
+  root.addEventListener('lostpointercapture',end);
+
+  root.addEventListener('keydown',e=>{
+    const k=e.key;let next=null;
+    const base=Math.round(tgt);
+    if(k==='ArrowRight'||k==='ArrowUp')next=base+1;
+    else if(k==='ArrowLeft'||k==='ArrowDown')next=base-1;
+    else if(k==='PageUp')next=base+5;
+    else if(k==='PageDown')next=base-5;
+    else if(k==='Home')next=min;
+    else if(k==='End')next=max;
+    else if(k==='Enter'){e.preventDefault();$('next').click();return;}
+    if(next===null)return;
+    e.preventDefault();
+    tau=80;tgt=clamp(next);commit();go();
+  });
+  paint();
+}
 
 function step(i,options={}){
   cur=i;draftStage='step';const q=Q[i];
   let f;
   const answerFieldHints=`autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="text" enterkeyhint="next" aria-autocomplete="none" data-form-type="other" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-gramm="false" data-enable-grammarly="false"`;
   if(q.t==='yn')f=`<div class="yn"><button data-v="예">예</button><button data-v="아니요">아니요</button></div>`;
-  else if(q.t==='area')f=`<textarea id="zeusAnswerField" ${answerFieldHints} ${q.sm?'style="min-height:84px"':''} ${q.ph?`placeholder="${esc(q.ph)}"`:''}></textarea>`;
+  else if(q.t==='range'){
+     const parsed=parseInt(A[q.k],10);
+     const startAge=Math.max(q.min,Math.min(q.max,Number.isFinite(parsed)?parsed:q.min));
+     f=`<div class="age" id="ageSlider" role="slider" tabindex="0" aria-label="${esc(q.l)}" aria-valuemin="${q.min}" aria-valuemax="${q.max}" aria-valuenow="${startAge}" aria-valuetext="${startAge}세"><div class="age-inner" id="ageInner"><div class="age-rail"><div class="age-fill"></div></div><div class="age-thumb"><span class="age-bubble"><b id="ageNum">${startAge}</b><i>세</i></span></div></div><div class="age-ends"><span>${q.min}세</span><span>${q.max}세</span></div></div>${q.note?`<p class="age-note">${esc(q.note)}</p>`:''}`;
+  }
+  else if(q.t==='area')f=`<textarea id="zeusAnswerField" ${answerFieldHints} ${q.ph?`placeholder="${esc(q.ph)}"`:''}></textarea>`;
   else f=`<input type="text" id="zeusAnswerField" ${answerFieldHints} ${q.ph?`placeholder="${esc(q.ph)}"`:''}>`;
   // 네이티브 form 래퍼를 제거해 Chrome Autofill이 비밀번호/결제/주소 폼으로 탐지할 단서를 없앱니다.
-  const answerFieldForm=q.t==='yn'?f:`<div class="answer-form" role="group" aria-label="답변 입력">${f}</div>`;
+  const answerFieldForm=(q.t==='yn'||q.t==='range')?f:`<div class="answer-form" role="group" aria-label="답변 입력">${f}</div>`;
   $('stage').innerHTML=`
    <h2>${q.q}</h2>${answerFieldForm}<p class="err" id="err"></p>
    <div class="nav ${i===0?'one':''} ${fromConfirm?'edit-return':''}">${i===0||fromConfirm?'':'<button class="b" id="prev">이전</button>'}<button class="b go" id="next">다음</button></div>`;
   const err=$('err'),hide=()=>err.classList.remove('on');
   const f1=$('zeusAnswerField');
-  const read=()=>{if(f1){const value=q.sm?f1.value.replace(/\s*\n\s*/g,' ').trim():f1.value.trim();A[q.k]=q.k==='uid'?value.toUpperCase():value}};
+  const read=()=>{if(f1){const value=f1.value.trim();A[q.k]=q.k==='uid'?value.toUpperCase():value}};
   
   if(f1){
     f1.value=A[q.k]||'';
     if(q.k==='uid'){
-      f1.value=f1.value.toUpperCase();
+      const UID_MAX=16;
+      f1.maxLength=UID_MAX;
+      const coarse=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent||'');
+      /* 16글자에서 더 입력하려는 시도 차단 (+ 휴대폰·패드는 키보드 내리기) */
+      f1.addEventListener('beforeinput',e=>{
+        if(String(e.inputType||'').indexOf('insert')!==0)return;
+        const sel=(f1.selectionEnd||0)-(f1.selectionStart||0);
+        if(f1.value.length-sel>=UID_MAX&&!e.isComposing){
+          e.preventDefault();
+          if(coarse)f1.blur();
+        }
+      });
+      f1.addEventListener('input',()=>{
+        if(f1.value.length>UID_MAX)f1.value=f1.value.slice(0,UID_MAX);
+        if(coarse&&f1.value.length>=UID_MAX)f1.blur();
+      });
+      f1.value=f1.value.slice(0,UID_MAX).toUpperCase();
       A.uid=f1.value;
       f1.addEventListener('input',()=>{
         const cursor=f1.selectionStart;
@@ -2189,6 +2310,12 @@ function step(i,options={}){
   document.querySelectorAll('.yn button').forEach(b=>{
     if(A[q.k]===b.dataset.v)b.classList.add('sel');
     b.onclick=()=>{A[q.k]=b.dataset.v;document.querySelectorAll('.yn button').forEach(x=>x.classList.toggle('sel',x===b));hide()}});
+  if(q.t==='range'){
+    const parsedAge=parseInt(A[q.k],10);
+    const startAge=Math.max(q.min,Math.min(q.max,Number.isFinite(parsedAge)?parsedAge:q.min));
+    A[q.k]=startAge;
+    initAgeSlider(q,startAge,n=>{A[q.k]=n;hide();});
+  }
   if(!fromConfirm && i>0){
     $('prev').onclick=()=>{read();step(i-1)};
   }
@@ -2206,7 +2333,7 @@ function step(i,options={}){
 function confirmV(){
   draftStage='confirm';fromConfirm=false;
   const privacyNotice='<p class="privacy-note">부정 이용 방지를 위해 IP 주소와 운영체제(OS)가 일부 검사됩니다.</p>';
-  const answerRows=Q.map((q,i)=>`<div class="row"><div><span>${q.l}</span><p>${esc(A[q.k])}</p></div><button class="edit" data-i="${i}">수정</button></div>`).join('');
+  const answerRows=Q.map((q,i)=>`<div class="row"><div><span>${q.l}</span><p>${esc(A[q.k])}${q.t==='range'?'세':''}</p></div><button class="edit" data-i="${i}">수정</button></div>`).join('');
   const confirmDetails=privacyNotice+answerRows;
   $('stage').innerHTML=`<h2>작성하신 내용을<br>마지막으로 확인해주세요.</h2>
   ${confirmDetails}
@@ -2241,7 +2368,7 @@ async function submit(){
   const btn=$('send'),err=$('err');btn.disabled=true;err.classList.remove('on');
   try{
     const device=await collectDeviceInfo();
-    const rec={nick:A.nick,uid:A.uid,age:A.age,why:A.why,tour:A.tour,...device};
+    const rec={nick:A.nick,uid:A.uid,age:Number(A.age),why:A.why,tour:A.tour,...device};
     const response=await fetch(CFG.applyUrl,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
@@ -2405,52 +2532,79 @@ startHallPrefetch().catch(()=>{});
   const isMobile=matchMedia('(max-width:899px)').matches||/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent||'')||isTabletDesktop;
   if(!isMobile)return;
 
-  const armBackTrap=()=>{
-    try{
-      const current=history.state;
-      const nextState=current&&typeof current==='object'&&!Array.isArray(current)
-        ? {...current,__zeusClanBackTrap:true}
-        : {__zeusClanBackTrap:true};
-      history.pushState(nextState,'',location.href);
-    }catch(e){}
+  /* 뒤로가기 트랩: 홈이 아닌 화면(가입신청서·명예의 전당·완료)에서만 히스토리 항목을 1개 유지한다.
+     - 뒤로가기를 누르면 항목이 소모되고(popstate) → '이전'/'돌아가기'와 같은 동작을 한 뒤 항목을 다시 채운다 (몇 번이든 반복)
+     - 홈 화면에서는 항목이 없으므로 뒤로가기가 브라우저 기본 동작(종료/이전 페이지)으로 처리된다 */
+  const KEY='__zeusClanBackTrap';
+  const isTrap=st=>!!(st&&typeof st==='object'&&st[KEY]);
+  let hasTrap=isTrap(history.state);
+  let pending=0; /* 코드가 직접 호출한 history.back() 중 아직 popstate가 오지 않은 횟수 */
+
+  const atHome=()=>{
+    const on=document.querySelector('.view.on');
+    return !on||on.id==='home'||on.classList.contains('leaving');
+  };
+  const syncTrap=()=>{
+    if(pending>0)return;
+    const home=atHome();
+    if(!home&&!hasTrap){
+      try{history.pushState({[KEY]:true},'',location.href);hasTrap=true;}catch(e){}
+    }else if(home&&hasTrap){
+      /* 앱 안의 버튼으로 홈에 돌아온 경우: 남은 트랩 항목을 소모해 홈에서의 뒤로가기가 정상 종료되게 함 */
+      hasTrap=false;pending++;
+      try{history.back();}catch(e){pending=Math.max(0,pending-1);}
+      setTimeout(()=>{if(pending>0){pending=0;hasTrap=isTrap(history.state);syncTrap();}},700);
+    }
   };
 
-  armBackTrap();
-
   window.addEventListener('popstate',()=>{
+    if(pending>0){pending--;hasTrap=isTrap(history.state);syncTrap();return;}
+    if(isTrap(history.state)){hasTrap=true;return;}
+    hasTrap=false;
+
     const activeView=document.querySelector('.view.on');
     if(!activeView)return;
 
-    if(document.body.classList.contains('tablet-keyboard-open')){
-      if(typeof window.__zeusDismissTabletKeyboard==='function')window.__zeusDismissTabletKeyboard();
-      armBackTrap();
+    /* 홈 화면에서 뒤로가기: 브라우저 종료(이전 페이지로 이동) */
+    if(atHome()){
+      try{history.back();}catch(e){}
       return;
     }
 
-    let handled=false;
+    if(document.body.classList.contains('tablet-keyboard-open')){
+      if(typeof window.__zeusDismissTabletKeyboard==='function')window.__zeusDismissTabletKeyboard();
+      syncTrap();
+      return;
+    }
+
     if(activeView.id==='form'){
       const previousButton=$('prev');
       if(previousButton){
         previousButton.click();
-        handled=true;
       }else if(fromConfirm){
         fromConfirm=false;
         confirmV();
-        handled=true;
       }else if($('send')){
         step(4);
-        handled=true;
       }else{
         show('home');
-        handled=true;
       }
     }else if(activeView.id==='hallV'){
       $('hallBack').click();
-      handled=true;
+    }else if(activeView.id==='doneV'){
+      $('doneBack').click();
+    }else{
+      show('home');
     }
-
-    if(handled)armBackTrap();
+    syncTrap();
   });
+
+  /* 화면 전환(홈 ↔ 다른 화면)을 감지해 트랩을 맞춘다 */
+  new MutationObserver(syncTrap).observe(document.body,{attributes:true,attributeFilter:['data-view']});
+  /* 사용자 터치 직후에도 한 번 더 확인(브라우저가 사용자 조작 없이 추가된 항목을 건너뛰는 것을 방지) */
+  document.addEventListener('pointerdown',syncTrap,{capture:true,passive:true});
+  window.addEventListener('pageshow',()=>{hasTrap=isTrap(history.state);syncTrap();});
+  syncTrap();
 })();
 
 (function(){
