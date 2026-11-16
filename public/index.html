@@ -127,7 +127,7 @@ body{overflow-x:clip}
   html,body{width:100%;height:100%;overflow:hidden}
   body{min-height:0;overscroll-behavior:none}
   .wrap{
-    height:var(--mobile-viewport-height,100dvh);
+    height:var(--app-h,100%);
     min-height:0;
     padding:max(8px,env(safe-area-inset-top,0px)) 14px max(12px,env(safe-area-inset-bottom,0px));
     display:flex;
@@ -554,10 +554,10 @@ body{overflow-x:clip}
     overflow:hidden;
     overscroll-behavior:none;
   }
-  body.tablet-device.tablet-keyboard-open{
-    bottom:auto;
-    top:var(--tablet-visual-top,0px);
+  body.tablet-device.tablet-keyboard-open .wrap{
     height:var(--tablet-visual-height,100%);
+    max-height:var(--tablet-visual-height,100%);
+    margin-top:var(--tablet-visual-top,0px);
   }
   body.tablet-device .wrap{
     height:100%;
@@ -853,7 +853,7 @@ body:not(.calm) .fx{animation:zeusFxIn .8s ease both}
 
 /* ===== No-scroll fit: page always fits the viewport, content scales with viewport height ===== */
 html{height:100%;overflow:hidden;overscroll-behavior:none}
-body{height:100%;max-height:100dvh;overflow:hidden}
+body{height:100%;max-height:var(--app-h,100%);overflow:hidden}
 @media(min-width:900px){
   html,body{height:100%;overflow:hidden}
   body{overflow:clip}
@@ -890,6 +890,34 @@ body{height:100%;max-height:100dvh;overflow:hidden}
   #home .card{min-height:clamp(44px,19dvh,76px);padding-top:6px;padding-bottom:6px}
   #home .card.main{min-height:clamp(58px,26dvh,100px);font-size:clamp(16px,5.5dvh,22px)}
 }
+
+/* ===== Footer pinned to the very bottom on every device ===== */
+:root{--app-h:100%}
+@supports (height:100dvh){:root{--app-h:100dvh}}
+body:not(.keyboard-open):not(.tablet-keyboard-open) .wrap{padding-bottom:0!important}
+.foot{flex:0 0 auto!important;margin-top:auto!important;padding-bottom:max(6px,env(safe-area-inset-bottom,0px))!important}
+
+/* ===== Tablet fit: 키보드가 올라와도 로고·타이틀이 작아지지 않도록 '키보드 없는 안정 높이(--stage-h)' 기준으로 크기 결정 ===== */
+:root{--stage-h:100vh}
+@media(min-width:900px){
+  body.tablet-device{--avail-h:var(--tablet-visual-height,100dvh)}
+  body.tablet-device .brand-panel .hero{--logo-size:clamp(96px,min(calc(var(--stage-h)*.4),calc(var(--avail-h)*.66)),280px)}
+  body.tablet-device .brand-panel .hero .logo{transition:width .5s cubic-bezier(.22,.75,.25,1),height .5s cubic-bezier(.22,.75,.25,1)}
+  body.tablet-device .brand-panel .hero::before{transition:top .5s cubic-bezier(.22,.75,.25,1)}
+  body.tablet-device .brand-panel .hero h1{font-size:clamp(28px,min(calc(var(--stage-h)*.0833),calc(var(--avail-h)*.15)),56px);transition:font-size .5s cubic-bezier(.22,.75,.25,1),transform .2s cubic-bezier(.22,.75,.25,1),opacity .18s ease}
+  body.tablet-device #brandPanel .hero .since{font-size:clamp(12px,calc(var(--stage-h)*.03),20px);transition:opacity .16s ease,transform .2s cubic-bezier(.22,.75,.25,1),max-height .5s ease,margin .5s ease}
+  body.tablet-device.tablet-keyboard-open #brandPanel .hero .since{max-height:0;margin-top:0;margin-bottom:0}
+  body.tablet-device #brandTag{transition:opacity .32s ease,transform .42s cubic-bezier(.22,.75,.25,1),height .5s ease,margin .5s ease,padding .5s ease,border-width .5s ease}
+  body.tablet-device.tablet-keyboard-open #brandTag{height:0!important;margin-top:0!important;padding-top:0!important;padding-bottom:0!important;border-width:0;overflow:hidden}
+}
+/* 패드 세로 화면(홈): 화면 폭·높이에 맞춰 로고/문구 확대 */
+@media(min-width:600px) and (max-width:899px) and (min-height:700px){
+  body.home-state #brandPanel .hero .logo{width:clamp(150px,min(25dvh,34vw),270px);height:clamp(150px,min(25dvh,34vw),270px)}
+  body.home-state #brandPanel .hero .since{font-size:clamp(14px,2.3vw,22px);margin:clamp(12px,1.8dvh,20px) 0 6px}
+  body.home-state #brandPanel .hero h1{font-size:clamp(40px,9vw,76px)}
+  body.home-state #brandPanel .hero .tag{font-size:clamp(13px,2.3vw,20px);padding:7px 18px;margin-top:clamp(10px,1.6dvh,16px)}
+}
+@media(prefers-reduced-motion:reduce){body.tablet-device .brand-panel .hero *,body.tablet-device .brand-panel .hero::before,body.tablet-device #brandTag{transition:none!important}}
 </style>
 <!-- Main emblem normalized to symmetric transparent bounds for optical centering. -->
 </head>
@@ -1236,6 +1264,36 @@ function smoothLayout(mutate){
   }
   applyViewport();
   updateViewport();
+})();
+
+/* Keep the layout exactly as tall as the area the user can really see, so the footer sits at the very bottom in every browser/device.
+   visualViewport.height is deliberately NOT used here: some in-app browsers (e.g. KakaoTalk) report it smaller than the visible area even without a keyboard. */
+(function fitAppHeight(){
+  const root=document.documentElement,body=document.body;
+  const isField=el=>!!(el&&el.matches&&el.matches('input,textarea'));
+  const typing=()=>body.classList.contains('keyboard-open')||body.classList.contains('tablet-keyboard-open')||isField(document.activeElement);
+  let frame=0;
+  function apply(){
+    frame=0;
+    if(typing())return;
+    const vv=window.visualViewport;
+    if(vv&&vv.scale>1.02)return;
+    const vals=[window.innerHeight,root.clientHeight].filter(v=>Number.isFinite(v)&&v>0);
+    if(!vals.length)return;
+    const h=Math.round(Math.min(...vals))+'px';
+    if(root.style.getPropertyValue('--app-h')!==h)root.style.setProperty('--app-h',h);
+  }
+  const schedule=()=>{if(!frame)frame=requestAnimationFrame(apply);};
+  const settle=()=>{schedule();[120,360,800].forEach(ms=>setTimeout(schedule,ms));};
+  window.addEventListener('resize',schedule,{passive:true});
+  window.addEventListener('orientationchange',settle,{passive:true});
+  window.addEventListener('pageshow',settle);
+  window.addEventListener('load',settle);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')settle();});
+  document.addEventListener('focusout',()=>setTimeout(settle,250));
+  if(window.visualViewport)window.visualViewport.addEventListener('resize',schedule,{passive:true});
+  if(typeof MutationObserver!=='undefined')new MutationObserver(settle).observe(body,{attributes:true,attributeFilter:['class']});
+  settle();
 })();
 
 (function setupTabletKeyboardAndViewport(){
@@ -1625,7 +1683,7 @@ function smoothLayout(mutate){
     }
 
     if(keyboardOpen)applyTabletViewport(metrics);
-    else releaseTabletViewport();
+    else{releaseTabletViewport();if(baseHeight>0)root.style.setProperty('--stage-h',Math.round(baseHeight)+'px');}
   }
 
   function beginFieldFocus(field){
@@ -2289,6 +2347,38 @@ startHallPrefetch().catch(()=>{});
     const m=W<900;setTimeout(strike,(m?500:800)+Math.random()*(m?1100:1400));
   }
   strike();requestAnimationFrame(frame);
+})();
+</script>
+<script>
+/* 패드 가로모드: 브랜드(로고 묶음) 위치가 바뀌면(키보드 열림/닫힘, 돌아가기 등) 부드럽게 이동 */
+(function brandFlip(){
+  const panel=document.getElementById('brandPanel'),hero=panel&&panel.querySelector('.hero');
+  if(!hero||typeof hero.animate!=='function'||typeof ResizeObserver==='undefined')return;
+  const wide=matchMedia('(min-width:900px)'),calm=matchMedia('(prefers-reduced-motion:reduce)');
+  let last=null,armed=false;
+  const pos=()=>{const r=panel.getBoundingClientRect();return r.width?{x:r.left+r.width/2,y:r.top+r.height/2}:null};
+  function offset(){try{const m=new DOMMatrix(getComputedStyle(hero).transform);return[m.m41,m.m42]}catch(e){return[0,0]}}
+  function check(){
+    const p=pos();
+    if(p&&last&&armed&&wide.matches&&!calm.matches&&document.body.classList.contains('tablet-device')){
+      const dx=last.x-p.x,dy=last.y-p.y;
+      if(Math.abs(dx)>2||Math.abs(dy)>2){
+        const o=offset();
+        hero.getAnimations().forEach(a=>{if(a.id==='zeus-brand')a.cancel()});
+        hero.animate([{transform:'translate3d('+(dx+o[0])+'px,'+(dy+o[1])+'px,0)'},{transform:'translate3d(0,0,0)'}],
+          {duration:520,easing:'cubic-bezier(.22,.75,.25,1)',id:'zeus-brand'});
+      }
+    }
+    last=p;
+  }
+  new ResizeObserver(check).observe(panel);
+  new MutationObserver(check).observe(document.body,{attributes:true,attributeFilter:['class']});
+  new MutationObserver(check).observe(document.documentElement,{attributes:true,attributeFilter:['style']});
+  window.addEventListener('resize',check,{passive:true});
+  if(window.visualViewport)window.visualViewport.addEventListener('resize',check,{passive:true});
+  const arm=()=>setTimeout(()=>{last=pos();armed=true},600);
+  last=pos();
+  if(document.readyState==='complete')arm();else window.addEventListener('load',arm);
 })();
 </script>
 </body>
