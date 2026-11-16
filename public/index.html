@@ -976,9 +976,8 @@ body.bt-flipping #brandPanel,body.bt-flipping #brandPanel .hero .logo,body.bt-fl
 @media(prefers-reduced-motion:reduce){body.pad-portrait .brand-panel{animation:none!important;transition:none!important}}
 /* 브랜드 문구: 두 문구를 한 칸에 겹쳐 폭을 항상 긴 문구 기준으로 유지(폭 고정/줄바꿈 오류 방지) */
 #brandTagText{display:inline-grid!important;white-space:nowrap!important}
-#brandTagText>.tg{grid-area:1/1;justify-self:center;white-space:nowrap!important;transition:opacity .5s ease,visibility 0s}
-#brandTag[data-face="home"] .tg-legend,#brandTag:not([data-face]) .tg-legend,#brandTag[data-face="legend"] .tg-home{opacity:0;visibility:hidden;transition:opacity .5s ease,visibility 0s .5s}
-@media(prefers-reduced-motion:reduce){#brandTagText>.tg{transition:none!important}}
+#brandTagText>.tg{grid-area:1/1;justify-self:center;white-space:nowrap!important}
+#brandTag[data-face="home"] .tg-legend,#brandTag:not([data-face]) .tg-legend,#brandTag[data-face="legend"] .tg-home{visibility:hidden}
 </style>
 <!-- Main emblem normalized to symmetric transparent bounds for optical centering. -->
 </head>
@@ -1942,21 +1941,31 @@ const TAG_LEGEND='WHERE YOUR LEGEND BEGINS',TAG_HOME='<span class="y">영웅</sp
 const brandPortrait=()=>matchMedia('(max-width:899px) and (orientation:portrait)').matches&&!matchMedia('(prefers-reduced-motion:reduce)').matches;
 /* 세로화면 홈 진입: LEGEND 문구 표시 → 1.5초 뒤 페이드로 영웅·전설 문장 */
 function brandTagIntro(){
-  const tag=$('brandTag');
-  if(!tag)return;
+  const tag=$('brandTag'),text=$('brandTagText');
+  if(!tag||!text)return;
   clearTimeout(brandTagTimer);
-  tag.dataset.mode='home';tag.dataset.face='legend';
-  brandTagTimer=setTimeout(()=>{tag.dataset.face='home';},1500);
+  tag.dataset.mode='home';tag.dataset.face='legend';tag.classList.remove('tag-fade');text.classList.remove('tag-text-fade');
+  brandTagTimer=setTimeout(()=>{
+    text.classList.add('tag-text-fade');
+    brandTagTimer=setTimeout(()=>{tag.dataset.face='home';text.classList.remove('tag-text-fade');},500);
+  },1500);
 }
 function updateBrandTag(isContentView){
-  const tag=$('brandTag');
-  if(!tag)return;
-  const nextMode=isContentView?'content':'home';
+  const tag=$('brandTag'),text=$('brandTagText');
+  if(!tag||!text)return;
+  const nextMode=isContentView?'content':'home',face=isContentView?'legend':'home';
   if(!isContentView&&tag.dataset.mode==='content'&&brandPortrait()){brandTagIntro();return;}
   if(tag.dataset.mode===nextMode&&tag.dataset.face)return;
   clearTimeout(brandTagTimer);
   tag.dataset.mode=nextMode;
-  tag.dataset.face=isContentView?'legend':'home';
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){
+    tag.dataset.face=face;tag.classList.remove('tag-fade');text.classList.remove('tag-text-fade');return;
+  }
+  const desktop=matchMedia('(min-width:900px)').matches;
+  const fade=desktop?text:tag,cls=desktop?'tag-text-fade':'tag-fade';
+  (desktop?tag:text).classList.remove(desktop?'tag-fade':'tag-text-fade');
+  fade.classList.add(cls);
+  brandTagTimer=setTimeout(()=>{tag.dataset.face=face;fade.classList.remove(cls);},500);
 }
 if(brandPortrait())brandTagIntro();
 function positionMobileBrand(){
