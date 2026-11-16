@@ -917,6 +917,14 @@ body:not(.keyboard-open):not(.tablet-keyboard-open) .wrap{padding-bottom:0!impor
   body.home-state #brandPanel .hero h1{font-size:clamp(40px,9vw,76px)}
   body.home-state #brandPanel .hero .tag{font-size:clamp(13px,2.3vw,20px);padding:7px 18px;margin-top:clamp(10px,1.6dvh,16px)}
 }
+/* 휴대폰 세로(홈): 패드 세로의 (로고·글자 : 버튼) 비율을 따라 확대. 기준 = 메인 버튼 높이(--hm)·폭 */
+@media(max-width:599px) and (orientation:portrait) and (min-height:621px){
+  body.home-state{--hm:clamp(94px,15dvh,114px)}
+  body.home-state #brandPanel .hero .logo{width:clamp(132px,min(calc(var(--hm)*1.55),44vw),190px);height:clamp(132px,min(calc(var(--hm)*1.55),44vw),190px)}
+  body.home-state #brandPanel .hero .since{font-size:clamp(13px,3.4vw,17px);margin:clamp(10px,1.5dvh,16px) 0 5px}
+  body.home-state #brandPanel .hero h1{font-size:clamp(31px,min(10.4vw,calc(var(--hm)*.4)),50px)}
+  body.home-state #brandPanel .hero .tag{font-size:clamp(11.5px,3.1vw,15px);padding:6px 14px;margin-top:clamp(9px,1.4dvh,14px)}
+}
 @media(prefers-reduced-motion:reduce){body.tablet-device .brand-panel .hero *,body.tablet-device .brand-panel .hero::before,body.tablet-device #brandTag{transition:none!important}}
 
 /* ===== 줄바꿈 방지 ===== */
@@ -951,7 +959,7 @@ body.pad-portrait[data-view="form"] #brandPanel .hero .logo{width:var(--bt-logo,
 body.pad-portrait[data-view="form"] #brandPanel .hero h1{font-size:var(--bt-fs,clamp(32px,5.2vw,50px));margin:var(--bt-mt,10px) 0 0;transition:font-size .5s cubic-bezier(.22,.75,.25,1),margin .5s cubic-bezier(.22,.75,.25,1)}
 body.pad-portrait.keyboard-open:not(.bt-off)[data-view="form"] #form.view.on{padding:0;min-height:0}
 body.pad-portrait .wrap{max-width:clamp(520px,84vw,740px)}
-body.pad-portrait[data-view="form"] .wrap{max-width:clamp(480px,76vw,680px)}
+body.pad-portrait[data-view="form"] .wrap{max-width:clamp(450px,70vw,640px)}
 body.pad-portrait[data-view="form"] .desktop-layout{justify-content:center;gap:clamp(14px,3dvh,34px)}
 body.pad-portrait[data-view="form"] .right-panel{flex:0 1 auto;overflow:visible}
 body.pad-portrait[data-view="form"] .brand-panel{padding-top:calc(var(--bt-g) + env(safe-area-inset-top,0px))}
@@ -1862,11 +1870,27 @@ function zeusVisibleHeight(base){
   update();
 })();
 
+const TAG_LEGEND='WHERE YOUR LEGEND BEGINS',TAG_HOME='<span class="y">영웅</span>, <span class="p">전설</span> 타이틀 누적 299개 배출';
+const brandPortrait=()=>matchMedia('(max-width:899px) and (orientation:portrait)').matches&&!matchMedia('(prefers-reduced-motion:reduce)').matches;
+/* 세로화면 홈 진입: LEGEND 문구 표시 → 1초 뒤 페이드로 영웅·전설 문장 */
+function brandTagIntro(){
+  const tag=$('brandTag'),text=$('brandTagText');
+  if(!tag||!text)return;
+  clearTimeout(brandTagTimer);
+  tag.dataset.mode='home';tag.style.width='';delete tag.dataset.widthLocked;
+  tag.classList.remove('tag-fade');text.classList.remove('tag-text-fade');
+  text.innerHTML=TAG_LEGEND;
+  brandTagTimer=setTimeout(()=>{
+    tag.classList.add('tag-fade');
+    brandTagTimer=setTimeout(()=>{text.innerHTML=TAG_HOME;tag.classList.remove('tag-fade');},500);
+  },1000);
+}
 function updateBrandTag(isContentView){
   const tag=$('brandTag');
   const text=$('brandTagText');
   if(!tag||!text)return;
   const nextMode=isContentView?'content':'home';
+  if(!isContentView&&tag.dataset.mode==='content'&&brandPortrait()){brandTagIntro();return;}
   if(tag.dataset.mode===nextMode)return;
   clearTimeout(brandTagTimer);
   const nextHtml=isContentView
@@ -1913,6 +1937,7 @@ function updateBrandTag(isContentView){
     tag.classList.remove('tag-fade');
   },500);
 }
+if(brandPortrait())brandTagIntro();
 function positionMobileBrand(){
   const layout=$('desktopLayout');
   const page=document.querySelector('.wrap');
@@ -2468,9 +2493,10 @@ startHallPrefetch().catch(()=>{});
     const box=document.getElementById('formBox');if(!box)return;
     const avail=zeusVisibleHeight(stable),formH=box.offsetHeight,panelW=box.offsetWidth||Math.min(w*.84,740);
     /* 슬라이드(폼) 폭 대비 비율: 키보드 올림 .22 / 내림 .34, 남는 공간에 맞춰 자동 축소 (브랜드 블록 ≈ 로고×1.45) */
-    const room=avail-formH-(typing?60:90);
-    const want=typing?Math.min(panelW*.22,stable*.12):Math.min(panelW*.5,stable*.3,360);
-    const logo=Math.floor(Math.min(want,room*(typing?1:.85)/1.45));
+    const pw=Math.max(450,Math.min(w*.7,640));
+    const room=avail-formH-(typing?44:90);
+    const want=Math.min(pw*(typing?.46:.5),typing?avail*.3:stable*.3,360);
+    const logo=Math.floor(Math.min(want,room*.85/1.45));
     if(logo<84){body.classList.add('bt-off');return;}
     root.style.setProperty('--bt-logo',logo+'px');
     root.style.setProperty('--bt-fs',Math.max(26,Math.min(Math.round(logo*.28),Math.round(w*.09)))+'px');
