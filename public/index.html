@@ -951,6 +951,7 @@ body.pad-portrait[data-view="form"] #brandPanel .hero .logo{width:var(--bt-logo,
 body.pad-portrait[data-view="form"] #brandPanel .hero h1{font-size:var(--bt-fs,clamp(32px,5.2vw,50px));margin:var(--bt-mt,10px) 0 0;transition:font-size .5s cubic-bezier(.22,.75,.25,1),margin .5s cubic-bezier(.22,.75,.25,1)}
 body.pad-portrait.keyboard-open:not(.bt-off)[data-view="form"] #form.view.on{padding:0;min-height:0}
 body.pad-portrait .wrap{max-width:clamp(520px,84vw,740px)}
+body.pad-portrait[data-view="form"] .wrap{max-width:clamp(480px,76vw,680px)}
 body.pad-portrait[data-view="form"] .desktop-layout{justify-content:center;gap:clamp(14px,3dvh,34px)}
 body.pad-portrait[data-view="form"] .right-panel{flex:0 1 auto;overflow:visible}
 body.pad-portrait[data-view="form"] .brand-panel{padding-top:calc(var(--bt-g) + env(safe-area-inset-top,0px))}
@@ -1185,6 +1186,7 @@ function zeusVisibleHeight(base){
     if(monitorTimer){clearInterval(monitorTimer);monitorTimer=0;}
   }
 
+  window.__zeusCloseKeyboard=()=>closeKeyboard(true);
   function closeKeyboard(force=false){
     if(!keyboardDetected)return;
     const height=visibleHeight();
@@ -2446,7 +2448,7 @@ startHallPrefetch().catch(()=>{});
 /* 패드 세로: 안정 높이 추적 → body.pad-portrait, 가입신청서 상단 브랜드(로고+ZEUS CLAN) 표시/숨김 */
 (function padPortrait(){
   const root=document.documentElement,body=document.body,isF=el=>el&&el.matches&&el.matches('input,textarea');
-  let stable=0,w0=innerWidth,raf=0,focusAt=0;
+  let stable=0,w0=innerWidth,raf=0,focusAt=0,noKbAt=0,hadKb=false;
   const layoutH=()=>Math.min(innerHeight,root.clientHeight||innerHeight);
   function update(){
     raf=0;
@@ -2454,7 +2456,9 @@ startHallPrefetch().catch(()=>{});
     if(Math.abs(w-w0)>40){w0=w;stable=0;}
     const vv=window.visualViewport,vh=vv&&vv.height?Math.min(layoutH(),vv.height):layoutH();
     const kb=stable>0&&vh<stable-Math.max(80,stable*.08);
-    const typing=body.classList.contains('keyboard-open');
+    const cls=body.classList.contains('keyboard-open');
+    if(!cls){noKbAt=0;hadKb=false;}else if(kb){noKbAt=0;hadKb=true;}else if(!noKbAt){noKbAt=1;setTimeout(()=>{noKbAt=0;const v=window.visualViewport,h=v&&v.height?Math.min(layoutH(),v.height):layoutH();if(body.classList.contains('keyboard-open')&&!(stable>0&&h<stable-Math.max(80,stable*.08))&&window.__zeusCloseKeyboard)window.__zeusCloseKeyboard();},hadKb?140:780);}
+    const typing=cls;
     if(!kb&&!typing)stable=layoutH();
     const pad=w>=600&&w<900&&stable>=700&&stable>w*1.1;
     body.classList.toggle('pad-portrait',pad);
@@ -2464,11 +2468,12 @@ startHallPrefetch().catch(()=>{});
     const box=document.getElementById('formBox');if(!box)return;
     const avail=zeusVisibleHeight(stable),formH=box.offsetHeight,panelW=box.offsetWidth||Math.min(w*.84,740);
     /* 슬라이드(폼) 폭 대비 비율: 키보드 올림 .22 / 내림 .34, 남는 공간에 맞춰 자동 축소 (브랜드 블록 ≈ 로고×1.45) */
-    const want=Math.min(panelW*(typing?.22:.34),stable*(typing?.12:.2),280);
-    const logo=Math.floor(Math.min(want,(avail-formH-60)/1.45));
+    const room=avail-formH-(typing?60:90);
+    const want=typing?Math.min(panelW*.22,stable*.12):Math.min(panelW*.5,stable*.3,360);
+    const logo=Math.floor(Math.min(want,room*(typing?1:.85)/1.45));
     if(logo<84){body.classList.add('bt-off');return;}
     root.style.setProperty('--bt-logo',logo+'px');
-    root.style.setProperty('--bt-fs',Math.max(26,Math.round(logo*.3))+'px');
+    root.style.setProperty('--bt-fs',Math.max(26,Math.min(Math.round(logo*.28),Math.round(w*.09)))+'px');
     root.style.setProperty('--bt-mt',Math.round(logo*.06)+'px');
     root.style.setProperty('--bt-h',Math.ceil(logo*1.5)+16+'px');
     body.classList.remove('bt-off');
