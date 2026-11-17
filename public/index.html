@@ -1469,7 +1469,13 @@ function zeusVisibleHeight(base){
 
   const isField=el=>!!(el&&el.matches&&el.matches('input,textarea'));
   const fieldBase=m=>isField(document.activeElement)?Math.max(zeusEstFull('l'),m.reference):m.reference;
+  let vkOverlay=false,fbTimer=0,fbPadEl=null;
   function viewportMetrics(){
+    const vkRect=navigator.virtualKeyboard&&navigator.virtualKeyboard.boundingRect;
+    if(vkOverlay&&vkRect&&vkRect.height>0&&Number.isFinite(vkRect.top)){
+      const full=Math.max(window.innerHeight||0,document.documentElement&&document.documentElement.clientHeight||0);
+      return {visible:Math.max(1,Math.round(vkRect.top)),reference:full};
+    }
     const values=[window.innerHeight,document.documentElement&&document.documentElement.clientHeight,viewport&&viewport.height]
       .filter(v=>Number.isFinite(v)&&v>0);
     if(!values.length)return {visible:window.innerHeight||1,reference:window.innerHeight||1};
@@ -1671,6 +1677,7 @@ function zeusVisibleHeight(base){
     resetBrandTitleAdjustments();
     baseHeight=Math.max(baseHeight,metrics.reference,window.innerHeight||0,document.documentElement.clientHeight||0);
     releaseTabletViewport();
+    endFallback();
     if(!fieldFocused)stopMonitor();
     if(restoreSlide)restoreFormPosition(previousSlideTop);
     else savedFormScrollTop=null;
@@ -1821,8 +1828,42 @@ function zeusVisibleHeight(base){
     else{releaseTabletViewport();if(baseHeight>0)root.style.setProperty('--stage-h',Math.round(baseHeight)+'px');}
   }
 
+  function endFallback(){
+    clearTimeout(fbTimer);fbTimer=0;
+    if(fbPadEl){fbPadEl.style.removeProperty('padding-bottom');fbPadEl=null;}
+    if(vkOverlay&&!keyboardOpen){
+      try{navigator.virtualKeyboard.overlaysContent=false;}catch(e){}
+      vkOverlay=false;
+    }
+  }
+  function heuristicReveal(){
+    const f=document.activeElement;
+    const sc=isField(f)&&f.closest('.view.on');
+    if(!sc)return;
+    sc.style.setProperty('padding-bottom','55vh','important');fbPadEl=sc;
+    requestAnimationFrame(()=>{
+      const r=f.getBoundingClientRect();
+      sc.scrollBy({top:r.top-window.innerHeight*.22,behavior:'smooth'});
+    });
+  }
+  function runFallback(){
+    fbTimer=0;
+    if(!isTabletDesktop||keyboardOpen||!isField(document.activeElement))return;
+    const vk=navigator.virtualKeyboard;
+    if(vk&&!vkOverlay){try{vk.overlaysContent=true;vkOverlay=true;}catch(e){}}
+    let tries=0;
+    const probe=()=>{
+      if(keyboardOpen||!isField(document.activeElement))return;
+      const r=vk&&vk.boundingRect;
+      if(vkOverlay&&r&&r.height>0){openTabletKeyboard();update(false);scheduleReveal(60);return;}
+      if(++tries<6){fbTimer=setTimeout(probe,100);return;}
+      endFallback();heuristicReveal();
+    };
+    probe();
+  }
   function beginFieldFocus(field){
     if(!isTabletDesktop||!isField(field))return;
+    if(!keyboardOpen){clearTimeout(fbTimer);fbTimer=setTimeout(runFallback,600);}
     clearTimeout(closeCheckTimer);
     if(!fieldFocused){
       fieldFocused=true;
@@ -1885,6 +1926,7 @@ function zeusVisibleHeight(base){
         update();
         scheduleReveal(90);
       }else{
+        if(!keyboardOpen)endFallback();
         clearTimeout(fallbackTimer);
         if(keyboardOpen)scheduleClose(true);
         else{
