@@ -968,7 +968,7 @@ body.pad-portrait .row span{font-size:14px}
 body.pad-portrait .row p{font-size:17px}
 @keyframes btIn{from{max-height:0;opacity:0}}
 body.pad-portrait[data-view="form"] .brand-panel{--bt-g:48px;display:flex;flex:0 0 auto;align-items:center;justify-content:center;padding:var(--bt-g) 0;margin:calc(var(--bt-g)*-1) 0;pointer-events:none;overflow:hidden;max-height:calc(var(--bt-h,230px) + var(--bt-g)*2);opacity:1;transition:max-height .5s cubic-bezier(.22,.75,.25,1),opacity .45s ease}
-body.pad-portrait[data-view="form"]:not(.bt-off) .brand-panel{animation:btIn .6s cubic-bezier(.22,.75,.25,1)}
+body.pad-portrait.bt-enter[data-view="form"]:not(.bt-off) .brand-panel{animation:btIn .6s cubic-bezier(.22,.75,.25,1)}
 body.pad-portrait[data-view="form"].bt-off .brand-panel{max-height:0;opacity:0}
 body.pad-portrait[data-view="form"] #brandPanel .hero{position:static;transform:none;margin:0;width:100%;text-align:center;display:block;animation:none}
 body.pad-portrait[data-view="form"] #brandPanel .hero .since,body.pad-portrait[data-view="form"] #brandPanel .hero .tag{display:none}
@@ -2138,6 +2138,10 @@ function showNow(id){
   const isHome=id==='home';
   const isContentView=!isHome;
   document.body.dataset.view=id;
+  if(id==='form'&&prevId!=='form'){
+    const bb=document.body;bb.classList.add('bt-enter');
+    clearTimeout(window.__btEnterT);window.__btEnterT=setTimeout(()=>bb.classList.remove('bt-enter'),800);
+  }
   document.body.classList.toggle('home-state',isHome);
   document.body.classList.toggle('hall-state',id==='hallV');
   document.body.classList.toggle('calm',id==='form'||id==='hallV'||id==='doneV');
@@ -2243,6 +2247,10 @@ function initAgeSlider(q,start,onChange){
 }
 
 function step(i,options={}){
+  if(document.body.dataset.view==='form'&&typeof smoothLayout==='function'){smoothLayout(()=>stepImpl(i,options));return;}
+  stepImpl(i,options);
+}
+function stepImpl(i,options={}){
   cur=i;draftStage='step';const q=Q[i];
   {const fb=$('formBox');fb.classList.remove('is-confirm','cf-tight');fb.style.removeProperty('--cf');$('form').classList.remove('confirm-fit');}
   let f;
@@ -2257,9 +2265,20 @@ function step(i,options={}){
   else f=`<input type="text" id="zeusAnswerField" ${answerFieldHints} ${q.ph?`placeholder="${esc(q.ph)}"`:''}>`;
   // 네이티브 form 래퍼를 제거해 Chrome Autofill이 비밀번호/결제/주소 폼으로 탐지할 단서를 없앱니다.
   const answerFieldForm=(q.t==='yn'||q.t==='range')?f:`<div class="answer-form" role="group" aria-label="답변 입력">${f}</div>`;
-  $('stage').innerHTML=`
+  const stageHtml=`
    <h2>${q.q}</h2>${answerFieldForm}<p class="err" id="err"></p>
    <div class="nav ${i===0?'one':''} ${fromConfirm?'edit-return':''}">${i===0||fromConfirm?'':'<button class="b" id="prev">이전</button>'}<button class="b go" id="next">다음</button></div>`;
+  // 입력칸이 있는 슬라이드끼리 넘어갈 때는 새 입력칸에 포커스를 먼저 옮긴 뒤 이전 슬라이드를 제거해
+  // 키보드가 닫혔다 다시 열리며 화면이 흔들리는 현상을 막습니다.
+  const stageEl=$('stage'),prevActive=document.activeElement;
+  const keepKeyboard=(q.t==='text'||q.t==='area')&&!!(prevActive&&stageEl.contains(prevActive)&&prevActive.matches&&prevActive.matches('input,textarea'));
+  if(keepKeyboard){
+    Array.from(stageEl.children).forEach(n=>{
+      n.setAttribute('data-old','1');n.removeAttribute('id');
+      n.querySelectorAll('[id]').forEach(e=>e.removeAttribute('id'));
+    });
+    stageEl.insertAdjacentHTML('beforeend',stageHtml);
+  }else stageEl.innerHTML=stageHtml;
   const err=$('err'),hide=()=>err.classList.remove('on');
   const f1=$('zeusAnswerField');
   const read=()=>{if(f1){const value=f1.value.trim();A[q.k]=q.k==='uid'?value.toUpperCase():value}};
@@ -2329,9 +2348,11 @@ function step(i,options={}){
     if(fromConfirm){fromConfirm=false;confirmV()}else if(i<4)step(i+1);else confirmV();
   };
   show('form');
-  if(f1&&q.t!=='area'&&!options.skipAutofocus){
+  if(f1&&!options.skipAutofocus){
     try{f1.focus({preventScroll:true});}catch(error){f1.focus();}
+    try{const n=f1.value.length;f1.setSelectionRange(n,n);}catch(error){}
   }
+  stageEl.querySelectorAll('[data-old]').forEach(n=>n.remove());
 }
 let fitRaf=0;
 function fitConfirm(){
@@ -2722,7 +2743,7 @@ startHallPrefetch().catch(()=>{});
 <script>
 (function padPortrait(){
   const root=document.documentElement,body=document.body,isF=el=>el&&el.matches&&el.matches('input,textarea');
-  let stable=0,w0=innerWidth,raf=0,focusAt=0,noKbAt=0,hadKb=false;
+  let stable=0,w0=innerWidth,raf=0,focusAt=0,noKbAt=0,hadKb=false,offSince=0;
   const layoutH=()=>Math.min(innerHeight,root.clientHeight||innerHeight);
   function update(){
     raf=0;
@@ -2738,7 +2759,7 @@ startHallPrefetch().catch(()=>{});
     if(!kb&&!typing)stable=layoutH();
     const pad=w>=600&&w<900&&stable>=700&&stable>w*1.1;
     body.classList.toggle('pad-portrait',pad);
-    if(!pad){body.classList.remove('bt-off');return;}
+    if(!pad){offSince=0;body.classList.remove('bt-off');return;}
     root.style.setProperty('--pp-h',stable+'px');
     if(body.dataset.view!=='form')return;
     const box=document.getElementById('formBox');if(!box)return;
@@ -2747,7 +2768,13 @@ startHallPrefetch().catch(()=>{});
     const room=avail-formH-(typing?44:90);
     const want=Math.min(pw*(typing?.46:.5),typing?avail*.3:stable*.3,360);
     const logo=Math.floor(Math.min(want,room*.85/1.45));
-    if(logo<84){body.classList.add('bt-off');return;}
+    if(logo<84){
+      if(body.classList.contains('bt-off'))return;
+      const nowT=performance.now();if(!offSince)offSince=nowT;
+      if(nowT-offSince<350){setTimeout(go,370-(nowT-offSince));return;}
+      body.classList.add('bt-off');return;
+    }
+    offSince=0;
     root.style.setProperty('--bt-logo',logo+'px');
     root.style.setProperty('--bt-fs',Math.max(26,Math.min(Math.round(logo*.28),Math.round(w*.09)))+'px');
     root.style.setProperty('--bt-mt',Math.round(logo*.06)+'px');
