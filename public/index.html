@@ -65,8 +65,8 @@ input:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(23
 .nav.one{grid-template-columns:minmax(0,10fr)}
 .nav.edit-return{display:grid;grid-template-columns:1fr}
 .nav.edit-return #next{width:100%;min-width:0}
-.b{padding:14px 8px;font:700 16px 'Noto Sans KR',sans-serif;border-radius:10px;border:0;box-shadow:inset 0 0 0 1px var(--line);background:rgba(0,0,0,.3);color:var(--gold2);cursor:pointer}
-.b.go{background:linear-gradient(135deg,#f6dc9b,#e9c46a 55%,#c9973a);color:#1a1305;border:0;box-shadow:none}
+.b{padding:14px 8px;font:700 16px 'Noto Sans KR',sans-serif;border-radius:10px;border:1px solid var(--line);background:rgba(0,0,0,.3);color:var(--gold2);cursor:pointer}
+.b.go{background:linear-gradient(135deg,#f6dc9b,#e9c46a 55%,#c9973a);color:#1a1305;border:0}
 .b:disabled{opacity:.5}
 
 @media(min-width:900px){
@@ -96,12 +96,14 @@ input:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(23
 .age.drag .age-bubble{transform:translateX(-50%) translateY(-2px) scale(1.06);box-shadow:0 10px 24px rgba(0,0,0,.55),0 0 0 5px rgba(233,196,106,.12),inset 0 1px 0 rgba(255,255,255,.1)}
 .age-ends{display:flex;justify-content:space-between;margin-top:6px;font-size:12px;color:var(--mut)}
 .age-note{margin:8px 2px 0;font-size:12px;line-height:1.5;color:var(--mut)}
-
+@media(prefers-reduced-motion:reduce){.age-thumb,.age-bubble{transition:none}}
 @media(max-width:899px){.age-inner{margin-top:50px}.age-note{margin-top:6px}}
 .row{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.09)}
 .row:last-child{border:0}.row div{min-width:0;flex:1}
 .row span{display:block;font-size:12px;color:var(--gold);margin-bottom:2px}
 .row p{margin:0;white-space:pre-wrap;word-break:break-word}
+.nick-warn{flex:none;font-size:clamp(18px,2.2vw,24px);line-height:1.2;padding:4px 10px}.nick-warn[hidden]{display:none}
+body.pad-portrait .nick-warn{font-size:clamp(24px,3vw,30px)}
 .edit{flex:none;padding:6px 12px;font:500 13px 'Noto Sans KR',sans-serif;border-radius:8px;border:1px solid var(--line);background:none;color:var(--gold2);cursor:pointer}
 .done{text-align:center;padding:36px 10px}
 .done h2{font-size:22px;color:var(--gold2)}.done p{color:var(--mut);margin:0}
@@ -117,7 +119,7 @@ img{-webkit-user-drag:none;user-drag:none}
 .fx{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
 .halo{position:absolute;left:50%;top:150px;width:560px;height:560px;max-width:140vw;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,200,60,.34),rgba(255,170,0,.1) 42%,transparent 68%)}
 .wrap{position:relative;z-index:1}
-
+@media(prefers-reduced-motion:reduce){.fx *,.logo{animation:none!important}}
 @media(min-width:900px){
 .wrap{max-width:1120px;padding:48px 40px 24px}
 .hero{display:flex;align-items:center;justify-content:center;gap:60px;text-align:left;margin-bottom:40px}
@@ -306,7 +308,7 @@ body{overflow-x:clip}
   #brandTagText{display:inline-block;transition:opacity .5s ease,transform .5s ease}
   #brandTagText.tag-text-fade{opacity:0;transform:translateY(5px)}
 }
-
+@media(prefers-reduced-motion:reduce){#brandTag,#brandTagText{transition:none}}
 
 
 
@@ -727,7 +729,12 @@ body{overflow-x:clip}
     transform:translateY(-8px);
   }
 }
-
+@media(prefers-reduced-motion:reduce){
+  body.tablet-device #brandPanel .hero .since,
+  body.tablet-device #brandPanel .hero h1{
+    transition:none!important;
+  }
+}
 
 @media (min-width:900px){
   body.tablet-device #brandTag{
@@ -742,7 +749,9 @@ body{overflow-x:clip}
     pointer-events:none;
   }
 }
-
+@media(prefers-reduced-motion:reduce){
+  body.tablet-device #brandTag{transition:none!important}
+}
 
 .answer-form{display:block;margin:0;padding:0;border:0;background:transparent}
 
@@ -872,7 +881,12 @@ body:not(.calm) .fx{animation:zeusFxIn .8s ease both}
   #home .grid>.card:nth-child(3){animation-delay:.28s}
   .fx .halo{transition:top .45s cubic-bezier(.22,.75,.25,1),left .45s cubic-bezier(.22,.75,.25,1)}
 }
-
+@media(prefers-reduced-motion:reduce){
+  body:not(.calm) .fx,
+  .view.on:not(#home),.view.on.leaving:not(#home),
+  body.home-state #brandPanel .hero,#home .grid>.card{animation:none!important}
+  .fx .halo{transition:none!important}
+}
 
 html{height:100%;overflow:hidden;overscroll-behavior:none}
 body{height:100%;max-height:var(--app-h,100%);overflow:hidden}
@@ -944,7 +958,7 @@ body:not(.keyboard-open):not(.tablet-keyboard-open) .wrap{padding-bottom:0!impor
 @media(max-width:599px) and (orientation:portrait) and (max-height:620px){
   body.home-state #brandPanel .hero .tag{font-size:clamp(11.5px,3.1vw,14px);padding:5px 12px}
 }
-
+@media(prefers-reduced-motion:reduce){body.tablet-device .brand-panel .hero *,body.tablet-device .brand-panel .hero::before,body.tablet-device #brandTag{transition:none!important}}
 
 h1,.tag,#brandTag,#brandTagText{white-space:nowrap!important}
 @media(min-width:900px){body .brand-panel .hero h1{font-size:clamp(28px,min(8.33vh,5.2vw),50px)}}
@@ -968,7 +982,7 @@ body.pad-portrait .row span{font-size:14px}
 body.pad-portrait .row p{font-size:17px}
 @keyframes btIn{from{max-height:0;opacity:0}}
 body.pad-portrait[data-view="form"] .brand-panel{--bt-g:48px;display:flex;flex:0 0 auto;align-items:center;justify-content:center;padding:var(--bt-g) 0;margin:calc(var(--bt-g)*-1) 0;pointer-events:none;overflow:hidden;max-height:calc(var(--bt-h,230px) + var(--bt-g)*2);opacity:1;transition:max-height .5s cubic-bezier(.22,.75,.25,1),opacity .45s ease}
-body.pad-portrait.bt-enter[data-view="form"]:not(.bt-off) .brand-panel{animation:btIn .6s cubic-bezier(.22,.75,.25,1)}
+body.pad-portrait[data-view="form"]:not(.bt-off) .brand-panel{animation:btIn .6s cubic-bezier(.22,.75,.25,1)}
 body.pad-portrait[data-view="form"].bt-off .brand-panel{max-height:0;opacity:0}
 body.pad-portrait[data-view="form"] #brandPanel .hero{position:static;transform:none;margin:0;width:100%;text-align:center;display:block;animation:none}
 body.pad-portrait[data-view="form"] #brandPanel .hero .since,body.pad-portrait[data-view="form"] #brandPanel .hero .tag{display:none}
@@ -983,7 +997,7 @@ body.pad-portrait[data-view="form"] .right-panel{flex:0 1 auto;overflow:visible}
 body.pad-portrait[data-view="form"] .brand-panel{padding-top:calc(var(--bt-g) + env(safe-area-inset-top,0px))}
 body.bt-flip #brandPanel .hero,body.bt-flip.pad-portrait[data-view="form"] .brand-panel{animation:none!important}
 body.bt-flipping #brandPanel,body.bt-flipping #brandPanel .hero .logo,body.bt-flipping #brandPanel .hero h1{transition:none!important;overflow:visible!important}
-
+@media(prefers-reduced-motion:reduce){body.pad-portrait .brand-panel{animation:none!important;transition:none!important}}
 #brandTagText{display:inline-grid!important;white-space:nowrap!important}
 #brandTagText>.tg{grid-area:1/1;justify-self:center;white-space:nowrap!important}
 #brandTag[data-face="home"] .tg-legend,#brandTag:not([data-face]) .tg-legend,#brandTag[data-face="legend"] .tg-home{visibility:hidden}
@@ -1043,11 +1057,8 @@ body.bt-flipping #brandPanel,body.bt-flipping #brandPanel .hero .logo,body.bt-fl
 <footer class="foot">ZEUS CLAN • ALL RIGHTS RESERVED</footer>
 </div>
 <script>
-// 애니메이션 항상 사용: 기기/브라우저의 '동작 줄이기(prefers-reduced-motion)' 설정을 무시
-// (카카오톡 인앱 브라우저는 이 설정을 전달하지 않아 동작하지만, 크롬은 전달해서 애니메이션이 꺼지던 문제)
-const ZEUS_MOTION={matches:false};
-
 const CFG={
+  nickUrl:"https://nick-846511432830.asia-northeast3.run.app", // ★ Cloud Run 배포 주소로 변경 (끝에 / 없이)
   applyUrl:"/api/apply",
   hallUrl:"/api/hall",
   hallImageUrl:"/api/hall-image"
@@ -1061,7 +1072,6 @@ let hallImageQueue=[];
 let hallImageActive=0;
 
 const Q=[
- {k:'nick',l:'닉네임',q:'게임에서 사용하는 닉네임을 알려주세요.',t:'text'},
  {k:'uid',l:'게임 UID',q:'게임 UID를 알려주세요.',t:'text',ph:'예: 428BCBA023C04781'},
  {k:'age',l:'연령',q:'연령을 알려주세요.',t:'range',min:17,max:60,note:'가입 절차를 위해서만 사용되며, 외부로 공유되지 않습니다.'},
  {k:'why',l:'가입 사유',q:'ZEUS에 가입하고 싶은 사유를 알려주세요.',t:'area'},
@@ -1076,7 +1086,7 @@ let fromConfirm=false;
 let draftStage='step';
 let brandTagTimer=0;
 function clearApplyDraft(){
-  Q.forEach(q=>{delete A[q.k]});
+  Q.forEach(q=>{delete A[q.k]});delete A.nick;delete A.nickFor;nickSeq++;nickState='idle';
   cur=0;fromConfirm=false;draftStage='step';
 }
 
@@ -1106,7 +1116,7 @@ function flipTargets(){
 function smoothLayout(mutate){
   const canAnimate=SUPPORTS_FLIP&&flipDepth===0
     &&matchMedia('(max-width:899px)').matches
-    &&!ZEUS_MOTION.matches;
+    &&!matchMedia('(prefers-reduced-motion:reduce)').matches;
   if(!canAnimate){mutate();return;}
   const targets=flipTargets();
   const firsts=targets.map(el=>el.getBoundingClientRect());
@@ -1469,13 +1479,7 @@ function zeusVisibleHeight(base){
 
   const isField=el=>!!(el&&el.matches&&el.matches('input,textarea'));
   const fieldBase=m=>isField(document.activeElement)?Math.max(zeusEstFull('l'),m.reference):m.reference;
-  let vkOverlay=false;
   function viewportMetrics(){
-    const vkRect=navigator.virtualKeyboard&&navigator.virtualKeyboard.boundingRect;
-    if(vkOverlay&&vkRect&&vkRect.height>0&&Number.isFinite(vkRect.top)){
-      const full=Math.max(window.innerHeight||0,document.documentElement&&document.documentElement.clientHeight||0);
-      return {visible:Math.max(1,Math.round(vkRect.top)),reference:full};
-    }
     const values=[window.innerHeight,document.documentElement&&document.documentElement.clientHeight,viewport&&viewport.height]
       .filter(v=>Number.isFinite(v)&&v>0);
     if(!values.length)return {visible:window.innerHeight||1,reference:window.innerHeight||1};
@@ -1594,10 +1598,7 @@ function zeusVisibleHeight(base){
     if(next){
       root.classList.add('tablet-viewport-lock');
       document.body.classList.add('tablet-device');
-      try{if(navigator.virtualKeyboard){navigator.virtualKeyboard.overlaysContent=true;vkOverlay=true;}}catch(e){}
     }else{
-      try{if(navigator.virtualKeyboard&&vkOverlay){navigator.virtualKeyboard.overlaysContent=false;}}catch(e){}
-      vkOverlay=false;
       root.classList.remove('tablet-viewport-lock');
       document.body.classList.remove('tablet-device','tablet-keyboard-open');
       resetBrandTitleAdjustments();
@@ -1937,7 +1938,6 @@ function zeusVisibleHeight(base){
         clearTimeout(fallbackTimer);
         openTabletKeyboard();
         startMonitor();
-        update(false);
         scheduleReveal(90);
       }else if(virtualKeyboardWasOpen){
         virtualKeyboardWasOpen=false;
@@ -1961,18 +1961,6 @@ function zeusVisibleHeight(base){
     }
     update(false);
   };
-  if(/zdebug/.test(location.hash+location.search)){
-    const box=document.createElement('div');
-    box.style.cssText='position:fixed;left:6px;top:6px;z-index:2147483647;pointer-events:none;background:rgba(0,0,0,.78);color:#7CFC7C;font:11px/1.35 monospace;padding:6px 8px;border-radius:6px;white-space:pre';
-    document.body.appendChild(box);
-    setInterval(()=>{
-      const vk=navigator.virtualKeyboard,r=vk&&vk.boundingRect,vv=window.visualViewport;
-      box.textContent=['tablet='+isTabletDesktop+' kbOpen='+keyboardOpen+' focus='+fieldFocused,
-        'inner='+innerWidth+'x'+innerHeight+' vv.h='+(vv?Math.round(vv.height):'-')+' base='+Math.round(baseHeight),
-        'vkAPI='+!!vk+' overlay='+vkOverlay+' rect.h='+(r?Math.round(r.height):'-')+' top='+(r?Math.round(r.top):'-'),
-        'ua='+(/Android/.test(navigator.userAgent)?'Android':'Desktop-UA')+' ptr='+(coarseQuery.matches?'coarse':'fine')].join('\n');
-    },250);
-  }
   desktopQuery.addEventListener?.('change',resyncTabletMode);
   [coarseQuery,anyCoarseQuery,fineHoverQuery].forEach(q=>q.addEventListener?.('change',resyncTabletMode));
 
@@ -1980,7 +1968,7 @@ function zeusVisibleHeight(base){
 })();
 
 const TAG_LEGEND='WHERE YOUR LEGEND BEGINS',TAG_HOME='<span class="y">영웅</span>, <span class="p">전설</span> 타이틀 누적 299개 배출';
-const brandPortrait=()=>matchMedia('(max-width:899px) and (orientation:portrait)').matches&&!ZEUS_MOTION.matches;
+const brandPortrait=()=>matchMedia('(max-width:899px) and (orientation:portrait)').matches&&!matchMedia('(prefers-reduced-motion:reduce)').matches;
 function brandTagIntro(){
   const tag=$('brandTag'),text=$('brandTagText');
   if(!tag||!text)return;
@@ -1999,7 +1987,7 @@ function updateBrandTag(isContentView){
   if(tag.dataset.mode===nextMode&&tag.dataset.face)return;
   clearTimeout(brandTagTimer);
   tag.dataset.mode=nextMode;
-  if(ZEUS_MOTION.matches){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){
     tag.dataset.face=face;tag.classList.remove('tag-fade');text.classList.remove('tag-text-fade');return;
   }
   const desktop=matchMedia('(min-width:900px)').matches;
@@ -2103,7 +2091,7 @@ function show(id){
   const current=document.querySelector('.view.on');
   const leaveSmoothly=id==='home'&&current&&current.id!=='home'
     &&matchMedia('(max-width:899px)').matches
-    &&!ZEUS_MOTION.matches;
+    &&!matchMedia('(prefers-reduced-motion:reduce)').matches;
   if(!leaveSmoothly){showNow(id);return;}
   current.classList.add('leaving');
   const active=document.activeElement;
@@ -2127,7 +2115,7 @@ function zeusPlayFlip(f,l){
 }
 function showNow(id){
   const prevId=document.body.dataset.view;
-  const flipFirst=(prevId==='home'&&id==='form'||prevId==='form'&&id==='home')&&Element.prototype.animate&&!ZEUS_MOTION.matches?zeusBrandRects():null;
+  const flipFirst=(prevId==='home'&&id==='form'||prevId==='form'&&id==='home')&&Element.prototype.animate&&!matchMedia('(prefers-reduced-motion:reduce)').matches?zeusBrandRects():null;
   document.body.classList.toggle('bt-flip',!!flipFirst);
   if(flipFirst){
     document.body.classList.add('bt-flipping');
@@ -2138,10 +2126,6 @@ function showNow(id){
   const isHome=id==='home';
   const isContentView=!isHome;
   document.body.dataset.view=id;
-  if(id==='form'&&prevId!=='form'){
-    const bb=document.body;bb.classList.add('bt-enter');
-    clearTimeout(window.__btEnterT);window.__btEnterT=setTimeout(()=>bb.classList.remove('bt-enter'),800);
-  }
   document.body.classList.toggle('home-state',isHome);
   document.body.classList.toggle('hall-state',id==='hallV');
   document.body.classList.toggle('calm',id==='form'||id==='hallV'||id==='doneV');
@@ -2169,7 +2153,7 @@ function initAgeSlider(q,start,onChange){
   const root=$('ageSlider'),inner=$('ageInner'),bub=$('ageNum');
   if(!root||!inner||!bub)return;
   const min=q.min,max=q.max,span=max-min;
-  const reduce=ZEUS_MOTION.matches;
+  const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
   const clamp=v=>Math.max(min,Math.min(max,v));
   let cur=start,tgt=start,raf=0,last=0,tau=80,pid=null,downX=0,moved=false,onThumb=false,grab=0,shown=start,committed=start;
   const paint=()=>{
@@ -2246,11 +2230,33 @@ function initAgeSlider(q,start,onChange){
   paint();
 }
 
-function step(i,options={}){
-  if(document.body.dataset.view==='form'&&typeof smoothLayout==='function'){smoothLayout(()=>stepImpl(i,options));return;}
-  stepImpl(i,options);
+async function getNickname(uid){
+  const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),45000);
+  try{
+    const r=await fetch(`${CFG.nickUrl}/api/nickname?id=${encodeURIComponent(uid)}`,{signal:ctl.signal});
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.error||'조회 실패');
+    return d.name;
+  }finally{clearTimeout(t)}
 }
-function stepImpl(i,options={}){
+let nickState='idle',nickSeq=0;
+function startNickLookup(uid){
+  const seq=++nickSeq;nickState='loading';A.nick='';A.nickFor=uid;renderNickRow();
+  (async()=>{
+    try{const n=await getNickname(uid);if(seq!==nickSeq)return;A.nick=n;nickState='ok'}
+    catch(e){if(seq!==nickSeq)return;nickState='fail'}
+    renderNickRow();
+  })();
+}
+function renderNickRow(){
+  const v=$('nickVal'),w=$('nickWarn'),b=$('send');
+  if(v){
+    v.textContent=nickState==='ok'?A.nick:nickState==='loading'?'확인 중...':'확인할 수 없음';
+    if(w){w.hidden=nickState!=='fail'}
+  }
+  if(b)b.disabled=nickState!=='ok';
+}
+function step(i,options={}){
   cur=i;draftStage='step';const q=Q[i];
   {const fb=$('formBox');fb.classList.remove('is-confirm','cf-tight');fb.style.removeProperty('--cf');$('form').classList.remove('confirm-fit');}
   let f;
@@ -2265,20 +2271,9 @@ function stepImpl(i,options={}){
   else f=`<input type="text" id="zeusAnswerField" ${answerFieldHints} ${q.ph?`placeholder="${esc(q.ph)}"`:''}>`;
   // 네이티브 form 래퍼를 제거해 Chrome Autofill이 비밀번호/결제/주소 폼으로 탐지할 단서를 없앱니다.
   const answerFieldForm=(q.t==='yn'||q.t==='range')?f:`<div class="answer-form" role="group" aria-label="답변 입력">${f}</div>`;
-  const stageHtml=`
+  $('stage').innerHTML=`
    <h2>${q.q}</h2>${answerFieldForm}<p class="err" id="err"></p>
    <div class="nav ${i===0?'one':''} ${fromConfirm?'edit-return':''}">${i===0||fromConfirm?'':'<button class="b" id="prev">이전</button>'}<button class="b go" id="next">다음</button></div>`;
-  // 입력칸이 있는 슬라이드끼리 넘어갈 때는 새 입력칸에 포커스를 먼저 옮긴 뒤 이전 슬라이드를 제거해
-  // 키보드가 닫혔다 다시 열리며 화면이 흔들리는 현상을 막습니다.
-  const stageEl=$('stage'),prevActive=document.activeElement;
-  const keepKeyboard=(q.t==='text'||q.t==='area')&&!!(prevActive&&stageEl.contains(prevActive)&&prevActive.matches&&prevActive.matches('input,textarea'));
-  if(keepKeyboard){
-    Array.from(stageEl.children).forEach(n=>{
-      n.setAttribute('data-old','1');n.removeAttribute('id');
-      n.querySelectorAll('[id]').forEach(e=>e.removeAttribute('id'));
-    });
-    stageEl.insertAdjacentHTML('beforeend',stageHtml);
-  }else stageEl.innerHTML=stageHtml;
   const err=$('err'),hide=()=>err.classList.remove('on');
   const f1=$('zeusAnswerField');
   const read=()=>{if(f1){const value=f1.value.trim();A[q.k]=q.k==='uid'?value.toUpperCase():value}};
@@ -2345,14 +2340,13 @@ function stepImpl(i,options={}){
     read();const v=A[q.k]||'';
     if(!v){err.textContent='답변을 입력해 주세요.';err.classList.add('on');return}
     if(q.k==='uid'&&!uidOk(v)){err.textContent='게임 UID를 다시 확인해주세요.';err.classList.add('on');return}
-    if(fromConfirm){fromConfirm=false;confirmV()}else if(i<4)step(i+1);else confirmV();
+    if(q.k==='uid'&&A.nickFor!==v)startNickLookup(v);
+    if(fromConfirm){fromConfirm=false;confirmV()}else if(i<Q.length-1)step(i+1);else confirmV();
   };
   show('form');
-  if(f1&&!options.skipAutofocus){
+  if(f1&&q.t!=='area'&&!options.skipAutofocus){
     try{f1.focus({preventScroll:true});}catch(error){f1.focus();}
-    try{const n=f1.value.length;f1.setSelectionRange(n,n);}catch(error){}
   }
-  stageEl.querySelectorAll('[data-old]').forEach(n=>n.remove());
 }
 let fitRaf=0;
 function fitConfirm(){
@@ -2386,13 +2380,14 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(scheduleFit);
 function confirmV(){
   draftStage='confirm';fromConfirm=false;
   const privacyNotice='<p class="privacy-note">부정 이용 방지를 위해 IP 주소와 운영체제(OS)가 일부 검사됩니다.</p>';
-  const answerRows=Q.map((q,i)=>`<div class="row"><div><span>${q.l}</span><p>${esc(A[q.k])}${q.t==='range'?'세':''}</p></div><button class="edit" data-i="${i}">수정</button></div>`).join('');
+  const nickRow=`<div class="row"><div><span>닉네임</span><p id="nickVal"></p></div><span class="nick-warn" id="nickWarn" role="img" aria-label="닉네임을 확인할 수 없습니다" title="닉네임을 확인할 수 없습니다" hidden>⚠️</span></div>`;
+  const answerRows=nickRow+Q.map((q,i)=>`<div class="row"><div><span>${q.l}</span><p>${esc(A[q.k])}${q.t==='range'?'세':''}</p></div><button class="edit" data-i="${i}">수정</button></div>`).join('');
   const confirmDetails=privacyNotice+answerRows;
   $('stage').innerHTML=`<h2>작성하신 내용을<br>마지막으로 확인해주세요.</h2>
   ${confirmDetails}
   <p class="err" id="err"></p><div class="nav one confirm-submit"><button class="b go" id="send">가입 신청하기</button></div>`;
   document.querySelectorAll('.edit[data-i]').forEach(b=>b.onclick=()=>{fromConfirm=true;step(+b.dataset.i)});
-  $('send').onclick=submit;$('formBox').classList.add('is-confirm');show('form');
+  $('send').onclick=submit;renderNickRow();$('formBox').classList.add('is-confirm');show('form');
   scheduleFit();requestAnimationFrame(()=>requestAnimationFrame(fitConfirm));setTimeout(fitConfirm,450);
 }
 function detectOsFromUserAgent(ua){
@@ -2419,10 +2414,11 @@ async function collectDeviceInfo(){
   return {os:String(os).slice(0,100),deviceModel:String(deviceModel).slice(0,100)};
 }
 async function submit(){
+  if(nickState!=='ok')return;
   const btn=$('send'),err=$('err');btn.disabled=true;err.classList.remove('on');
   try{
     const device=await collectDeviceInfo();
-    const rec={nick:A.nick,uid:A.uid,age:Number(A.age),why:A.why,tour:A.tour,...device};
+    const rec={nick:A.nick||'확인 불가',uid:A.uid,age:Number(A.age),why:A.why,tour:A.tour,...device};
     const response=await fetch(CFG.applyUrl,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
@@ -2634,7 +2630,7 @@ startHallPrefetch().catch(()=>{});
         fromConfirm=false;
         confirmV();
       }else if($('send')){
-        step(4);
+        step(Q.length-1);
       }else{
         show('home');
       }
@@ -2656,7 +2652,7 @@ startHallPrefetch().catch(()=>{});
 
 (function(){
   const cv=document.getElementById('bolt'),cx=cv.getContext('2d');
-  if(ZEUS_MOTION.matches)return;
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
   const viewport=window.visualViewport;
   let W,H;
   const fit=()=>{
@@ -2713,7 +2709,7 @@ startHallPrefetch().catch(()=>{});
 (function brandFlip(){
   const panel=document.getElementById('brandPanel'),hero=panel&&panel.querySelector('.hero');
   if(!hero||typeof hero.animate!=='function'||typeof ResizeObserver==='undefined')return;
-  const wide=matchMedia('(min-width:900px)'),calm=ZEUS_MOTION;
+  const wide=matchMedia('(min-width:900px)'),calm=matchMedia('(prefers-reduced-motion:reduce)');
   let last=null,armed=false;
   const pos=()=>{const r=panel.getBoundingClientRect();return r.width?{x:r.left+r.width/2,y:r.top+r.height/2}:null};
   function offset(){try{const m=new DOMMatrix(getComputedStyle(hero).transform);return[m.m41,m.m42]}catch(e){return[0,0]}}
@@ -2743,7 +2739,7 @@ startHallPrefetch().catch(()=>{});
 <script>
 (function padPortrait(){
   const root=document.documentElement,body=document.body,isF=el=>el&&el.matches&&el.matches('input,textarea');
-  let stable=0,w0=innerWidth,raf=0,focusAt=0,noKbAt=0,hadKb=false,offSince=0;
+  let stable=0,w0=innerWidth,raf=0,focusAt=0,noKbAt=0,hadKb=false;
   const layoutH=()=>Math.min(innerHeight,root.clientHeight||innerHeight);
   function update(){
     raf=0;
@@ -2759,7 +2755,7 @@ startHallPrefetch().catch(()=>{});
     if(!kb&&!typing)stable=layoutH();
     const pad=w>=600&&w<900&&stable>=700&&stable>w*1.1;
     body.classList.toggle('pad-portrait',pad);
-    if(!pad){offSince=0;body.classList.remove('bt-off');return;}
+    if(!pad){body.classList.remove('bt-off');return;}
     root.style.setProperty('--pp-h',stable+'px');
     if(body.dataset.view!=='form')return;
     const box=document.getElementById('formBox');if(!box)return;
@@ -2768,19 +2764,11 @@ startHallPrefetch().catch(()=>{});
     const room=avail-formH-(typing?44:90);
     const want=Math.min(pw*(typing?.46:.5),typing?avail*.3:stable*.3,360);
     const logo=Math.floor(Math.min(want,room*.85/1.45));
-    if(logo<84){
-      if(body.classList.contains('bt-off'))return;
-      const nowT=performance.now();if(!offSince)offSince=nowT;
-      if(nowT-offSince<350){setTimeout(go,370-(nowT-offSince));return;}
-      body.classList.add('bt-off');return;
-    }
-    offSince=0;
-    const prevLogo=parseFloat(root.style.getPropertyValue('--bt-logo'));
-    const L=(Number.isFinite(prevLogo)&&Math.abs(logo-prevLogo)<=4&&!body.classList.contains('bt-off'))?prevLogo:logo;
-    root.style.setProperty('--bt-logo',L+'px');
-    root.style.setProperty('--bt-fs',Math.max(26,Math.min(Math.round(L*.28),Math.round(w*.09)))+'px');
-    root.style.setProperty('--bt-mt',Math.round(L*.06)+'px');
-    root.style.setProperty('--bt-h',Math.ceil(L*1.5)+16+'px');
+    if(logo<84){body.classList.add('bt-off');return;}
+    root.style.setProperty('--bt-logo',logo+'px');
+    root.style.setProperty('--bt-fs',Math.max(26,Math.min(Math.round(logo*.28),Math.round(w*.09)))+'px');
+    root.style.setProperty('--bt-mt',Math.round(logo*.06)+'px');
+    root.style.setProperty('--bt-h',Math.ceil(logo*1.5)+16+'px');
     body.classList.remove('bt-off');
   }
   const go=()=>{if(!raf)raf=requestAnimationFrame(update)};
