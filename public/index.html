@@ -1469,7 +1469,7 @@ function zeusVisibleHeight(base){
 
   const isField=el=>!!(el&&el.matches&&el.matches('input,textarea'));
   const fieldBase=m=>isField(document.activeElement)?Math.max(zeusEstFull('l'),m.reference):m.reference;
-  let vkOverlay=false,fbTimer=0,fbPadEl=null;
+  let vkOverlay=false;
   function viewportMetrics(){
     const vkRect=navigator.virtualKeyboard&&navigator.virtualKeyboard.boundingRect;
     if(vkOverlay&&vkRect&&vkRect.height>0&&Number.isFinite(vkRect.top)){
@@ -1594,7 +1594,10 @@ function zeusVisibleHeight(base){
     if(next){
       root.classList.add('tablet-viewport-lock');
       document.body.classList.add('tablet-device');
+      try{if(navigator.virtualKeyboard){navigator.virtualKeyboard.overlaysContent=true;vkOverlay=true;}}catch(e){}
     }else{
+      try{if(navigator.virtualKeyboard&&vkOverlay){navigator.virtualKeyboard.overlaysContent=false;}}catch(e){}
+      vkOverlay=false;
       root.classList.remove('tablet-viewport-lock');
       document.body.classList.remove('tablet-device','tablet-keyboard-open');
       resetBrandTitleAdjustments();
@@ -1619,7 +1622,6 @@ function zeusVisibleHeight(base){
 
   function openTabletKeyboard(){
     if(!isTabletDesktop||keyboardOpen)return;
-    if(fbPadEl){fbPadEl.style.removeProperty('padding-bottom');fbPadEl=null;}
     clearFormRestoreMotion();
     const formView=document.getElementById('form');
     if(savedFormScrollTop===null)savedFormScrollTop=formView?formView.scrollTop:0;
@@ -1678,7 +1680,6 @@ function zeusVisibleHeight(base){
     resetBrandTitleAdjustments();
     baseHeight=Math.max(baseHeight,metrics.reference,window.innerHeight||0,document.documentElement.clientHeight||0);
     releaseTabletViewport();
-    endFallback();
     if(!fieldFocused)stopMonitor();
     if(restoreSlide)restoreFormPosition(previousSlideTop);
     else savedFormScrollTop=null;
@@ -1829,42 +1830,8 @@ function zeusVisibleHeight(base){
     else{releaseTabletViewport();if(baseHeight>0)root.style.setProperty('--stage-h',Math.round(baseHeight)+'px');}
   }
 
-  function endFallback(){
-    clearTimeout(fbTimer);fbTimer=0;
-    if(fbPadEl){fbPadEl.style.removeProperty('padding-bottom');fbPadEl=null;}
-    if(vkOverlay&&!keyboardOpen){
-      try{navigator.virtualKeyboard.overlaysContent=false;}catch(e){}
-      vkOverlay=false;
-    }
-  }
-  function heuristicReveal(){
-    const f=document.activeElement;
-    const sc=isField(f)&&f.closest('.view.on');
-    if(!sc||keyboardOpen)return;
-    sc.style.setProperty('padding-bottom','40vh','important');fbPadEl=sc;
-    requestAnimationFrame(()=>{
-      const r=f.getBoundingClientRect();
-      sc.scrollBy({top:r.top-window.innerHeight*.22,behavior:'smooth'});
-    });
-  }
-  function runFallback(){
-    fbTimer=0;
-    if(!isTabletDesktop||keyboardOpen||!isField(document.activeElement))return;
-    const vk=navigator.virtualKeyboard;
-    if(vk&&!vkOverlay){try{vk.overlaysContent=true;vkOverlay=true;}catch(e){}}
-    let tries=0;
-    const probe=()=>{
-      if(keyboardOpen||!isField(document.activeElement))return;
-      const r=vk&&vk.boundingRect;
-      if(vkOverlay&&r&&r.height>0){openTabletKeyboard();update(false);scheduleReveal(60);return;}
-      if(++tries<6){fbTimer=setTimeout(probe,100);return;}
-      endFallback();heuristicReveal();
-    };
-    probe();
-  }
   function beginFieldFocus(field){
     if(!isTabletDesktop||!isField(field))return;
-    if(!keyboardOpen){clearTimeout(fbTimer);fbTimer=setTimeout(runFallback,600);}
     clearTimeout(closeCheckTimer);
     if(!fieldFocused){
       fieldFocused=true;
@@ -1927,7 +1894,6 @@ function zeusVisibleHeight(base){
         update();
         scheduleReveal(90);
       }else{
-        if(!keyboardOpen)endFallback();
         clearTimeout(fallbackTimer);
         if(keyboardOpen)scheduleClose(true);
         else{
@@ -1971,6 +1937,7 @@ function zeusVisibleHeight(base){
         clearTimeout(fallbackTimer);
         openTabletKeyboard();
         startMonitor();
+        update(false);
         scheduleReveal(90);
       }else if(virtualKeyboardWasOpen){
         virtualKeyboardWasOpen=false;
@@ -1994,6 +1961,18 @@ function zeusVisibleHeight(base){
     }
     update(false);
   };
+  if(/zdebug/.test(location.hash+location.search)){
+    const box=document.createElement('div');
+    box.style.cssText='position:fixed;left:6px;top:6px;z-index:2147483647;pointer-events:none;background:rgba(0,0,0,.78);color:#7CFC7C;font:11px/1.35 monospace;padding:6px 8px;border-radius:6px;white-space:pre';
+    document.body.appendChild(box);
+    setInterval(()=>{
+      const vk=navigator.virtualKeyboard,r=vk&&vk.boundingRect,vv=window.visualViewport;
+      box.textContent=['tablet='+isTabletDesktop+' kbOpen='+keyboardOpen+' focus='+fieldFocused,
+        'inner='+innerWidth+'x'+innerHeight+' vv.h='+(vv?Math.round(vv.height):'-')+' base='+Math.round(baseHeight),
+        'vkAPI='+!!vk+' overlay='+vkOverlay+' rect.h='+(r?Math.round(r.height):'-')+' top='+(r?Math.round(r.top):'-'),
+        'ua='+(/Android/.test(navigator.userAgent)?'Android':'Desktop-UA')+' ptr='+(coarseQuery.matches?'coarse':'fine')].join('\n');
+    },250);
+  }
   desktopQuery.addEventListener?.('change',resyncTabletMode);
   [coarseQuery,anyCoarseQuery,fineHoverQuery].forEach(q=>q.addEventListener?.('change',resyncTabletMode));
 
