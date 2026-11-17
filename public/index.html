@@ -1619,6 +1619,7 @@ function zeusVisibleHeight(base){
 
   function openTabletKeyboard(){
     if(!isTabletDesktop||keyboardOpen)return;
+    if(fbPadEl){fbPadEl.style.removeProperty('padding-bottom');fbPadEl=null;}
     clearFormRestoreMotion();
     const formView=document.getElementById('form');
     if(savedFormScrollTop===null)savedFormScrollTop=formView?formView.scrollTop:0;
@@ -1839,8 +1840,8 @@ function zeusVisibleHeight(base){
   function heuristicReveal(){
     const f=document.activeElement;
     const sc=isField(f)&&f.closest('.view.on');
-    if(!sc)return;
-    sc.style.setProperty('padding-bottom','55vh','important');fbPadEl=sc;
+    if(!sc||keyboardOpen)return;
+    sc.style.setProperty('padding-bottom','40vh','important');fbPadEl=sc;
     requestAnimationFrame(()=>{
       const r=f.getBoundingClientRect();
       sc.scrollBy({top:r.top-window.innerHeight*.22,behavior:'smooth'});
