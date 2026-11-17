@@ -96,7 +96,7 @@ input:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(23
 .age.drag .age-bubble{transform:translateX(-50%) translateY(-2px) scale(1.06);box-shadow:0 10px 24px rgba(0,0,0,.55),0 0 0 5px rgba(233,196,106,.12),inset 0 1px 0 rgba(255,255,255,.1)}
 .age-ends{display:flex;justify-content:space-between;margin-top:6px;font-size:12px;color:var(--mut)}
 .age-note{margin:8px 2px 0;font-size:12px;line-height:1.5;color:var(--mut)}
-@media(prefers-reduced-motion:reduce){.age-thumb,.age-bubble{transition:none}}
+
 @media(max-width:899px){.age-inner{margin-top:50px}.age-note{margin-top:6px}}
 .row{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.09)}
 .row:last-child{border:0}.row div{min-width:0;flex:1}
@@ -117,7 +117,7 @@ img{-webkit-user-drag:none;user-drag:none}
 .fx{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
 .halo{position:absolute;left:50%;top:150px;width:560px;height:560px;max-width:140vw;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,200,60,.34),rgba(255,170,0,.1) 42%,transparent 68%)}
 .wrap{position:relative;z-index:1}
-@media(prefers-reduced-motion:reduce){.fx *,.logo{animation:none!important}}
+
 @media(min-width:900px){
 .wrap{max-width:1120px;padding:48px 40px 24px}
 .hero{display:flex;align-items:center;justify-content:center;gap:60px;text-align:left;margin-bottom:40px}
@@ -306,7 +306,7 @@ body{overflow-x:clip}
   #brandTagText{display:inline-block;transition:opacity .5s ease,transform .5s ease}
   #brandTagText.tag-text-fade{opacity:0;transform:translateY(5px)}
 }
-@media(prefers-reduced-motion:reduce){#brandTag,#brandTagText{transition:none}}
+
 
 
 
@@ -727,12 +727,7 @@ body{overflow-x:clip}
     transform:translateY(-8px);
   }
 }
-@media(prefers-reduced-motion:reduce){
-  body.tablet-device #brandPanel .hero .since,
-  body.tablet-device #brandPanel .hero h1{
-    transition:none!important;
-  }
-}
+
 
 @media (min-width:900px){
   body.tablet-device #brandTag{
@@ -747,9 +742,7 @@ body{overflow-x:clip}
     pointer-events:none;
   }
 }
-@media(prefers-reduced-motion:reduce){
-  body.tablet-device #brandTag{transition:none!important}
-}
+
 
 .answer-form{display:block;margin:0;padding:0;border:0;background:transparent}
 
@@ -879,12 +872,7 @@ body:not(.calm) .fx{animation:zeusFxIn .8s ease both}
   #home .grid>.card:nth-child(3){animation-delay:.28s}
   .fx .halo{transition:top .45s cubic-bezier(.22,.75,.25,1),left .45s cubic-bezier(.22,.75,.25,1)}
 }
-@media(prefers-reduced-motion:reduce){
-  body:not(.calm) .fx,
-  .view.on:not(#home),.view.on.leaving:not(#home),
-  body.home-state #brandPanel .hero,#home .grid>.card{animation:none!important}
-  .fx .halo{transition:none!important}
-}
+
 
 html{height:100%;overflow:hidden;overscroll-behavior:none}
 body{height:100%;max-height:var(--app-h,100%);overflow:hidden}
@@ -956,7 +944,7 @@ body:not(.keyboard-open):not(.tablet-keyboard-open) .wrap{padding-bottom:0!impor
 @media(max-width:599px) and (orientation:portrait) and (max-height:620px){
   body.home-state #brandPanel .hero .tag{font-size:clamp(11.5px,3.1vw,14px);padding:5px 12px}
 }
-@media(prefers-reduced-motion:reduce){body.tablet-device .brand-panel .hero *,body.tablet-device .brand-panel .hero::before,body.tablet-device #brandTag{transition:none!important}}
+
 
 h1,.tag,#brandTag,#brandTagText{white-space:nowrap!important}
 @media(min-width:900px){body .brand-panel .hero h1{font-size:clamp(28px,min(8.33vh,5.2vw),50px)}}
@@ -995,7 +983,7 @@ body.pad-portrait[data-view="form"] .right-panel{flex:0 1 auto;overflow:visible}
 body.pad-portrait[data-view="form"] .brand-panel{padding-top:calc(var(--bt-g) + env(safe-area-inset-top,0px))}
 body.bt-flip #brandPanel .hero,body.bt-flip.pad-portrait[data-view="form"] .brand-panel{animation:none!important}
 body.bt-flipping #brandPanel,body.bt-flipping #brandPanel .hero .logo,body.bt-flipping #brandPanel .hero h1{transition:none!important;overflow:visible!important}
-@media(prefers-reduced-motion:reduce){body.pad-portrait .brand-panel{animation:none!important;transition:none!important}}
+
 #brandTagText{display:inline-grid!important;white-space:nowrap!important}
 #brandTagText>.tg{grid-area:1/1;justify-self:center;white-space:nowrap!important}
 #brandTag[data-face="home"] .tg-legend,#brandTag:not([data-face]) .tg-legend,#brandTag[data-face="legend"] .tg-home{visibility:hidden}
@@ -1055,6 +1043,10 @@ body.bt-flipping #brandPanel,body.bt-flipping #brandPanel .hero .logo,body.bt-fl
 <footer class="foot">ZEUS CLAN • ALL RIGHTS RESERVED</footer>
 </div>
 <script>
+// 애니메이션 항상 사용: 기기/브라우저의 '동작 줄이기(prefers-reduced-motion)' 설정을 무시
+// (카카오톡 인앱 브라우저는 이 설정을 전달하지 않아 동작하지만, 크롬은 전달해서 애니메이션이 꺼지던 문제)
+const ZEUS_MOTION={matches:false};
+
 const CFG={
   applyUrl:"/api/apply",
   hallUrl:"/api/hall",
@@ -1114,7 +1106,7 @@ function flipTargets(){
 function smoothLayout(mutate){
   const canAnimate=SUPPORTS_FLIP&&flipDepth===0
     &&matchMedia('(max-width:899px)').matches
-    &&!matchMedia('(prefers-reduced-motion:reduce)').matches;
+    &&!ZEUS_MOTION.matches;
   if(!canAnimate){mutate();return;}
   const targets=flipTargets();
   const firsts=targets.map(el=>el.getBoundingClientRect());
@@ -1966,7 +1958,7 @@ function zeusVisibleHeight(base){
 })();
 
 const TAG_LEGEND='WHERE YOUR LEGEND BEGINS',TAG_HOME='<span class="y">영웅</span>, <span class="p">전설</span> 타이틀 누적 299개 배출';
-const brandPortrait=()=>matchMedia('(max-width:899px) and (orientation:portrait)').matches&&!matchMedia('(prefers-reduced-motion:reduce)').matches;
+const brandPortrait=()=>matchMedia('(max-width:899px) and (orientation:portrait)').matches&&!ZEUS_MOTION.matches;
 function brandTagIntro(){
   const tag=$('brandTag'),text=$('brandTagText');
   if(!tag||!text)return;
@@ -1985,7 +1977,7 @@ function updateBrandTag(isContentView){
   if(tag.dataset.mode===nextMode&&tag.dataset.face)return;
   clearTimeout(brandTagTimer);
   tag.dataset.mode=nextMode;
-  if(matchMedia('(prefers-reduced-motion: reduce)').matches){
+  if(ZEUS_MOTION.matches){
     tag.dataset.face=face;tag.classList.remove('tag-fade');text.classList.remove('tag-text-fade');return;
   }
   const desktop=matchMedia('(min-width:900px)').matches;
@@ -2089,7 +2081,7 @@ function show(id){
   const current=document.querySelector('.view.on');
   const leaveSmoothly=id==='home'&&current&&current.id!=='home'
     &&matchMedia('(max-width:899px)').matches
-    &&!matchMedia('(prefers-reduced-motion:reduce)').matches;
+    &&!ZEUS_MOTION.matches;
   if(!leaveSmoothly){showNow(id);return;}
   current.classList.add('leaving');
   const active=document.activeElement;
@@ -2113,7 +2105,7 @@ function zeusPlayFlip(f,l){
 }
 function showNow(id){
   const prevId=document.body.dataset.view;
-  const flipFirst=(prevId==='home'&&id==='form'||prevId==='form'&&id==='home')&&Element.prototype.animate&&!matchMedia('(prefers-reduced-motion:reduce)').matches?zeusBrandRects():null;
+  const flipFirst=(prevId==='home'&&id==='form'||prevId==='form'&&id==='home')&&Element.prototype.animate&&!ZEUS_MOTION.matches?zeusBrandRects():null;
   document.body.classList.toggle('bt-flip',!!flipFirst);
   if(flipFirst){
     document.body.classList.add('bt-flipping');
@@ -2151,7 +2143,7 @@ function initAgeSlider(q,start,onChange){
   const root=$('ageSlider'),inner=$('ageInner'),bub=$('ageNum');
   if(!root||!inner||!bub)return;
   const min=q.min,max=q.max,span=max-min;
-  const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const reduce=ZEUS_MOTION.matches;
   const clamp=v=>Math.max(min,Math.min(max,v));
   let cur=start,tgt=start,raf=0,last=0,tau=80,pid=null,downX=0,moved=false,onThumb=false,grab=0,shown=start,committed=start;
   const paint=()=>{
@@ -2621,7 +2613,7 @@ startHallPrefetch().catch(()=>{});
 
 (function(){
   const cv=document.getElementById('bolt'),cx=cv.getContext('2d');
-  if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  if(ZEUS_MOTION.matches)return;
   const viewport=window.visualViewport;
   let W,H;
   const fit=()=>{
@@ -2678,7 +2670,7 @@ startHallPrefetch().catch(()=>{});
 (function brandFlip(){
   const panel=document.getElementById('brandPanel'),hero=panel&&panel.querySelector('.hero');
   if(!hero||typeof hero.animate!=='function'||typeof ResizeObserver==='undefined')return;
-  const wide=matchMedia('(min-width:900px)'),calm=matchMedia('(prefers-reduced-motion:reduce)');
+  const wide=matchMedia('(min-width:900px)'),calm=ZEUS_MOTION;
   let last=null,armed=false;
   const pos=()=>{const r=panel.getBoundingClientRect();return r.width?{x:r.left+r.width/2,y:r.top+r.height/2}:null};
   function offset(){try{const m=new DOMMatrix(getComputedStyle(hero).transform);return[m.m41,m.m42]}catch(e){return[0,0]}}
