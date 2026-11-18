@@ -991,6 +991,15 @@ body.bt-flipping #brandPanel,body.bt-flipping #brandPanel .hero .logo,body.bt-fl
 #brandTagText{display:inline-grid!important;white-space:nowrap!important}
 #brandTagText>.tg{grid-area:1/1;justify-self:center;white-space:nowrap!important}
 #brandTag[data-face="home"] .tg-legend,#brandTag:not([data-face]) .tg-legend,#brandTag[data-face="legend"] .tg-home{visibility:hidden}
+
+/* 모바일 브라우저 주소창·앱 상단바를 뺀 실제 보이는 높이 기준 (가로 화면 윗부분 잘림 방지) */
+@supports (height:100dvh){
+  @media(min-width:900px){
+    .wrap{height:100dvh;min-height:100dvh}
+    .right-panel .view:not(#home){max-height:min(86dvh,calc(100dvh - 90px))}
+  }
+}
+body.kb-backup .right-panel{padding-bottom:var(--kb-pad,0px)!important}
 </style>
 <!-- Main emblem normalized to symmetric transparent bounds for optical centering. -->
 </head>
@@ -2440,6 +2449,35 @@ window.addEventListener('orientationchange',()=>setTimeout(scheduleFit,300));
 if(window.visualViewport)window.visualViewport.addEventListener('resize',scheduleFit,{passive:true});
 if(typeof ResizeObserver!=='undefined'){const rp=$('rightPanel');if(rp)new ResizeObserver(scheduleFit).observe(rp);}
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(scheduleFit);
+function zeusTop(){
+  const a=document.activeElement;
+  if(a&&a.matches&&a.matches('input,textarea'))return;
+  ['form','rightPanel'].forEach(id=>{const e=$(id);if(e)e.scrollTop=0});
+  const w=document.querySelector('.wrap');if(w)w.scrollTop=0;
+  try{scrollTo(0,0)}catch(e){}
+}
+// 키보드가 올라왔는데 기존 감지가 놓친 경우(브라우저 전환·화면 회전 직후)를 위한 보조 감지:
+// 저장된 기준 높이를 쓰지 않고, 현재 화면 높이와 보이는 영역의 차이로 직접 계산한다.
+(function zeusKbBackup(){
+  const vv=window.visualViewport;if(!vv)return;
+  const b=document.body,r=document.documentElement;let raf=0;
+  const field=()=>{const a=document.activeElement;return a&&a.matches&&a.matches('input,textarea')?a:null};
+  function update(){
+    raf=0;
+    const f=field(),kb=Math.round(innerHeight-vv.height-vv.offsetTop);
+    const handled=b.classList.contains('keyboard-open')||b.classList.contains('tablet-keyboard-open');
+    if(f&&kb>100&&!handled){
+      const was=b.classList.contains('kb-backup');
+      r.style.setProperty('--kb-pad',kb+'px');b.classList.add('kb-backup');
+      if(!was)setTimeout(()=>{try{f.scrollIntoView({block:'center',behavior:'smooth'})}catch(e){}},80);
+    }else if(b.classList.contains('kb-backup')){b.classList.remove('kb-backup');r.style.removeProperty('--kb-pad')}
+  }
+  const sch=()=>{if(!raf)raf=requestAnimationFrame(update)};
+  vv.addEventListener('resize',sch);vv.addEventListener('scroll',sch);
+  document.addEventListener('focusin',()=>setTimeout(sch,350));
+  document.addEventListener('focusout',()=>setTimeout(sch,200));
+  addEventListener('orientationchange',()=>setTimeout(sch,700));
+})();
 function confirmV(){
   draftStage='confirm';fromConfirm=false;
   // 수정 슬라이드에서 '다음'으로 돌아올 때: 입력칸이 선택된 채 화면이 교체되면
@@ -2449,7 +2487,7 @@ function confirmV(){
     if(a&&a.matches&&a.matches('input,textarea')){try{a.blur()}catch(e){}}
     try{window.__zeusResetTabletKeyboard&&window.__zeusResetTabletKeyboard()}catch(e){}
     try{window.__zeusCloseKeyboard&&window.__zeusCloseKeyboard()}catch(e){}
-    const w=document.querySelector('.wrap');if(w)w.scrollTop=0;
+    zeusTop();
   }
   const privacyNotice='<p class="privacy-note">부정 이용 방지를 위해 IP 주소와 운영체제(OS)가 일부 검사됩니다.</p>';
   const nickRow=`<div class="row"><div><span>닉네임</span><p id="nickVal"></p></div><span class="edit nick-warn" id="nickWarn" role="img" aria-label="닉네임을 확인할 수 없습니다" title="닉네임을 확인할 수 없습니다" hidden><span class="nw-sp" aria-hidden="true">수정</span><svg viewBox="0 0 24 22" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.6 21.6 19.4H2.4Z" stroke-width="2"/><path d="M12 8.6v5" stroke-width="2.2"/><circle cx="12" cy="16.4" r=".6" stroke-width="1.8"/></svg></span></div>`;
@@ -2459,7 +2497,7 @@ function confirmV(){
   ${confirmDetails}
   <p class="err" id="err"></p><div class="nav one confirm-submit"><button class="b go" id="send">가입 신청하기</button></div>`;
   document.querySelectorAll('.edit[data-i]').forEach(b=>b.onclick=()=>{fromConfirm=true;step(+b.dataset.i)});
-  $('send').onclick=submit;renderNickRow();[0,350,900].forEach(t=>setTimeout(()=>{window.zeusUnstickKeyboard&&window.zeusUnstickKeyboard();if(typeof scheduleFit==='function')scheduleFit();const w=document.querySelector('.wrap');if(w&&t>0&&!document.body.classList.contains('keyboard-open'))w.scrollTop=0},t));$('formBox').classList.add('is-confirm');show('form');
+  $('send').onclick=submit;renderNickRow();[0,350,900].forEach(t=>setTimeout(()=>{window.zeusUnstickKeyboard&&window.zeusUnstickKeyboard();if(typeof scheduleFit==='function')scheduleFit();zeusTop()},t));$('formBox').classList.add('is-confirm');show('form');
   scheduleFit();requestAnimationFrame(()=>requestAnimationFrame(fitConfirm));setTimeout(fitConfirm,450);
 }
 function detectOsFromUserAgent(ua){
