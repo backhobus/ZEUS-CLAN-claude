@@ -1000,6 +1000,11 @@ body.bt-flipping #brandPanel,body.bt-flipping #brandPanel .hero .logo,body.bt-fl
   }
 }
 body.kb-backup .right-panel{padding-bottom:var(--kb-pad,0px)!important}
+/* 낮은 화면(가로)에서 가운데 정렬로 윗부분이 화면 밖으로 잘려 스크롤도 안 되는 문제 방지 */
+@media(max-width:899px){
+  body:not(.home-state) .right-panel{justify-content:flex-start!important}
+  body:not(.home-state) .right-panel>.view.on{margin-top:auto!important;margin-bottom:auto!important}
+}
 </style>
 <!-- Main emblem normalized to symmetric transparent bounds for optical centering. -->
 </head>
@@ -2176,7 +2181,7 @@ function showNow(id){
   }
 }
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const uidOk=v=>/^[0-9A-Z]{15,16}$/.test(v)&&!v.includes('O')&&(v.match(/[0-9]/g)||[]).length>=4&&/[A-Z]/.test(v);
+const uidOk=v=>/^[0-9A-Z]{7,16}$/.test(v)&&!v.includes('O')&&/[A-Z]/.test(v);
 
 function initAgeSlider(q,start,onChange){
   const root=$('ageSlider'),inner=$('ageInner'),bub=$('ageNum');
@@ -2466,17 +2471,25 @@ function zeusTop(){
     raf=0;
     const f=field(),kb=Math.round(innerHeight-vv.height-vv.offsetTop);
     const handled=b.classList.contains('keyboard-open')||b.classList.contains('tablet-keyboard-open');
-    if(f&&kb>100&&!handled){
-      const was=b.classList.contains('kb-backup');
-      r.style.setProperty('--kb-pad',kb+'px');b.classList.add('kb-backup');
-      if(!was)setTimeout(()=>{try{f.scrollIntoView({block:'center',behavior:'smooth'})}catch(e){}},80);
-    }else if(b.classList.contains('kb-backup')){b.classList.remove('kb-backup');r.style.removeProperty('--kb-pad')}
+    const bk=b.classList.contains('kb-backup');
+    const vb=vv.offsetTop+vv.height;
+    const rc=f?f.getBoundingClientRect():null;
+    const covered=!!rc&&(rc.bottom>vb-4||rc.top<vv.offsetTop+2);
+    const up=!!f&&(kb>100||vv.height<Math.max(innerHeight,zeusFull[zeusKind()]||0)-100);
+    if(up&&(bk||!handled||covered)){
+      const need=Math.max(kb,covered?Math.ceil(rc.bottom-vb)+24:0,0);
+      const cur=parseFloat(r.style.getPropertyValue('--kb-pad'))||0;
+      r.style.setProperty('--kb-pad',(bk?Math.max(cur,need):need)+'px');b.classList.add('kb-backup');
+      if(!bk||covered)setTimeout(()=>{try{f.scrollIntoView({block:'center',behavior:'smooth'})}catch(e){}},80);
+    }else if(bk){b.classList.remove('kb-backup');r.style.removeProperty('--kb-pad')}
   }
   const sch=()=>{if(!raf)raf=requestAnimationFrame(update)};
   vv.addEventListener('resize',sch);vv.addEventListener('scroll',sch);
   document.addEventListener('focusin',()=>setTimeout(sch,350));
   document.addEventListener('focusout',()=>setTimeout(sch,200));
   addEventListener('orientationchange',()=>setTimeout(sch,700));
+  addEventListener('pageshow',()=>setTimeout(sch,400));
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(sch,400)});
 })();
 function confirmV(){
   draftStage='confirm';fromConfirm=false;
