@@ -102,8 +102,8 @@ input:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(23
 .row:last-child{border:0}.row div{min-width:0;flex:1}
 .row span{display:block;font-size:12px;color:var(--gold);margin-bottom:2px}
 .row p{margin:0;white-space:pre-wrap;word-break:break-word}
-.nick-warn{flex:none;font-size:clamp(18px,2.2vw,24px);line-height:1.2;padding:4px 10px}.nick-warn[hidden]{display:none}
-body.pad-portrait .nick-warn{font-size:clamp(24px,3vw,30px)}
+.nick-warn{flex:none;font-size:clamp(24px,3vw,32px);line-height:1.2;padding:4px 10px}.nick-warn[hidden]{display:none}
+body.pad-portrait .nick-warn{font-size:clamp(30px,3.8vw,40px)}
 .edit{flex:none;padding:6px 12px;font:500 13px 'Noto Sans KR',sans-serif;border-radius:8px;border:1px solid var(--line);background:none;color:var(--gold2);cursor:pointer}
 .done{text-align:center;padding:36px 10px}
 .done h2{font-size:22px;color:var(--gold2)}.done p{color:var(--mut);margin:0}
@@ -2254,14 +2254,14 @@ async function getNickname(uid){
     const r=await fetch(`${CFG.nickUrl}/api/nickname?id=${encodeURIComponent(uid)}`,{signal:ctl.signal});
     const d=await r.json();
     if(!r.ok)throw new Error(d.error||'조회 실패');
-    return d.name;
+    return d;
   }finally{clearTimeout(t)}
 }
 var nickState='idle',nickSeq=0;
 function startNickLookup(uid){
   const seq=++nickSeq;nickState='loading';A.nick='';A.nickFor=uid;renderNickRow();
   (async()=>{
-    try{const n=await getNickname(uid);if(seq!==nickSeq)return;A.nick=n;nickState='ok'}
+    try{const d=await getNickname(uid);if(seq!==nickSeq)return;if(!d.name)throw 0;A.nick=d.name;nickState=d.krw===true?'ok':'nokrw'}
     catch(e){if(seq!==nickSeq)return;nickState='fail'}
     renderNickRow();
   })();
@@ -2269,8 +2269,8 @@ function startNickLookup(uid){
 function renderNickRow(){
   const v=$('nickVal'),w=$('nickWarn'),b=$('send');
   if(v){
-    v.textContent=nickState==='ok'?A.nick:nickState==='loading'?'확인 중...':'확인할 수 없음';
-    if(w)w.hidden=nickState!=='fail';
+    v.textContent=(nickState==='ok'||nickState==='nokrw')?A.nick:nickState==='loading'?'확인 중...':'확인할 수 없음';
+    if(w)w.hidden=nickState!=='fail'&&nickState!=='nokrw';
   }
   if(b)b.disabled=nickState!=='ok';
 }
