@@ -1045,8 +1045,6 @@ body.bt-flipping #brandPanel,body.bt-flipping #brandPanel .hero .logo,body.bt-fl
 <footer class="foot">ZEUS CLAN • ALL RIGHTS RESERVED</footer>
 </div>
 <script>
-// 애니메이션 항상 사용: 기기/브라우저의 '동작 줄이기(prefers-reduced-motion)' 설정을 무시
-// (카카오톡 인앱 브라우저는 이 설정을 전달하지 않아 동작하지만, 크롬은 전달해서 애니메이션이 꺼지던 문제)
 const ZEUS_MOTION={matches:false};
 
 const CFG={
@@ -2274,8 +2272,6 @@ function renderNickRow(){
   }
   if(b)b.disabled=nickState!=='ok';
 }
-// 키보드가 닫혔는데 '키보드 열림' 상태(클래스/높이값)가 남아 화면이 잘리는 현상을
-// 모든 기기·방향에서 자동으로 복구하는 안전장치 (입력칸이 선택돼 있으면 건드리지 않음)
 (function zeusStaleKeyboardGuard(){
   const b=document.body,r=document.documentElement;
   const KB=['keyboard-open','tablet-keyboard-open'];
@@ -2317,13 +2313,10 @@ function stepImpl(i,options={}){
   }
   else if(q.t==='area')f=`<textarea id="zeusAnswerField" ${answerFieldHints} ${q.ph?`placeholder="${esc(q.ph)}"`:''}></textarea>`;
   else f=`<input type="text" id="zeusAnswerField" ${answerFieldHints} ${q.ph?`placeholder="${esc(q.ph)}"`:''}>`;
-  // 네이티브 form 래퍼를 제거해 Chrome Autofill이 비밀번호/결제/주소 폼으로 탐지할 단서를 없앱니다.
   const answerFieldForm=(q.t==='yn'||q.t==='range')?f:`<div class="answer-form" role="group" aria-label="답변 입력">${f}</div>`;
   const stageHtml=`
    <h2>${q.q}</h2>${answerFieldForm}<p class="err" id="err"></p>
    <div class="nav ${i===0?'one':''} ${fromConfirm?'edit-return':''}">${i===0||fromConfirm?'':'<button class="b" id="prev">이전</button>'}<button class="b go" id="next">다음</button></div>`;
-  // 입력칸이 있는 슬라이드끼리 넘어갈 때는 새 입력칸에 포커스를 먼저 옮긴 뒤 이전 슬라이드를 제거해
-  // 키보드가 닫혔다 다시 열리며 화면이 흔들리는 현상을 막습니다.
   const stageEl=$('stage'),prevActive=document.activeElement;
   const keepKeyboard=(q.t==='text'||q.t==='area')&&!!(prevActive&&stageEl.contains(prevActive)&&prevActive.matches&&prevActive.matches('input,textarea'));
   if(keepKeyboard){
@@ -2440,8 +2433,6 @@ if(typeof ResizeObserver!=='undefined'){const rp=$('rightPanel');if(rp)new Resiz
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(scheduleFit);
 function confirmV(){
   draftStage='confirm';fromConfirm=false;
-  // 수정 슬라이드에서 '다음'으로 돌아올 때: 입력칸이 선택된 채 화면이 교체되면
-  // 키보드가 닫혀도 '키보드 열림' 상태가 남아 화면이 잘리므로, 먼저 정식으로 닫는다.
   {
     const a=document.activeElement;
     if(a&&a.matches&&a.matches('input,textarea')){try{a.blur()}catch(e){}}
