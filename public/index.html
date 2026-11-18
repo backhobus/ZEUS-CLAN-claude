@@ -102,8 +102,10 @@ input:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(23
 .row:last-child{border:0}.row div{min-width:0;flex:1}
 .row span{display:block;font-size:12px;color:var(--gold);margin-bottom:2px}
 .row p{margin:0;white-space:pre-wrap;word-break:break-word}
-.nick-warn{flex:none;font-size:clamp(24px,3vw,32px);line-height:1.2;padding:4px 10px}.nick-warn[hidden]{display:none}
-body.pad-portrait .nick-warn{font-size:clamp(30px,3.8vw,40px)}
+.nick-warn{position:relative;border-color:transparent!important;background:none!important;box-shadow:none!important;outline:0!important;color:#ffc83d;cursor:default;pointer-events:none}
+#formBox .row{align-items:center}.nick-warn[hidden]{display:none}
+.nick-warn .nw-sp{visibility:hidden}
+.nick-warn svg{position:absolute;left:50%;top:50%;height:100%;width:auto;transform:translate(-50%,-50%)}
 .edit{flex:none;padding:6px 12px;font:500 13px 'Noto Sans KR',sans-serif;border-radius:8px;border:1px solid var(--line);background:none;color:var(--gold2);cursor:pointer}
 .done{text-align:center;padding:36px 10px}
 .done h2{font-size:22px;color:var(--gold2)}.done p{color:var(--mut);margin:0}
@@ -1045,6 +1047,8 @@ body.bt-flipping #brandPanel,body.bt-flipping #brandPanel .hero .logo,body.bt-fl
 <footer class="foot">ZEUS CLAN • ALL RIGHTS RESERVED</footer>
 </div>
 <script>
+// 애니메이션 항상 사용: 기기/브라우저의 '동작 줄이기(prefers-reduced-motion)' 설정을 무시
+// (카카오톡 인앱 브라우저는 이 설정을 전달하지 않아 동작하지만, 크롬은 전달해서 애니메이션이 꺼지던 문제)
 const ZEUS_MOTION={matches:false};
 
 const CFG={
@@ -2272,6 +2276,8 @@ function renderNickRow(){
   }
   if(b)b.disabled=nickState!=='ok';
 }
+// 키보드가 닫혔는데 '키보드 열림' 상태(클래스/높이값)가 남아 화면이 잘리는 현상을
+// 모든 기기·방향에서 자동으로 복구하는 안전장치 (입력칸이 선택돼 있으면 건드리지 않음)
 (function zeusStaleKeyboardGuard(){
   const b=document.body,r=document.documentElement;
   const KB=['keyboard-open','tablet-keyboard-open'];
@@ -2313,10 +2319,13 @@ function stepImpl(i,options={}){
   }
   else if(q.t==='area')f=`<textarea id="zeusAnswerField" ${answerFieldHints} ${q.ph?`placeholder="${esc(q.ph)}"`:''}></textarea>`;
   else f=`<input type="text" id="zeusAnswerField" ${answerFieldHints} ${q.ph?`placeholder="${esc(q.ph)}"`:''}>`;
+  // 네이티브 form 래퍼를 제거해 Chrome Autofill이 비밀번호/결제/주소 폼으로 탐지할 단서를 없앱니다.
   const answerFieldForm=(q.t==='yn'||q.t==='range')?f:`<div class="answer-form" role="group" aria-label="답변 입력">${f}</div>`;
   const stageHtml=`
    <h2>${q.q}</h2>${answerFieldForm}<p class="err" id="err"></p>
    <div class="nav ${i===0?'one':''} ${fromConfirm?'edit-return':''}">${i===0||fromConfirm?'':'<button class="b" id="prev">이전</button>'}<button class="b go" id="next">다음</button></div>`;
+  // 입력칸이 있는 슬라이드끼리 넘어갈 때는 새 입력칸에 포커스를 먼저 옮긴 뒤 이전 슬라이드를 제거해
+  // 키보드가 닫혔다 다시 열리며 화면이 흔들리는 현상을 막습니다.
   const stageEl=$('stage'),prevActive=document.activeElement;
   const keepKeyboard=(q.t==='text'||q.t==='area')&&!!(prevActive&&stageEl.contains(prevActive)&&prevActive.matches&&prevActive.matches('input,textarea'));
   if(keepKeyboard){
@@ -2433,6 +2442,8 @@ if(typeof ResizeObserver!=='undefined'){const rp=$('rightPanel');if(rp)new Resiz
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(scheduleFit);
 function confirmV(){
   draftStage='confirm';fromConfirm=false;
+  // 수정 슬라이드에서 '다음'으로 돌아올 때: 입력칸이 선택된 채 화면이 교체되면
+  // 키보드가 닫혀도 '키보드 열림' 상태가 남아 화면이 잘리므로, 먼저 정식으로 닫는다.
   {
     const a=document.activeElement;
     if(a&&a.matches&&a.matches('input,textarea')){try{a.blur()}catch(e){}}
@@ -2441,7 +2452,7 @@ function confirmV(){
     const w=document.querySelector('.wrap');if(w)w.scrollTop=0;
   }
   const privacyNotice='<p class="privacy-note">부정 이용 방지를 위해 IP 주소와 운영체제(OS)가 일부 검사됩니다.</p>';
-  const nickRow=`<div class="row"><div><span>닉네임</span><p id="nickVal"></p></div><span class="nick-warn" id="nickWarn" role="img" aria-label="닉네임을 확인할 수 없습니다" title="닉네임을 확인할 수 없습니다" hidden>⚠️</span></div>`;
+  const nickRow=`<div class="row"><div><span>닉네임</span><p id="nickVal"></p></div><span class="edit nick-warn" id="nickWarn" role="img" aria-label="닉네임을 확인할 수 없습니다" title="닉네임을 확인할 수 없습니다" hidden><span class="nw-sp" aria-hidden="true">수정</span><svg viewBox="0 0 24 22" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.6 21.6 19.4H2.4Z" stroke-width="2"/><path d="M12 8.6v5" stroke-width="2.2"/><circle cx="12" cy="16.4" r=".6" stroke-width="1.8"/></svg></span></div>`;
   const answerRows=nickRow+Q.map((q,i)=>`<div class="row"><div><span>${q.l}</span><p>${esc(A[q.k])}${q.t==='range'?'세':''}</p></div><button class="edit" data-i="${i}">수정</button></div>`).join('');
   const confirmDetails=privacyNotice+answerRows;
   $('stage').innerHTML=`<h2>작성하신 내용을<br>마지막으로 확인해주세요.</h2>
